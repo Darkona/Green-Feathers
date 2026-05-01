@@ -1,0 +1,54 @@
+package com.darkona.feathers.basic;
+
+import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.api.SpendResult;
+import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.registry.FeathersIds;
+import com.darkona.feathers.config.FeathersCommonConfig;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
+import static com.darkona.feathers.api.registry.FeathersIds.id;
+
+/**
+ * Sprinting and jumping cost feathers, so Green Feathers does something on its own. Built only on the public API,
+ * as another mod would. Off when Actions of Stamina is installed: it owns player actions.
+ */
+@EventBusSubscriber(modid = FeathersIds.MOD_ID)
+public final class BasicExertion {
+
+    public static final ResourceLocation SPRINT = id("sprint");
+    public static final ResourceLocation JUMP = id("jump");
+
+    private static final boolean ACTIONS_OF_STAMINA = ModList.get().isLoaded("actionsofstamina");
+
+    private BasicExertion() {}
+
+    public static boolean isActive() {
+        return !ACTIONS_OF_STAMINA && FeathersCommonConfig.ENABLE_BASIC_EXERTION.get();
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide() || !isActive() || !player.isSprinting() || player.isPassenger()) return;
+
+        double perSecond = FeathersCommonConfig.SPRINT_FEATHERS_PER_SECOND.get();
+        if (perSecond <= 0) return;
+
+        SpendResult result = FeathersAPI.startDrain(player, SPRINT, Stamina.perTick(perSecond));
+        if (!result.allowed()) player.setSprinting(false);
+    }
+
+    @SubscribeEvent
+    public static void onJump(LivingEvent.LivingJumpEvent event) {
+        if (event.getEntity().level().isClientSide() || !isActive() || !(event.getEntity() instanceof Player player)) return;
+        double feathers = FeathersCommonConfig.JUMP_FEATHERS.get();
+        if (feathers > 0) FeathersAPI.spend(player, JUMP, Stamina.ofFeathers(feathers));
+    }
+}

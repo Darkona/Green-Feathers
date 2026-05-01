@@ -1,0 +1,61 @@
+package com.darkona.feathers.api.spi;
+
+import com.darkona.feathers.api.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+
+/**
+ * Implemented by Green Feathers. Use {@link FeathersAPI}; this interface is not meant for other mods to call or
+ * implement and may change between versions.
+ */
+public interface FeathersService {
+
+    boolean supports(LivingEntity entity);
+
+    FeathersView view(LivingEntity entity);
+
+    SpendResult spend(LivingEntity entity, ResourceLocation source, int stamina, SpendOptions options);
+
+    int gain(LivingEntity entity, ResourceLocation source, int stamina);
+
+    void setStamina(LivingEntity entity, int stamina);
+
+    void reset(LivingEntity entity);
+
+    SpendResult startDrain(LivingEntity entity, ResourceLocation source, double staminaPerTick, DrainOptions options);
+
+    void stopDrain(LivingEntity entity, ResourceLocation source);
+
+    boolean isDraining(LivingEntity entity, ResourceLocation source);
+
+    void blockRegen(LivingEntity entity, ResourceLocation source, int ticks);
+
+    void unblockRegen(LivingEntity entity, ResourceLocation source);
+
+    void addBonusStamina(LivingEntity entity, ResourceLocation source, int stamina, int ticks);
+
+    void removeBonusStamina(LivingEntity entity, ResourceLocation source);
+
+    void setRestBonus(LivingEntity entity, ResourceLocation source, double multiplier, int ticks);
+
+    void removeRestBonus(LivingEntity entity, ResourceLocation source);
+
+    Climate getClimate(LivingEntity entity);
+
+    int getArmorWeight(LivingEntity entity);
+
+    double getPieceWeight(ItemStack stack);
+
+    void recalculateWeight(LivingEntity entity);
+
+    void registerClimateProvider(ResourceLocation id, int priority, ClimateProvider provider);
+
+    void registerRegenFactor(ResourceLocation id, RegenFactor factor);
+
+    void registerWeightSource(ResourceLocation id, WeightSource source);
+
+    void registerStaminaModifier(ResourceLocation id, int ordinal, StaminaModifier modifier);
+
+    void sync(LivingEntity entity);
+}

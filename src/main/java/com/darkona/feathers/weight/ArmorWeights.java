@@ -1,0 +1,206 @@
+package com.darkona.feathers.weight;
+
+import com.darkona.feathers.api.WeightSource;
+import com.darkona.feathers.api.event.ArmorWeightEvent;
+import com.darkona.feathers.api.registry.FeathersAttributes;
+import com.darkona.feathers.api.registry.FeathersDataMaps;
+import com.darkona.feathers.api.registry.FeathersEnchantments;
+import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.core.Extensions;
+import com.darkona.feathers.Feathers;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.neoforged.neoforge.common.NeoForge;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Armor weight: how many feathers worn armor makes unusable.
+ * <p>
+ * A piece's base weight comes from the most specific source that has an answer: a config rule for the item, a
+ * config rule for one of its tags, the {@link FeathersDataMaps#ARMOR_WEIGHT} data map, a config rule for its armor
+ * material and piece, a config rule for its armor material, and for other armor its defense points times
+ * {@code unlisted_armor_weight_per_defense}. Lightweight removes a share per level; Curse of Heaviness doubles it.
+ * The worn total plus every {@link WeightSource} goes through {@link ArmorWeightEvent} and
+ * is then scaled by the armor weight multiplier attribute, and rounded once.
+ */
+public final class ArmorWeights {
+
+    private static final EquipmentSlot[] ARMOR_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+    private static final int UNRESOLVED = -1;
+
+    private record TagRule(TagKey<Item> tag, int weight) {}
+
+    /* Parsed config rules, and the resolved base weight per item. Guarded by the class lock: tooltips read them on
+       the client thread while the integrated server fills them. */
+    private static final Reference2IntOpenHashMap<Item> itemRules = new Reference2IntOpenHashMap<>();
+    private static final List<TagRule> tagRules = new ArrayList<>();
+    private static final Object2IntOpenHashMap<String> materialPieceRules = new Object2IntOpenHashMap<>();
+    private static final Object2IntOpenHashMap<ResourceLocation> materialRules = new Object2IntOpenHashMap<>();
+    private static final Reference2IntOpenHashMap<Item> baseWeightCache = new Reference2IntOpenHashMap<>();
+    private static boolean rulesLoaded;
+
+    static {
+        itemRules.defaultReturnValue(UNRESOLVED);
+        materialPieceRules.defaultReturnValue(UNRESOLVED);
+        materialRules.defaultReturnValue(UNRESOLVED);
+        baseWeightCache.defaultReturnValue(UNRESOLVED);
+    }
+
+    private ArmorWeights() {}
+
+    /**
+     * Forgets parsed rules and cached weights: the config or the datapacks changed.
+     */
+    public static synchronized void invalidate() {
+        rulesLoaded = false;
+        baseWeightCache.clear();
+    }
+
+    private static void loadRules() {
+        if (rulesLoaded) return;
+        itemRules.clear();
+        tagRules.clear();
+        materialPieceRules.clear();
+        materialRules.clear();
+
+        for (String rule : FeathersCommonConfig.ARMOR_WEIGHTS.get()) {
+            int eq = rule.lastIndexOf('=');
+            if (eq <= 0) {
+                Feathers.LOGGER.warn("Armor weight rule '{}' has no '=weight' part, ignored.", rule);
+                continue;
+            }
+            String target = rule.substring(0, eq).trim();
+            int weight;
+            try {
+                weight = Math.max(0, Integer.parseInt(rule.substring(eq + 1).trim()));
+            } catch (NumberFormatException e) {
+                Feathers.LOGGER.warn("Armor weight rule '{}' has a weight that isn't a whole number, ignored.", rule);
+                continue;
+            }
+
+            switch (target.charAt(0)) {
+                case '#' -> {
+                    ResourceLocation id = ResourceLocation.tryParse(target.substring(1));
+                    if (id != null) tagRules.add(new TagRule(TagKey.create(Registries.ITEM, id), weight));
+                    else Feathers.LOGGER.warn("Armor weight rule '{}' has an invalid tag, ignored.", rule);
+                }
+                case '@' -> {
+                    String material = target.substring(1);
+                    int slash = material.indexOf('/');
+                    ResourceLocation id = ResourceLocation.tryParse(slash < 0 ? material : material.substring(0, slash));
+                    if (id == null) Feathers.LOGGER.warn("Armor weight rule '{}' has an invalid material, ignored.", rule);
+                    else if (slash < 0) materialRules.put(id, weight);
+                    else materialPieceRules.put(id + "/" + material.substring(slash + 1), weight);
+                }
+                default -> {
+                    ResourceLocation id = ResourceLocation.tryParse(target);
+                    if (id != null && BuiltInRegistries.ITEM.containsKey(id)) itemRules.put(BuiltInRegistries.ITEM.get(id), weight);
+                    else Feathers.LOGGER.warn("Armor weight rule '{}' names an unknown item, ignored.", rule);
+                }
+            }
+        }
+        rulesLoaded = true;
+    }
+
+    /**
+     * The weight of an item before enchantments.
+     */
+    public static synchronized int baseWeight(ItemStack stack) {
+        if (stack.isEmpty()) return 0;
+        Item item = stack.getItem();
+        int cached = baseWeightCache.getInt(item);
+        if (cached != UNRESOLVED) return cached;
+
+        int weight = resolveBaseWeight(stack);
+        baseWeightCache.put(item, weight);
+        return weight;
+    }
+
+    private static int resolveBaseWeight(ItemStack stack) {
+        loadRules();
+        Item item = stack.getItem();
+
+        int weight = itemRules.getInt(item);
+        if (weight != UNRESOLVED) return weight;
+
+        for (TagRule rule : tagRules) {
+            if (stack.is(rule.tag())) return rule.weight();
+        }
+
+        Integer mapped = stack.getItemHolder().getData(FeathersDataMaps.ARMOR_WEIGHT);
+        if (mapped != null) return mapped;
+
+        if (item instanceof ArmorItem armor) {
+            ResourceLocation material = armor.getMaterial().unwrapKey().map(ResourceKey::location).orElse(null);
+            if (material != null) {
+                weight = materialPieceRules.getInt(material + "/" + armor.getType().getName());
+                if (weight != UNRESOLVED) return weight;
+                weight = materialRules.getInt(material);
+                if (weight != UNRESOLVED) return weight;
+            }
+            return (int) Math.round(armor.getDefense() * FeathersCommonConfig.UNLISTED_ARMOR_WEIGHT_PER_DEFENSE.get());
+        }
+        return 0;
+    }
+
+    /**
+     * One piece's weight with its enchantments. Fractional: totals are rounded once.
+     */
+    public static double pieceWeight(ItemStack stack) {
+        int base = baseWeight(stack);
+        if (base == 0) return 0;
+        int lightweight = enchantmentLevel(FeathersEnchantments.LIGHTWEIGHT, stack);
+        int heavy = enchantmentLevel(FeathersEnchantments.HEAVY, stack);
+        double lightness = Math.max(0.0, 1.0 - lightweight * FeathersCommonConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
+        return base * lightness * (1 + heavy);
+    }
+
+    /**
+     * The entity's weight: armor plus weight sources, after the event and the multiplier. 0 when disabled.
+     */
+    public static int totalWeight(LivingEntity entity) {
+        if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) return 0;
+
+        double total = 0;
+        for (EquipmentSlot slot : ARMOR_SLOTS) {
+            total += pieceWeight(entity.getItemBySlot(slot));
+        }
+        for (Extensions.WeightEntry source : Extensions.weightSources()) {
+            total += source.source().weight(entity);
+        }
+
+        double weight = NeoForge.EVENT_BUS.post(new ArmorWeightEvent(entity, total)).getWeight();
+
+        AttributeInstance multiplier = entity.getAttribute(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER);
+        if (multiplier != null) weight *= multiplier.getValue();
+
+        return Math.max(0, (int) Math.round(weight));
+    }
+
+    /**
+     * Reads the level straight from the stack's enchantments, so no registry access is needed.
+     */
+    public static int enchantmentLevel(ResourceKey<Enchantment> enchantment, ItemStack stack) {
+        if (stack.isEmpty() || !stack.isEnchanted()) return 0;
+        for (Object2IntMap.Entry<Holder<Enchantment>> e : stack.getTagEnchantments().entrySet()) {
+            if (e.getKey().is(enchantment)) return e.getIntValue();
+        }
+        return 0;
+    }
+}

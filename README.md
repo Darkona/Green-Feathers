@@ -1,38 +1,76 @@
 # Green Feathers
 
-Green Feathers is a fork of Feathers, a stamina mod for Minecraft. It add Stamina in the form of Feathers that can be consumed to do things by other mods through an API. Green Feathers provides the Stamina system, regeneration and methods to alter, spend, and otherwise make use of the system. It aims to be highly configurable and easy to use by other mods.
+**Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods
+decide cost feathers. Run out and you can push on for a while, at a price.
 
-## Installation
+Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers
 
-Simply drag and drop the mod downloaded from the files section *URL PENDING* into your mods folder after installing [Minecraft Forge](files.minecraftforge.net).
-The mods folder is located at  ```%appdata%/.minecraft/mods```.
+![Feathers above the food bar, with a golden row of Endurance feathers](docs/images/hud.png)
 
-## Developer Information
+## How it plays
 
-Adding support to Green Feathers is easy. To import it, simply add this line to your ```build.gradle``` file's ```repositories```.
+- **Feathers come back on their own**, a little every second, after a short pause once you've spent some.
+- **Push past empty.** When you run out you can keep going into red *Strain* feathers. Regeneration pays Strain
+  back before anything else, slowly, so overdoing it leaves you drained for a while.
+- **Rest to recover.** Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods)
+  pays Strain back faster. Sleep restores everything.
+- **Exhaustion.** Spend absolutely everything and you're exhausted: no exerting yourself until you've caught your
+  breath.
+- **Weather and climate matter.** Cold weather slows your recovery. Heat makes everything cost double, and the
+  Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
+- **Heavy armor weighs you down** (optional). Every piece greys out some feathers you can't use. Netherite is heavy;
+  the *Lightweight* enchantment and the *Feather Ring* help.
+- **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
-```gradle
-repositories {
-     maven { url "https://www.cursemaven.com" }
-}
+On its own, Green Feathers makes sprinting and jumping cost feathers. Install
+[Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and
+movement mods like ParCool, Paragliders and Better Combat.
+
+## Plays well with others
+
+It stacks neatly with the other bars on the right: food, air bubbles, thirst.
+
+| ![With Cold Sweat and Thirst Was Taken](docs/images/hud-thirst.png) | ![Underwater in iron armor](docs/images/hud-underwater-armor.png) |
+|---|---|
+| With Cold Sweat and Thirst Was Taken | Underwater, in iron armor (grey = weight) |
+
+Supported out of the box, each switchable in the config:
+
+| Mod | What it does with feathers |
+|---|---|
+| Cold Sweat | Your body temperature decides when you're cold or overheating |
+| Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
+| Legendary Survival Overhaul | The same, from its temperature and hydration |
+| Thirst Was Taken | Being thirsty slows recovery, being well quenched speeds it up |
+| Serene Seasons | Winter outdoors is cold, summer sun is hot |
+| Curios | The Feather Ring goes in a ring slot |
+| AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
+
+## Configuration
+
+Everything is configurable in `config/feathers/`: how many feathers, how fast they come back, Strain, exhaustion,
+each effect, resting, armor weights per item or material, basic sprint/jump costs, each compat, and the HUD.
+
+## For mod developers
+
+Green Feathers is built to be spent by other mods. Compile against the API jar and treat it as optional:
+
+```groovy
+compileOnly "com.darkona.feathers:greenfeathers-api:1.21.1-2.0.0"
 ```
-And this to your project's dependencies.
-```gradle
-dependencies {
-	implementation fg.deobf("curse.maven:feathers-PENDING:FILE_VERSION") 
-}
+
+```java
+// A one-off cost. EXEMPT (creative players) also means "go ahead".
+if (FeathersAPI.spend(player, MY_DASH, Stamina.ofFeathers(3)).allowed()) dash(player);
+
+// A continuous cost: call every tick while it lasts, stop when it's refused.
+if (!FeathersAPI.startDrain(player, MY_GLIDE, Stamina.perTick(1.5)).allowed()) stopGliding(player);
 ```
-Where ```FILE_VERSION``` is the file ID of the version you want to use. You can find this by opening the URL of an Feathers file download and looking at the url. The numbers at the end are the file ID.
 
-Then simply run your gradle setup commands as normal, e.g. ```gradlew genEclipseRuns``` then ```gradlew eclipse```.
-
-You now have access to Feathers API and code! The API is pretty self explanatory but if you need any help, feel free to private message me [here](https://www.curseforge.com/members/elenaidev/followers)!
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+Costs can be fractions of a feather. The API also covers pausing regeneration, temporary bonus feathers, rest
+bonuses, and hooks for temperature, thirst and weight mods. Its classes are documented;
+`com.darkona.feathers.api.FeathersAPI` is the place to start.
 
 ## License
-[Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 
+[GNU GPL v3](LICENSE).

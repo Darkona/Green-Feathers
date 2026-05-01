@@ -1,68 +1,76 @@
 package com.darkona.feathers.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
-public class FeathersClientConfig {
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SPEC;
+public final class FeathersClientConfig {
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> REGEN_EFFECT;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> FROST_SOUND;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> DISPLAY_WEIGHTS;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> VISUAL_WEIGHTS;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> AFFECTED_BY_RIGHT_HEIGHT;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> FADE_WHEN_FULL;
+    public static final ModConfigSpec SPEC;
 
-    public static final ForgeConfigSpec.ConfigValue<Integer> X_OFFSET;
-    public static final ForgeConfigSpec.ConfigValue<Integer> Y_OFFSET;
-
-    public static final ForgeConfigSpec.ConfigValue<Integer> FADE_IN_COOLDOWN;
-    public static final ForgeConfigSpec.ConfigValue<Integer> FADE_OUT_COOLDOWN;
-    public static final ForgeConfigSpec.ConfigValue<Integer> FADE_COOLDOWN;
-
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ALTERNATIVE_FEATHER_COLOR;
+    public static final BooleanValue FADE_WHEN_FULL;
+    public static final IntValue FADE_COOLDOWN;
+    public static final IntValue FADE_IN_DURATION;
+    public static final IntValue FADE_OUT_DURATION;
+    public static final BooleanValue REGEN_EFFECT;
+    public static final BooleanValue FROST_SOUND;
+    public static final BooleanValue DISPLAY_WEIGHTS;
+    public static final BooleanValue VISUAL_WEIGHTS;
+    public static final BooleanValue AFFECTED_BY_RIGHT_HEIGHT;
+    public static final IntValue X_OFFSET;
+    public static final IntValue Y_OFFSET;
+    public static final BooleanValue ALTERNATIVE_FEATHER_COLOR;
 
     static {
-        BUILDER.push("Feathers' Config");
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
-        FADE_WHEN_FULL = BUILDER.comment("Fade the HUD overlay if the feathers are full.")
-                                .define("Fade When Full", false);
+        builder.push("hud");
 
-        FADE_COOLDOWN = BUILDER.comment("Duration (in ticks) before the HUD overlay fades.")
-                               .define("Fade Cooldown", 60);
+        FADE_WHEN_FULL = builder.comment("Fade the feathers out while they are full.")
+                .define("fade_when_full", false);
 
-        FADE_IN_COOLDOWN = BUILDER.comment("Duration (in ticks) of the HUD Fade-in animation.")
-                                  .define("Fade-in Duration", 40);
+        FADE_COOLDOWN = builder.comment("Ticks full before the feathers fade.")
+                .defineInRange("fade_cooldown_ticks", 60, 0, 1200);
 
-        FADE_OUT_COOLDOWN = BUILDER.comment("Duration (in ticks) of the HUD Fade-out animation.")
-                                   .define("Fade-out Duration", 40);
+        FADE_IN_DURATION = builder.comment("Ticks the fade-in takes.")
+                .defineInRange("fade_in_ticks", 40, 1, 1200);
 
-        REGEN_EFFECT = BUILDER.comment("Whether the feathers flash white when regenerating.")
-                              .define("Regeneration Effect", false);
+        FADE_OUT_DURATION = builder.comment("Ticks the fade-out takes.")
+                .defineInRange("fade_out_ticks", 40, 1, 1200);
 
-        FROST_SOUND = BUILDER.comment("Whether a sound is played when feathers freeze in cold biomes")
-                             .define("Cold Sound Effect", true);
+        REGEN_EFFECT = builder.comment("Flash the feathers when one regenerates.")
+                .define("regen_flash", false);
 
-        DISPLAY_WEIGHTS = BUILDER.comment("Whether armor weights are displayed when hovering over an item")
-                                 .define("Display Weights in Inventory", true);
+        AFFECTED_BY_RIGHT_HEIGHT = builder.comment("Stack the feathers with the other bars on the right (food, air, thirst...).",
+                        "Off: always draw them right above the food bar and let other bars sort themselves out.")
+                .define("stack_with_right_bars", true);
 
-        VISUAL_WEIGHTS = BUILDER.comment("Whether armor weights are displayed as icons (true) or text (false) when hovering over an item")
-                                .define("Display Weight As Icons", false);
+        X_OFFSET = builder.comment("Horizontal offset of the feathers, in pixels.")
+                .defineInRange("x_offset", 0, -1000, 1000);
 
-        AFFECTED_BY_RIGHT_HEIGHT = BUILDER.comment("Whether feather icons are affected by icons on the right side of the HUD.")
-                                          .define("Feathers Affected by Right Side Icons", true);
+        Y_OFFSET = builder.comment("Vertical offset of the feathers, in pixels. Negative moves them up.")
+                .defineInRange("y_offset", 0, -1000, 1000);
 
-        X_OFFSET = BUILDER.comment("How far left or right you want the feathers to be")
-                          .define("HUD X Offset", 0);
+        ALTERNATIVE_FEATHER_COLOR = builder.comment("Green feathers (true) or Elenai's original blue ones (false).")
+                .define("green_feathers", true);
 
-        Y_OFFSET = BUILDER
-                .comment("How far up or down you want the feathers to be. TIP: use this for compatibility with mods that add other bars such as thirst")
-                .define("HUD Y Offset", 0);
+        builder.pop();
 
-        ALTERNATIVE_FEATHER_COLOR = BUILDER
-                .comment("Use Green Feathers color for the feathers (true) or the original Elenai's Blue feathers (false)")
-                .define("Alternative Feather Color", true);
-        BUILDER.pop();
-        SPEC = BUILDER.build();
+        builder.push("feedback");
+
+        FROST_SOUND = builder.comment("Play a sound when the Cold effect freezes the feathers.")
+                .define("cold_sound", true);
+
+        DISPLAY_WEIGHTS = builder.comment("Show armor weight in item tooltips.")
+                .define("weight_in_tooltips", true);
+
+        VISUAL_WEIGHTS = builder.comment("Show tooltip weights as feather icons (true) or as text (false).")
+                .define("weight_as_icons", false);
+
+        builder.pop();
+
+        SPEC = builder.build();
     }
+
+    private FeathersClientConfig() {}
 }

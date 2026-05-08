@@ -12,6 +12,18 @@ DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TIMEOUT="${1:-300}"
 cd "$DIR" || exit 2
 RUN=run
+# Every process this run starts carries this tag in its environment, and cleanup kills only those: other checks,
+# other projects' clients and the shared Gradle daemon are never touched.
+export BOOTCHECK_TAG="$(basename "$DIR")-bootcheck-$$-$(date +%s)"
+own_processes() {
+    for d in /proc/[0-9]*; do
+        p=${d#/proc/}
+        [ "$p" = "$$" ] && continue
+        grep -qzx "BOOTCHECK_TAG=$BOOTCHECK_TAG" "$d/environ" 2>/dev/null || continue
+        tr '\0' ' ' < "$d/cmdline" 2>/dev/null | grep -q GradleDaemon && continue
+        echo "$p"
+    done
+}
 # A superflat world of its own (no structures, no caves to spawn in): generated once by a dedicated server run.
 BOOTWORLD="$RUN/bootworld"
 if [ ! -f "$BOOTWORLD/level.dat" ]; then
@@ -31,7 +43,7 @@ PROPS_EOF
     ./gradlew runServer --no-configuration-cache > "$GEN_LOG" 2>&1 &
     GEN=$!
     for _ in $(seq 1 300); do grep -qE 'Done \(' "$GEN_LOG" && break; kill -0 $GEN 2>/dev/null || break; sleep 1; done
-    for p in $(pgrep java); do [ "$(readlink /proc/$p/cwd)" = "$DIR/$RUN" ] && kill $p; done
+    kill $(own_processes) 2>/dev/null
     wait $GEN 2>/dev/null
     if [ -f "$PROPS.bootcheck-backup" ]; then mv "$PROPS.bootcheck-backup" "$PROPS"; else rm -f "$PROPS"; fi
     [ -f "$BOOTWORLD/level.dat" ] || { echo "BOOTCHECK: could not generate the superflat world (see $GEN_LOG)"; exit 2; }
@@ -66,7 +78,7 @@ GAME_LOG="$RUN/logs/latest.log"; rm -f "$GAME_LOG"
 SHOT="${SHOT:-build/client-boot-check.png}"; rm -f "$SHOT"
 
 export LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe MESA_GL_VERSION_OVERRIDE=3.3 MESA_GLSL_VERSION_OVERRIDE=330
-XAUTH="$DIR/build/client-boot-check.xauth"
+XAUTH="$DIR/build/$BOOTCHECK_TAG.xauth"
 xvfb-run -n 97 -f "$XAUTH" -s "-screen 0 1280x720x24" ./gradlew runBootCheck --no-configuration-cache ${COMPAT:+-Pcompat=$COMPAT} > "$LOG" 2>&1 &
 PID=$!
 logs() { cat "$LOG" "$GAME_LOG" 2>/dev/null; }
@@ -101,11 +113,8 @@ for _ in $(seq 1 "$TIMEOUT"); do
     sleep 1
 done
 
-# Only this project's game: the JVM running in its run dir. Other clients on the machine (other checks, other
-# projects' runs) are left alone, whatever their command line looks like.
-own_games() { for p in $(pgrep java); do [ "$(readlink /proc/$p/cwd)" = "$DIR/$RUN" ] && echo $p; done; }
-kill $(own_games) $PID 2>/dev/null; sleep 3; kill -9 $(own_games) 2>/dev/null
-pkill -f -- "-auth $XAUTH" 2>/dev/null; rm -f "$XAUTH"
+kill $(own_processes) 2>/dev/null; sleep 3; kill -9 $(own_processes) 2>/dev/null
+rm -f "$XAUTH"
 echo "BOOTCHECK: $verdict"
 logs | grep -E "$FAIL_RE" | head -5
 logs | grep -E "$OK_RE" | head -2

@@ -95,8 +95,11 @@ public final class FeatherColors {
         int cached = SHADES.get(key);
         if (cached != -1) return cached;
         float[] hsl = hsl(rgb);
-        float step = 0.34f * layer;
-        float lightness = hsl[2] >= 0.5f ? Math.max(0.2f, hsl[2] - step) : Math.min(0.86f, hsl[2] + step);
+        // Away from the base, and once that runs out of room, back past it to the other side, so layers never merge.
+        float direction = hsl[2] >= 0.5f ? -1f : 1f;
+        float lightness = hsl[2] + direction * 0.34f * layer;
+        if (lightness < 0.19f || lightness > 0.87f) lightness = hsl[2] - direction * 0.25f * (layer - 1);
+        lightness = Math.clamp(lightness, 0.2f, 0.86f);
         int shaded = rgb(hsl[0], hsl[1], lightness);
         SHADES.put(key, shaded);
         return shaded;

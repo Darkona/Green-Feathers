@@ -31,7 +31,7 @@ PROPS_EOF
     ./gradlew runServer --no-configuration-cache > "$GEN_LOG" 2>&1 &
     GEN=$!
     for _ in $(seq 1 300); do grep -qE 'Done \(' "$GEN_LOG" && break; kill -0 $GEN 2>/dev/null || break; sleep 1; done
-    for p in $(pgrep -f java); do [ "$(readlink /proc/$p/cwd)" = "$DIR/$RUN" ] && kill $p; done
+    for p in $(pgrep java); do [ "$(readlink /proc/$p/cwd)" = "$DIR/$RUN" ] && kill $p; done
     wait $GEN 2>/dev/null
     if [ -f "$PROPS.bootcheck-backup" ]; then mv "$PROPS.bootcheck-backup" "$PROPS"; else rm -f "$PROPS"; fi
     [ -f "$BOOTWORLD/level.dat" ] || { echo "BOOTCHECK: could not generate the superflat world (see $GEN_LOG)"; exit 2; }
@@ -101,7 +101,10 @@ for _ in $(seq 1 "$TIMEOUT"); do
     sleep 1
 done
 
-pkill -f -- "bootCheckRun(Program|Vm)Args" 2>/dev/null; kill $PID 2>/dev/null; sleep 3; pkill -9 -f -- "bootCheckRun(Program|Vm)Args" 2>/dev/null
+# Only this project's game: the JVM running in its run dir. Other clients on the machine (other checks, other
+# projects' runs) are left alone, whatever their command line looks like.
+own_games() { for p in $(pgrep java); do [ "$(readlink /proc/$p/cwd)" = "$DIR/$RUN" ] && echo $p; done; }
+kill $(own_games) $PID 2>/dev/null; sleep 3; kill -9 $(own_games) 2>/dev/null
 pkill -f -- "-auth $XAUTH" 2>/dev/null; rm -f "$XAUTH"
 echo "BOOTCHECK: $verdict"
 logs | grep -E "$FAIL_RE" | head -5

@@ -3,6 +3,7 @@ package com.darkona.feathers.core;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.event.DrainEvent;
 import com.darkona.feathers.api.event.ExhaustionEvent;
+import com.darkona.feathers.api.event.RegenEvent;
 import com.darkona.feathers.api.event.StrainEvent;
 import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
@@ -11,6 +12,8 @@ import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.climate.ClimateEffects;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.effect.ModEffects;
+import com.darkona.feathers.mount.MountExertion;
+import com.darkona.feathers.mount.MountTraits;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.weight.ArmorWeights;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +39,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
+import java.util.Arrays;
+
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 
 /**
@@ -55,12 +60,19 @@ public final class FeathersTicker {
 
     /* Mod bus, registered from the mod constructor */
 
+    /**
+     * Every living entity type gets the feathers attributes, so any mod's creature can become a mount (by extending
+     * the horse or through the mounts tag). Instances are only created for entities that read them.
+     */
     public static void addAttributes(EntityAttributeModificationEvent event) {
-        event.add(EntityType.PLAYER, FeathersAttributes.MAX_FEATHERS);
-        event.add(EntityType.PLAYER, FeathersAttributes.MAX_STRAIN);
-        event.add(EntityType.PLAYER, FeathersAttributes.FEATHERS_PER_SECOND);
-        event.add(EntityType.PLAYER, FeathersAttributes.USAGE_MULTIPLIER);
-        event.add(EntityType.PLAYER, FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER);
+        for (EntityType<? extends LivingEntity> type : event.getTypes()) {
+            if (event.has(type, FeathersAttributes.MAX_FEATHERS)) continue;
+            event.add(type, FeathersAttributes.MAX_FEATHERS);
+            event.add(type, FeathersAttributes.MAX_STRAIN);
+            event.add(type, FeathersAttributes.FEATHERS_PER_SECOND);
+            event.add(type, FeathersAttributes.USAGE_MULTIPLIER);
+            event.add(type, FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER);
+        }
     }
 
     public static void onConfigChanged(ModConfigEvent event) {
@@ -128,14 +140,18 @@ public final class FeathersTicker {
     /**
      * Attribute bases come from the common config.
      */
-    private static void refreshFromConfig(LivingEntity entity) {
-        setBase(entity.getAttribute(FeathersAttributes.MAX_FEATHERS), FeathersCommonConfig.MAX_FEATHERS.get());
+    static void refreshFromConfig(LivingEntity entity) {
+        boolean player = entity instanceof Player;
+        // A mount's max feathers is its own hidden trait, rolled once (see MountTraits); a player's comes from the config.
+        if (player) setBase(entity.getAttribute(FeathersAttributes.MAX_FEATHERS), FeathersCommonConfig.MAX_FEATHERS.get());
+        else MountTraits.ensureRolled(entity);
         setBase(entity.getAttribute(FeathersAttributes.MAX_STRAIN), FeathersCommonConfig.MAX_STRAIN.get());
-        setBase(entity.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND), FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get());
+        setBase(entity.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND), player ? FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()
+                : FeathersServiceImpl.mountStats(entity).regenPerSecond().orElseGet(FeathersCommonConfig.MOUNT_REGEN));
         FeathersData data = FeathersServiceImpl.data(entity);
         FeathersServiceImpl.ensureInitialized(entity, data);
         FeathersServiceImpl.refreshMaximums(entity, data);
-        data.weight = ArmorWeights.totalWeight(entity);
+        data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
         data.forceSync = true;
     }
 
@@ -167,7 +183,8 @@ public final class FeathersTicker {
 
             if (entity.tickCount % ATTRIBUTE_INTERVAL == 0) tickAttributes(entity, data);
             if (entity.tickCount % REGEN_FACTOR_INTERVAL == 0) applyRegenFactors(entity, data);
-            if (entity.tickCount % ClimateEffects.INTERVAL == 0) {
+            // Climate is a player thing for now; mounts only tire.
+            if (entity instanceof Player && entity.tickCount % ClimateEffects.INTERVAL == 0) {
                 data.climate = ClimateEffects.evaluate(entity);
                 ClimateEffects.apply(entity, data.climate);
             }
@@ -200,7 +217,7 @@ public final class FeathersTicker {
         double value = multiplier != null ? multiplier.getValue() : 1.0;
         if (value != data.lastWeightMultiplier) {
             data.lastWeightMultiplier = value;
-            data.weight = ArmorWeights.totalWeight(entity);
+            data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
         }
 
         if (entity.hasEffect(FeathersMobEffects.ENDURANCE) && data.bonus(ModEffects.ENDURANCE_BONUS) == null) {
@@ -280,6 +297,7 @@ public final class FeathersTicker {
                     int cost = FeathersServiceImpl.effectiveCost(entity, data, drain.source, base);
                     if (data.canPay(cost, drain.allowStrain, strainEnabled)) {
                         FeathersServiceImpl.payAndSettle(entity, data, cost, strainEnabled);
+                        data.logSpend(drain.source, cost, now);
                     } else {
                         stop = DrainEvent.Stopped.Reason.INSUFFICIENT;
                         FeathersServiceImpl.checkExhausted(entity, data, strainEnabled);
@@ -310,7 +328,12 @@ public final class FeathersTicker {
                     && player.getFoodData().getFoodLevel() <= HUNGRY_FOOD_LEVEL;
             if (blocked || hungry) {
                 data.regenCarry = 0;
+                data.regenPaused = true;
                 return;
+            }
+            if (data.regenPaused && data.stamina < data.maxStamina) {
+                if (NeoForge.EVENT_BUS.post(new RegenEvent(entity)).isCanceled()) return;
+                data.regenPaused = false;
             }
             if (FeathersCommonConfig.REST_BOOSTS_REGEN.get()) perTick *= data.restMultiplier;
         }
@@ -380,7 +403,10 @@ public final class FeathersTicker {
      * exhaustion, the regeneration pause, rest.
      */
     private static void syncIfChanged(LivingEntity entity, FeathersData data) {
-        if (!(entity instanceof ServerPlayer player)) return;
+        // A player's own feathers go to that player; a mount's go to whoever rides it.
+        ServerPlayer player = entity instanceof ServerPlayer self ? self
+                : MountExertion.riderOf(entity) instanceof ServerPlayer rider ? rider : null;
+        if (player == null) return;
 
         int shownStamina = FeathersCommonConfig.DEBUG_MODE.get() ? data.stamina : Stamina.toFeathers(data.stamina);
         int shownStrain = Stamina.toFeathersCeil(data.strain);
@@ -390,7 +416,7 @@ public final class FeathersTicker {
         if (!data.forceSync && shownStamina == data.syncedStamina && data.maxStamina == data.syncedMax
                 && shownStrain == data.syncedStrain && data.maxStrain == data.syncedMaxStrain && shownBonus == data.syncedBonus
                 && data.weight == data.syncedWeight && data.exhausted == data.syncedExhausted && delayed == data.syncedDelayed
-                && data.restState == data.syncedRest) return;
+                && data.restState == data.syncedRest && Arrays.equals(data.weightParts, data.syncedWeightParts)) return;
 
         data.forceSync = false;
         data.syncedStamina = shownStamina;
@@ -402,6 +428,7 @@ public final class FeathersTicker {
         data.syncedExhausted = data.exhausted;
         data.syncedDelayed = delayed;
         data.syncedRest = data.restState;
-        FeathersNetwork.sendSync(player, data);
+        System.arraycopy(data.weightParts, 0, data.syncedWeightParts, 0, data.weightParts.length);
+        FeathersNetwork.sendSync(player, entity, data);
     }
 }

@@ -5,6 +5,7 @@ import com.darkona.feathers.api.Climate;
 import com.darkona.feathers.api.ClimateProvider;
 import com.darkona.feathers.api.DrainOptions;
 import com.darkona.feathers.api.FeathersView;
+import com.darkona.feathers.api.MountStats;
 import com.darkona.feathers.api.RegenFactor;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
@@ -17,6 +18,8 @@ import com.darkona.feathers.api.event.GainEvent;
 import com.darkona.feathers.api.event.SpendEvent;
 import com.darkona.feathers.api.event.StrainEvent;
 import com.darkona.feathers.api.registry.FeathersAttributes;
+import com.darkona.feathers.api.registry.FeathersDataMaps;
+import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.spi.FeathersService;
 import com.darkona.feathers.config.FeathersCommonConfig;
 import com.darkona.feathers.network.FeathersNetwork;
@@ -24,8 +27,10 @@ import com.darkona.feathers.weight.ArmorWeights;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import net.neoforged.neoforge.common.NeoForge;
 
 /**
@@ -42,6 +47,12 @@ public final class FeathersServiceImpl implements FeathersService {
     public interface ClientBridge {
         boolean isLocalPlayer(LivingEntity entity);
 
+        /**
+         * The client's feathers for the local player or its mount, or null for any other entity.
+         */
+        @Nullable
+        FeathersView clientView(LivingEntity entity);
+
         FeathersView localView();
 
         SpendResult predictSpend(int stamina, boolean allowStrain);
@@ -57,9 +68,31 @@ public final class FeathersServiceImpl implements FeathersService {
 
     /* Access */
 
+    /**
+     * Players always; mounts (horses, donkeys, mules, camels...) when enabled in the config.
+     */
     @Override
     public boolean supports(LivingEntity entity) {
-        return entity instanceof Player;
+        return entity instanceof Player || isMount(entity);
+    }
+
+    /**
+     * Horses and anything extending them, plus the entity types in the {@code greenfeathers:mounts} tag or the
+     * {@code greenfeathers:mount_stats} data map: modpacks can give feathers to any creature with data alone.
+     */
+    public static boolean isMount(LivingEntity entity) {
+        if (entity instanceof Player || !FeathersCommonConfig.ENABLE_MOUNTS.get() || entity.getType().is(FeathersIds.NO_FEATHERS)) return false;
+        boolean mount = entity instanceof AbstractHorse || entity.getType().is(FeathersIds.MOUNTS)
+                || entity.getType().builtInRegistryHolder().getData(FeathersDataMaps.MOUNT_STATS) != null;
+        return mount && entity.getAttribute(FeathersAttributes.MAX_FEATHERS) != null;
+    }
+
+    /**
+     * The creature's mount tuning from the data map, or {@link MountStats#DEFAULT} (the config) without an entry.
+     */
+    public static MountStats mountStats(LivingEntity entity) {
+        MountStats stats = entity.getType().builtInRegistryHolder().getData(FeathersDataMaps.MOUNT_STATS);
+        return stats != null ? stats : MountStats.DEFAULT;
     }
 
     /**
@@ -83,7 +116,8 @@ public final class FeathersServiceImpl implements FeathersService {
         if (onClient(entity)) {
             // The client only knows its own player's feathers.
             ClientBridge bridge = clientBridge;
-            return bridge != null && bridge.isLocalPlayer(entity) ? bridge.localView() : FeathersView.NONE;
+            FeathersView known = bridge != null ? bridge.clientView(entity) : null;
+            return known != null ? known : FeathersView.NONE;
         }
         FeathersData data = data(entity);
         ensureInitialized(entity, data);
@@ -102,7 +136,7 @@ public final class FeathersServiceImpl implements FeathersService {
             data.stamina = data.maxStamina;
             data.fresh = false;
         }
-        data.weight = ArmorWeights.totalWeight(entity);
+        data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
         data.forceSync = true;
     }
 
@@ -172,6 +206,7 @@ public final class FeathersServiceImpl implements FeathersService {
         if (!data.canPay(cost, options.allowStrain(), strainEnabled)) return SpendResult.INSUFFICIENT;
 
         payAndSettle(entity, data, cost, strainEnabled);
+        data.logSpend(source, cost, entity.level().getGameTime());
 
         applyRegenDelay(data, options);
 
@@ -362,7 +397,7 @@ public final class FeathersServiceImpl implements FeathersService {
     public void recalculateWeight(LivingEntity entity) {
         if (!supports(entity) || onClient(entity)) return;
         FeathersData data = data(entity);
-        data.weight = ArmorWeights.totalWeight(entity);
+        data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
     }
 
     /* Extension points */

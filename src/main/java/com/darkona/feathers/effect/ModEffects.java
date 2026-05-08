@@ -57,7 +57,8 @@ public final class ModEffects {
             public boolean canApply(LivingEntity entity) {
                 if (!super.canApply(entity) || !FeathersCommonConfig.ENABLE_COLD.get()) return false;
                 if (!ColdSweatCompat.canApplyCold(entity)) return false;
-                return !entity.hasEffect(FeathersMobEffects.ENERGIZED);
+                // Cold and Heat never coexist: the climate swaps one for the other, potions can't stack them.
+                return !entity.hasEffect(FeathersMobEffects.ENERGIZED) && !entity.hasEffect(FeathersMobEffects.HOT);
             }
         }.addAttributeModifier(FEATHERS_PER_SECOND, id("effect.cold"), -0.5, ADD_MULTIPLIED_TOTAL));
 
@@ -69,7 +70,7 @@ public final class ModEffects {
             public boolean canApply(LivingEntity entity) {
                 if (!super.canApply(entity) || !FeathersCommonConfig.ENABLE_HEAT.get() || isProtectedFromHeat(entity)) return false;
                 if (!ColdSweatCompat.canApplyHeat(entity)) return false;
-                return !entity.hasEffect(FeathersMobEffects.MOMENTUM);
+                return !entity.hasEffect(FeathersMobEffects.MOMENTUM) && !entity.hasEffect(FeathersMobEffects.COLD);
             }
         }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.hot"), 1.0, ADD_VALUE));
 
@@ -85,7 +86,8 @@ public final class ModEffects {
             public boolean canApply(LivingEntity entity) {
                 return super.canApply(entity) && FeathersCommonConfig.ENABLE_MOMENTUM.get();
             }
-        }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.momentum"), -0.5, ADD_MULTIPLIED_TOTAL));
+        // Half the cost at level I, 35% at II, never below 20%: never free.
+        }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.momentum"), ADD_MULTIPLIED_TOTAL, amplifier -> Math.max(-0.8, -0.5 - 0.15 * amplifier)));
 
         // Shown while paying Strain back; the regeneration penalty is what makes Strain costly.
         EFFECTS.register("strain", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0x7E4488) {

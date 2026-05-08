@@ -1,19 +1,42 @@
 #!/usr/bin/env bash
-# Boots the real client headless (Xvfb + Mesa software GL) straight into a copy of run/world and reports whether it
+# Boots the real client headless (Xvfb + Mesa software GL) straight into a copy of a superflat test world and reports whether it
 # joined without errors. Leaves a screenshot of the HUD in build/client-boot-check.png.
 # Adapted from Adrift's scripts/client-boot-check.sh.
 #
 # Usage: [COMPAT=coldsweat,thirst] [COMMANDS='feathers spend @s 7;effect give @s minecraft:speed'] [SHOT=path.png]
 #        scripts/client-boot-check.sh [TIMEOUT_SECONDS]
 #   COMPAT   compat mods on the runtime (see build.gradle); COMMANDS typed into chat after joining, ';'-separated.
-# Needs a world in run/world: any `./gradlew runServer` leaves one behind.
+# Generates its own superflat world (run/bootworld) the first time. Every run: noon, clear weather, no mob spawns.
 set -u
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TIMEOUT="${1:-300}"
 cd "$DIR" || exit 2
 RUN=run
-[ -d "$RUN/world" ] || { echo "BOOTCHECK: no world to join (run ./gradlew runServer once)"; exit 2; }
-rm -rf "$RUN/saves/gfboot"; mkdir -p "$RUN/saves"; cp -r "$RUN/world" "$RUN/saves/gfboot"
+# A superflat world of its own (no structures, no caves to spawn in): generated once by a dedicated server run.
+BOOTWORLD="$RUN/bootworld"
+if [ ! -f "$BOOTWORLD/level.dat" ]; then
+    echo "Generating a superflat world for the boot check..."
+    PROPS="$RUN/server.properties"; mkdir -p "$RUN"; [ -f "$PROPS" ] && cp "$PROPS" "$PROPS.bootcheck-backup"
+    echo "eula=true" > "$RUN/eula.txt"
+    cat > "$PROPS" <<'PROPS_EOF'
+level-name=bootworld
+level-type=minecraft\:flat
+generator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains"}
+generate-structures=false
+spawn-monsters=false
+online-mode=false
+server-port=25699
+PROPS_EOF
+    GEN_LOG="build/client-boot-check-world.log"; mkdir -p build
+    ./gradlew runServer --no-configuration-cache > "$GEN_LOG" 2>&1 &
+    GEN=$!
+    for _ in $(seq 1 300); do grep -qE 'Done \(' "$GEN_LOG" && break; kill -0 $GEN 2>/dev/null || break; sleep 1; done
+    for p in $(pgrep -f java); do [ "$(readlink /proc/$p/cwd)" = "$DIR/$RUN" ] && kill $p; done
+    wait $GEN 2>/dev/null
+    if [ -f "$PROPS.bootcheck-backup" ]; then mv "$PROPS.bootcheck-backup" "$PROPS"; else rm -f "$PROPS"; fi
+    [ -f "$BOOTWORLD/level.dat" ] || { echo "BOOTCHECK: could not generate the superflat world (see $GEN_LOG)"; exit 2; }
+fi
+rm -rf "$RUN/saves/gfboot"; mkdir -p "$RUN/saves"; cp -r "$BOOTWORLD" "$RUN/saves/gfboot"
 rm -f "$RUN/session.lock" "$RUN/saves/gfboot/session.lock"
 # A fresh player takes the world's game type (set to survival below) instead of whatever the last run left.
 rm -rf "$RUN/saves/gfboot/playerdata"
@@ -56,12 +79,14 @@ for _ in $(seq 1 "$TIMEOUT"); do
     if logs | grep -qE "$OK_RE"; then
         sleep 20
         X="env DISPLAY=:97 XAUTHORITY=$XAUTH xdotool"
-        IFS=';' read -ra CMDS <<< "${COMMANDS:-}"
+        SETUP='difficulty peaceful;time set noon;weather clear;gamerule doDaylightCycle false;gamerule doWeatherCycle false;gamerule doMobSpawning false'
+        IFS=';' read -ra CMDS <<< "$SETUP;${COMMANDS:-}"
         for cmd in "${CMDS[@]}"; do
             [ -z "$cmd" ] && continue
             $X key t; sleep 1; $X type --delay 20 "/$cmd"; $X key Return; sleep 1
         done
-        [ -n "${COMMANDS:-}" ] && sleep 4
+        # Chat messages fade after 10 s; wait them out so their box doesn't cover the HUD.
+        sleep 11
         # F2: the game takes its own screenshot (no image tools needed).
         rm -rf "$RUN/screenshots"
         DISPLAY=:97 XAUTHORITY="$XAUTH" xdotool search --name "Minecraft" windowactivate --sync key F2 2>/dev/null \

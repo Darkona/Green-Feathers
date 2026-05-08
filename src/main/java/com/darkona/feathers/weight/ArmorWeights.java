@@ -27,6 +27,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -171,26 +172,81 @@ public final class ArmorWeights {
         return base * lightness * (1 + heavy);
     }
 
+    /** Weight parts, in the order the HUD draws them: head to feet, then everything else. */
+    public static final int HEAD = 0, CHEST = 1, LEGS = 2, FEET = 3, OTHER = 4, PARTS = 5;
+
     /**
      * The entity's weight: armor plus weight sources, after the event and the multiplier. 0 when disabled.
      */
     public static int totalWeight(LivingEntity entity) {
+        return totalWeight(entity, null);
+    }
+
+    /**
+     * Same, and splits the total between the armor pieces (head to feet) and everything else into {@code parts}
+     * (length {@link #PARTS}), scaled like the total and rounded so they add up to it.
+     */
+    public static int totalWeight(LivingEntity entity, int[] parts) {
+        if (parts != null) Arrays.fill(parts, 0);
         if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) return 0;
 
-        double total = 0;
-        for (EquipmentSlot slot : ARMOR_SLOTS) {
-            total += pieceWeight(entity.getItemBySlot(slot));
-        }
+        double head = pieceWeight(entity.getItemBySlot(EquipmentSlot.HEAD));
+        double chest = pieceWeight(entity.getItemBySlot(EquipmentSlot.CHEST));
+        double legs = pieceWeight(entity.getItemBySlot(EquipmentSlot.LEGS));
+        double feet = pieceWeight(entity.getItemBySlot(EquipmentSlot.FEET));
+        double other = 0;
         for (Extensions.WeightEntry source : Extensions.weightSources()) {
-            total += source.source().weight(entity);
+            other += source.source().weight(entity);
         }
+        double raw = head + chest + legs + feet + other;
 
-        double weight = NeoForge.EVENT_BUS.post(new ArmorWeightEvent(entity, total)).getWeight();
+        double weight = NeoForge.EVENT_BUS.post(new ArmorWeightEvent(entity, raw)).getWeight();
 
         AttributeInstance multiplier = entity.getAttribute(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER);
         if (multiplier != null) weight *= multiplier.getValue();
 
-        return Math.max(0, (int) Math.round(weight));
+        int total = Math.max(0, (int) Math.round(weight));
+        if (parts != null && total > 0) {
+            if (raw <= 0) {
+                parts[OTHER] = total;
+            } else {
+                double scale = weight / raw;
+                split(total, parts, head * scale, chest * scale, legs * scale, feet * scale, other * scale);
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Rounds the shares to whole feathers adding up to {@code total}: floors first, then the largest remainders.
+     */
+    private static void split(int total, int[] parts, double... shares) {
+        int assigned = 0;
+        for (int i = 0; i < PARTS; i++) {
+            parts[i] = (int) Math.floor(shares[i]);
+            assigned += parts[i];
+        }
+        while (assigned < total) {
+            int best = 0;
+            double bestRemainder = -1;
+            for (int i = 0; i < PARTS; i++) {
+                double remainder = shares[i] - parts[i];
+                if (remainder > bestRemainder) {
+                    bestRemainder = remainder;
+                    best = i;
+                }
+            }
+            parts[best]++;
+            assigned++;
+        }
+        while (assigned > total) {
+            for (int i = PARTS - 1; i >= 0 && assigned > total; i--) {
+                if (parts[i] > 0) {
+                    parts[i]--;
+                    assigned--;
+                }
+            }
+        }
     }
 
     /**

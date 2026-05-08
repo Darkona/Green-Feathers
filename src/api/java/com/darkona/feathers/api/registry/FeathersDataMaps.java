@@ -1,7 +1,9 @@
 package com.darkona.feathers.api.registry;
 
+import com.darkona.feathers.api.MountStats;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.datamaps.DataMapType;
 
@@ -17,6 +19,13 @@ public final class FeathersDataMaps {
     public static final DataMapType<Item, Integer> ARMOR_WEIGHT = DataMapType
             .builder(id("armor_weight"), Registries.ITEM, Codec.intRange(0, 1000))
             .synced(Codec.INT, false)
+            .build();
+
+    /**
+     * Per-creature mount tuning; an entry also makes the creature a mount. See {@link MountStats}.
+     */
+    public static final DataMapType<EntityType<?>, MountStats> MOUNT_STATS = DataMapType
+            .builder(id("mount_stats"), Registries.ENTITY_TYPE, MountStats.CODEC)
             .build();
 
     private FeathersDataMaps() {}

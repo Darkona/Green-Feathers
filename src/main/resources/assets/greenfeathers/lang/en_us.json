@@ -77,5 +77,7 @@
   "item.greenfeathers.feather_ring": "Feather Ring",
   "item.greenfeathers.feather_ring.tooltip.ring": "Halves armor weight while worn in a ring slot.",
   "item.greenfeathers.feather_ring.tooltip.offhand": "Halves armor weight while held in the off hand.",
-  "greenfeathers.armor_weight_multiplier": "Armor Weight Multiplier"
+  "greenfeathers.armor_weight_multiplier": "Armor Weight Multiplier",
+  "jade.greenfeathers.mount_stamina": "Stamina: %s/%s feathers",
+  "config.jade.plugin_greenfeathers.mount_stamina": "Mount stamina"
 }

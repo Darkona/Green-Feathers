@@ -78,5 +78,7 @@
   "item.greenfeathers.feather_ring": "Federring",
   "item.greenfeathers.feather_ring.tooltip.ring": "Halbiert das Rüstungsgewicht, wenn er in einem Ringplatz getragen wird.",
   "item.greenfeathers.feather_ring.tooltip.offhand": "Halbiert das Rüstungsgewicht, wenn er in der Zweithand gehalten wird.",
-  "greenfeathers.armor_weight_multiplier": "Rüstungsgewicht-Multiplikator"
+  "greenfeathers.armor_weight_multiplier": "Rüstungsgewicht-Multiplikator",
+  "jade.greenfeathers.mount_stamina": "Ausdauer: %s/%s Federn",
+  "config.jade.plugin_greenfeathers.mount_stamina": "Reittier-Ausdauer"
 }

@@ -52,7 +52,10 @@ public final class Feathers {
         modEventBus.addListener(FeathersTicker::addAttributes);
         modEventBus.addListener(FeathersTicker::onConfigChanged);
         modEventBus.addListener(FeathersNetwork::register);
-        modEventBus.addListener((RegisterDataMapTypesEvent event) -> event.register(FeathersDataMaps.ARMOR_WEIGHT));
+        modEventBus.addListener((RegisterDataMapTypesEvent event) -> {
+            event.register(FeathersDataMaps.ARMOR_WEIGHT);
+            event.register(FeathersDataMaps.MOUNT_STATS);
+        });
         modEventBus.addListener(Feathers::commonSetup);
 
         // Built-in extensions go through the same API as other mods' do.

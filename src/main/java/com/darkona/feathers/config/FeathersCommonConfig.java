@@ -58,6 +58,16 @@ public final class FeathersCommonConfig {
     public static final DoubleValue SPRINT_FEATHERS_PER_SECOND;
     public static final DoubleValue JUMP_FEATHERS;
 
+    /* Mounts */
+    public static final BooleanValue ENABLE_MOUNTS;
+    public static final IntValue MOUNT_MIN_FEATHERS;
+    public static final IntValue MOUNT_MAX_FEATHERS;
+    public static final DoubleValue MOUNT_REGEN;
+    public static final DoubleValue MOUNT_GALLOP_FEATHERS_PER_SECOND;
+    public static final DoubleValue MOUNT_GALLOP_SPEED;
+    public static final DoubleValue MOUNT_JUMP_FEATHERS;
+    public static final DoubleValue MOUNT_EXHAUSTED_SLOWDOWN;
+
     /* Debugging */
     public static final BooleanValue DEBUG_MODE;
 
@@ -244,6 +254,45 @@ public final class FeathersCommonConfig {
         JUMP_FEATHERS = builder
                 .comment("Feathers per jump.")
                 .defineInRange("jump_feathers", 0.5, 0.0, 40.0);
+
+        builder.pop();
+
+        builder.push("mounts");
+
+        ENABLE_MOUNTS = builder
+                .comment("Horses, donkeys, mules and camels have feathers too: galloping and jumping tire them, rest restores them.",
+                        "Their feathers show above yours while you ride. An exhausted mount slows down.")
+                .define("mounts_enabled", true);
+
+        MOUNT_MIN_FEATHERS = builder
+                .comment("Each mount is born with its own stamina, a hidden trait like its speed or health: somewhere",
+                        "between these two, usually near the middle. Foals take after their parents.")
+                .defineInRange("mount_feathers_min", 14, 1, 1000);
+
+        MOUNT_MAX_FEATHERS = builder
+                .comment("The most feathers a mount can be born with.")
+                .defineInRange("mount_feathers_max", 30, 1, 1000);
+
+        MOUNT_REGEN = builder
+                .comment("Feathers a mount regenerates per second.")
+                .defineInRange("mount_regen_feathers_per_second", 0.5, 0.0, 40.0);
+
+        MOUNT_GALLOP_FEATHERS_PER_SECOND = builder
+                .comment("Feathers per second while galloping (ridden faster than mount_gallop_speed). Animals tire slowly:",
+                        "at 0.1, a 20-feather horse gallops for over three minutes.")
+                .defineInRange("mount_gallop_feathers_per_second", 0.1, 0.0, 40.0);
+
+        MOUNT_GALLOP_SPEED = builder
+                .comment("Horizontal speed, in blocks per tick, from which a ridden mount counts as galloping. A walk is about 0.1.")
+                .defineInRange("mount_gallop_speed", 0.25, 0.0, 10.0);
+
+        MOUNT_JUMP_FEATHERS = builder
+                .comment("Feathers for a fully charged jump (or a camel's dash); weaker jumps cost less.")
+                .defineInRange("mount_jump_feathers", 0.5, 0.0, 40.0);
+
+        MOUNT_EXHAUSTED_SLOWDOWN = builder
+                .comment("How much an exhausted mount slows down: 0.5 = half speed until it recovers.")
+                .defineInRange("mount_exhausted_slowdown", 0.5, 0.0, 0.95);
 
         builder.pop();
 

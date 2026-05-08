@@ -15,6 +15,33 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 java.withSourcesJar()
 
+// Test-only data, on the classpath only when running the GameTests: src/gametest/resources as is (it wins over the
+// mod's files at the same path), and for data maps, which allow one file per namespace, the mod's own entries merged
+// with the test entries from src/gametest/datamaps.
+if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
+    def mergedDataMaps = layout.buildDirectory.dir('gametest-datamaps')
+    def mergeTestDataMaps = tasks.register('mergeTestDataMaps') {
+        def modMaps = file('src/main/resources/data/greenfeathers/data_maps/entity_type')
+        def testMaps = file('src/gametest/datamaps')
+        inputs.dir(modMaps)
+        inputs.dir(testMaps)
+        outputs.dir(mergedDataMaps)
+        doLast {
+            def slurper = new groovy.json.JsonSlurper()
+            testMaps.eachFile { testFile ->
+                def modFile = new File(modMaps, testFile.name)
+                def merged = modFile.exists() ? slurper.parse(modFile) : [replace: false, values: [:]]
+                merged.values.putAll(slurper.parse(testFile).values)
+                def out = mergedDataMaps.get().file("data/greenfeathers/data_maps/entity_type/${testFile.name}").asFile
+                out.parentFile.mkdirs()
+                out.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(merged))
+            }
+        }
+    }
+    sourceSets.main.resources.srcDirs = [files(mergedDataMaps).builtBy(mergeTestDataMaps), 'src/gametest/resources'] + sourceSets.main.resources.srcDirs
+    tasks.named('processResources', ProcessResources) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+}
+
 // The public API lives in its own source set and ships twice: inside the mod jar, and alone as
 // greenfeathers-api for other mods to compile against.
 sourceSets {
@@ -94,6 +121,7 @@ dependencies {
     compileOnly "maven.modrinth:overflowing-bars:${overflowing_bars_version}"
     compileOnly "maven.modrinth:puzzles-lib:${puzzles_lib_version}"
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
+    compileOnly "maven.modrinth:jade:${jade_version}"
     localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 }
 
@@ -107,6 +135,9 @@ def compatRuntime = [
         sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         lso            : ["maven.modrinth:legendary-survival-overhaul:${lso_version}"],
         appleskin      : ["maven.modrinth:appleskin:${appleskin_version}"],
+        jade           : ["maven.modrinth:jade:${jade_version}"],
+        naturalist     : ["maven.modrinth:naturalist:${naturalist_version}", "maven.modrinth:geckolib:${geckolib_version}"],
+        mobwrangler    : ["maven.modrinth:mob-wrangler:${mob_wrangler_version}"],
         overflowingbars: ["maven.modrinth:overflowing-bars:${overflowing_bars_version}", "maven.modrinth:puzzles-lib:${puzzles_lib_version}"],
 ]
 if (project.hasProperty('compat')) {

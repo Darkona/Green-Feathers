@@ -28,6 +28,13 @@ public final class ClientFeathers {
     }
 
     /**
+     * The feathers of the mount the local player is riding, or {@link FeathersView#NONE} when not riding one.
+     */
+    public static FeathersView mount() {
+        return service().mount();
+    }
+
+    /**
      * For actions decided on the client (e.g. a dodge key): checks the local feathers and, if they allow it,
      * lowers them right away so the HUD doesn't lag. The server's next sync is authoritative; pair it with a
      * server-side {@code FeathersAPI.spend}, or with {@link #requestSpend}.

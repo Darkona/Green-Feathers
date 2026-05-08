@@ -5,6 +5,9 @@ import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersEnchantments;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.core.FeathersData;
+import com.darkona.feathers.core.FeathersServiceImpl;
+import com.darkona.feathers.weight.ArmorWeights;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
@@ -64,6 +67,11 @@ public class ArmorWeightTests {
             wear(player, iron());
             helper.assertValueEqual(FeathersAPI.get(player).weight(), 8, "full iron");
             helper.assertValueEqual(FeathersAPI.get(player).availableFeathers(), 12, "usable feathers under full iron");
+            FeathersData data = FeathersServiceImpl.data(player);
+            for (int part = ArmorWeights.HEAD; part <= ArmorWeights.FEET; part++) {
+                helper.assertValueEqual(data.weightPart(part), 2, "each iron piece's share of the weight");
+            }
+            helper.assertValueEqual(data.weightPart(ArmorWeights.OTHER), 0, "nothing else weighs");
         });
     }
 
@@ -107,6 +115,7 @@ public class ArmorWeightTests {
                     new AttributeModifier(id("test_ring"), -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
             tick(player, 10);
             helper.assertValueEqual(FeathersAPI.get(player).weight(), 4, "weight with the ring");
+            helper.assertValueEqual(FeathersServiceImpl.data(player).weightPart(ArmorWeights.CHEST), 1, "the ring halves each piece's share");
         });
     }
 }

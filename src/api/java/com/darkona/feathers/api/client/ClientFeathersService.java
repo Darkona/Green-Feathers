@@ -12,6 +12,8 @@ public interface ClientFeathersService {
 
     FeathersView local();
 
+    FeathersView mount();
+
     SpendResult predictSpend(int stamina, boolean allowStrain);
 
     void requestSpend(ResourceLocation source, int stamina, SpendOptions options);

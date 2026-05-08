@@ -1,7 +1,6 @@
 package com.darkona.feathers.client;
 
 import com.darkona.feathers.api.FeathersView;
-import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
@@ -12,25 +11,26 @@ import com.darkona.feathers.network.SpendDebugPayload;
 import com.darkona.feathers.network.SpendRequestPayload;
 import com.darkona.feathers.network.SyncPayload;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * The local player's feathers: the server's last snapshot, adjusted by local predictions until the next one.
- * Client thread only.
+ * The local player's feathers (this view) and those of the mount it rides, as last synced, with local predictions
+ * for the player until the next sync. Client thread only.
  */
-public final class ClientFeathersData implements FeathersView, ClientFeathersService, FeathersServiceImpl.ClientBridge {
+public final class ClientFeathersData extends SyncedFeathers implements ClientFeathersService, FeathersServiceImpl.ClientBridge {
 
     public static final ClientFeathersData INSTANCE = new ClientFeathersData();
 
     /** How long a debug spend line stays on the overlay. */
     public static final int DEBUG_LINE_TICKS = 60;
 
-    private boolean synced;
-    private int stamina, maxStamina, strain, maxStrain, bonus, weight, regenDelay;
-    private boolean exhausted;
-    private RestState rest = RestState.NONE;
+    private final SyncedFeathers mount = new SyncedFeathers();
+    private int mountId = -1;
 
     private ResourceLocation lastSpendSource;
     private int lastSpendCost;
@@ -39,7 +39,13 @@ public final class ClientFeathersData implements FeathersView, ClientFeathersSer
     private ClientFeathersData() {}
 
     public static void accept(SyncPayload payload) {
-        INSTANCE.apply(payload);
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && payload.entityId() != player.getId()) {
+            INSTANCE.mountId = payload.entityId();
+            INSTANCE.mount.apply(payload);
+        } else {
+            INSTANCE.apply(payload);
+        }
     }
 
     public static void acceptDebug(SpendDebugPayload payload) {
@@ -48,33 +54,36 @@ public final class ClientFeathersData implements FeathersView, ClientFeathersSer
         INSTANCE.lastSpendTicks = DEBUG_LINE_TICKS;
     }
 
-    private void apply(SyncPayload p) {
-        synced = true;
-        stamina = p.stamina();
-        maxStamina = p.maxStamina();
-        strain = p.strain();
-        maxStrain = p.maxStrain();
-        bonus = p.bonus();
-        weight = p.weight();
-        regenDelay = p.regenDelay();
-        exhausted = p.exhausted();
-        rest = p.rest();
-    }
-
     /**
      * Forgets everything on leaving a world.
      */
+    @Override
     void clear() {
-        synced = false;
-        stamina = maxStamina = strain = maxStrain = bonus = weight = regenDelay = 0;
-        exhausted = false;
-        rest = RestState.NONE;
+        super.clear();
+        mount.clear();
+        mountId = -1;
         lastSpendSource = null;
     }
 
+    @Override
     void tick() {
-        if (regenDelay > 0) regenDelay--;
+        super.tick();
+        mount.tick();
         if (lastSpendTicks > 0) lastSpendTicks--;
+        // The mount's feathers only mean something while riding it.
+        LocalPlayer player = Minecraft.getInstance().player;
+        Entity vehicle = player != null ? player.getVehicle() : null;
+        if (mountId != -1 && (vehicle == null || vehicle.getId() != mountId)) {
+            mount.clear();
+            mountId = -1;
+        }
+    }
+
+    /**
+     * The feathers of the mount the local player rides, or {@link FeathersView#NONE}.
+     */
+    public FeathersView mount() {
+        return mount.hasFeathers() ? mount : FeathersView.NONE;
     }
 
     public ResourceLocation lastSpendSource() {
@@ -85,63 +94,6 @@ public final class ClientFeathersData implements FeathersView, ClientFeathersSer
         return lastSpendCost;
     }
 
-    /* FeathersView */
-
-    @Override
-    public boolean hasFeathers() {
-        return synced;
-    }
-
-    @Override
-    public int stamina() {
-        return stamina;
-    }
-
-    @Override
-    public int maxStamina() {
-        return maxStamina;
-    }
-
-    @Override
-    public int availableStamina() {
-        return Math.max(0, stamina - Stamina.ofFeathers(weight)) + bonus;
-    }
-
-    @Override
-    public int weight() {
-        return weight;
-    }
-
-    @Override
-    public int strain() {
-        return strain;
-    }
-
-    @Override
-    public int maxStrain() {
-        return maxStrain;
-    }
-
-    @Override
-    public int bonusStamina() {
-        return bonus;
-    }
-
-    @Override
-    public int regenDelay() {
-        return regenDelay;
-    }
-
-    @Override
-    public boolean exhausted() {
-        return exhausted;
-    }
-
-    @Override
-    public RestState restState() {
-        return rest;
-    }
-
     /* ClientFeathersService, and the common service's client bridge */
 
     @Override
@@ -150,13 +102,14 @@ public final class ClientFeathersData implements FeathersView, ClientFeathersSer
     }
 
     @Override
-    public boolean isLocalPlayer(LivingEntity entity) {
-        return entity == Minecraft.getInstance().player;
+    public @Nullable FeathersView clientView(LivingEntity entity) {
+        if (entity == Minecraft.getInstance().player) return this;
+        return entity.getId() == mountId && mount.hasFeathers() ? mount : null;
     }
 
     @Override
-    public FeathersView localView() {
-        return this;
+    public boolean isLocalPlayer(LivingEntity entity) {
+        return entity == Minecraft.getInstance().player;
     }
 
     /**
@@ -182,5 +135,10 @@ public final class ClientFeathersData implements FeathersView, ClientFeathersSer
     @Override
     public void requestSpend(ResourceLocation source, int stamina, SpendOptions options) {
         PacketDistributor.sendToServer(new SpendRequestPayload(source, stamina, options.allowStrain(), options.regenDelayTicks()));
+    }
+
+    @Override
+    public FeathersView localView() {
+        return this;
     }
 }

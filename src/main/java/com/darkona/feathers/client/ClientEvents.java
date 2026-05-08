@@ -4,6 +4,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.client.ClientFeathers;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.basic.BasicExertion;
+import com.darkona.feathers.client.gui.FeatherColors;
 import com.darkona.feathers.client.gui.FeathersHud;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.config.FeathersCommonConfig;
@@ -14,6 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -23,6 +25,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -44,6 +47,12 @@ public final class ClientEvents {
     public static void onClientSetup(FMLClientSetupEvent event) {
         ClientFeathers.setService(ClientFeathersData.INSTANCE);
         FeathersServiceImpl.setClientBridge(ClientFeathersData.INSTANCE);
+    }
+
+    /** Feather colors come from textures: forget them when resource packs change. */
+    @SubscribeEvent
+    public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((ResourceManagerReloadListener) manager -> FeatherColors.clear());
     }
 
     @SubscribeEvent

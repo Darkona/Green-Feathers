@@ -78,5 +78,7 @@
   "item.greenfeathers.feather_ring": "Anel de Pena",
   "item.greenfeathers.feather_ring.tooltip.ring": "Reduz para metade o peso da armadura quando usado num espaço de anel.",
   "item.greenfeathers.feather_ring.tooltip.offhand": "Reduz para metade o peso da armadura quando segurado na mão secundária.",
-  "greenfeathers.armor_weight_multiplier": "Multiplicador de peso da armadura"
+  "greenfeathers.armor_weight_multiplier": "Multiplicador de peso da armadura",
+  "jade.greenfeathers.mount_stamina": "Resistência: %s/%s penas",
+  "config.jade.plugin_greenfeathers.mount_stamina": "Resistência das montadas"
 }

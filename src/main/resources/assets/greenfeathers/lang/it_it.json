@@ -78,5 +78,7 @@
   "item.greenfeathers.feather_ring": "Anello di Piuma",
   "item.greenfeathers.feather_ring.tooltip.ring": "Dimezza il peso dell'armatura se indossato in uno slot per anelli.",
   "item.greenfeathers.feather_ring.tooltip.offhand": "Dimezza il peso dell'armatura se tenuto nella mano secondaria.",
-  "greenfeathers.armor_weight_multiplier": "Moltiplicatore peso armatura"
+  "greenfeathers.armor_weight_multiplier": "Moltiplicatore peso armatura",
+  "jade.greenfeathers.mount_stamina": "Resistenza: %s/%s piume",
+  "config.jade.plugin_greenfeathers.mount_stamina": "Resistenza delle cavalcature"
 }

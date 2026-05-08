@@ -1,0 +1,184 @@
+{
+  "replace": false,
+  "values": {
+    "#mobwrangler:rideables": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mr_mob_wrangler"
+        }
+      ],
+      "gallop_speed": 0.1
+    },
+    "minecraft:sniffer": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "sniff_trail"
+        }
+      ],
+      "min_feathers": 30,
+      "max_feathers": 50,
+      "gallop_speed": 0.05,
+      "gallop_feathers_per_second": 0.05
+    },
+    "naturalist:ostrich": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "naturalist"
+        }
+      ]
+    },
+    "naturalist:giraffe": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "naturalist"
+        }
+      ]
+    },
+    "naturalist:elephant": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "naturalist"
+        }
+      ],
+      "min_feathers": 30,
+      "max_feathers": 50
+    },
+    "alexsmobs:elephant": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ],
+      "min_feathers": 30,
+      "max_feathers": 50
+    },
+    "alexsmobs:tusklin": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ]
+    },
+    "alexsmobs:grizzly_bear": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ]
+    },
+    "alexsmobs:komodo_dragon": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ],
+      "gallop_speed": 0.15
+    },
+    "alexsmobs:laviathan": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 60
+    },
+    "alexsmobs:endergrade": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ]
+    },
+    "wan_ancient_beasts:soarer": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "wan_ancient_beasts"
+        }
+      ]
+    },
+    "dmr:dragon": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "dmr"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:royal_red": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:overworld_drake": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:butterfly_leviathan": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:silver_glider": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "mounts_of_mayhem:nautilus": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mounts_of_mayhem"
+        }
+      ]
+    },
+    "mounts_of_mayhem:zombie_nautilus": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mounts_of_mayhem"
+        }
+      ]
+    }
+  }
+}

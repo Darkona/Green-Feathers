@@ -20,6 +20,9 @@ Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers
   Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
 - **Heavy armor weighs you down** (optional). Every piece greys out some feathers you can't use. Netherite is heavy;
   the *Lightweight* enchantment and the *Feather Ring* help.
+- **Mounts tire too** (optional). Horses, donkeys, mules and camels have their own feathers, shown instead of yours
+  while you ride, in hay-bale colors. Galloping and jumping tire them slowly; an exhausted mount slows down and
+  can't jump. Like speed and health, each animal is born with its own stamina, and foals take after their parents.
 - **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
 On its own, Green Feathers makes sprinting and jumping cost feathers. Install
@@ -49,7 +52,26 @@ Supported out of the box, each switchable in the config:
 ## Configuration
 
 Everything is configurable in `config/feathers/`: how many feathers, how fast they come back, Strain, exhaustion,
-each effect, resting, armor weights per item or material, basic sprint/jump costs, each compat, and the HUD.
+each effect, resting, armor weights per item or material, basic sprint/jump costs, mounts, each compat, and the HUD.
+Operators can inspect and adjust with `/feathers info|set|reset|max|regen|spend|debug`; `debug` shows what spent
+feathers recently, by source.
+
+## For modpack makers
+
+Any creature can be a mount with a datapack. List it in `data/greenfeathers/data_maps/entity_type/mount_stats.json`,
+optionally with its own numbers (anything left out uses the config):
+
+```json
+{
+  "values": {
+    "mymod:dragon": { "min_feathers": 40, "max_feathers": 60, "gallop_feathers_per_second": 0.05 }
+  }
+}
+```
+
+Fields: `min_feathers`, `max_feathers`, `regen_feathers_per_second`, `gallop_feathers_per_second`, `gallop_speed`,
+`jump_feathers`. The `greenfeathers:mounts` entity tag also works, with the default numbers. Armor weights have a data
+map too: `greenfeathers:armor_weight` (item → weight).
 
 ## For mod developers
 

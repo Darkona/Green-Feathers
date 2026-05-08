@@ -2,6 +2,7 @@ package com.darkona.feathers.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.ModConfigSpec.EnumValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
 public final class FeathersClientConfig {
@@ -19,7 +20,17 @@ public final class FeathersClientConfig {
     public static final BooleanValue AFFECTED_BY_RIGHT_HEIGHT;
     public static final IntValue X_OFFSET;
     public static final IntValue Y_OFFSET;
-    public static final BooleanValue ALTERNATIVE_FEATHER_COLOR;
+    public static final EnumValue<FeatherColor> FEATHER_COLOR;
+
+    /** The color of the player's own feathers. */
+    public enum FeatherColor {
+        /** Green Feathers' green. */
+        GREEN,
+        /** The blue of Elenai's original Feathers. */
+        BLUE,
+        /** White, like a chicken's. */
+        WHITE
+    }
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -51,8 +62,9 @@ public final class FeathersClientConfig {
         Y_OFFSET = builder.comment("Vertical offset of the feathers, in pixels. Negative moves them up.")
                 .defineInRange("y_offset", 0, -1000, 1000);
 
-        ALTERNATIVE_FEATHER_COLOR = builder.comment("Green feathers (true) or Elenai's original blue ones (false).")
-                .define("green_feathers", true);
+        FEATHER_COLOR = builder.comment("Color of your feathers: GREEN, BLUE (Elenai's original) or WHITE (like a chicken's).",
+                        "Mounts' feathers take their own color, and armor weight its armor's.")
+                .defineEnum("feather_color", FeatherColor.GREEN);
 
         builder.pop();
 

@@ -79,6 +79,8 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     int maxStamina;
     int maxStrain;
     int weight;
+    /** The weight split by armor piece, head to feet, then other sources (see ArmorWeights.PARTS). */
+    final int[] weightParts = new int[5];
     double lastWeightMultiplier = Double.NaN;
     boolean initialized;
     /** Never loaded from a save: starts with full feathers once the maximum is known. */
@@ -89,9 +91,13 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     final ArrayList<Timed> regenBlocks = new ArrayList<>(2);
     final ArrayList<Timed> restBonuses = new ArrayList<>(1);
     double regenCarry;
+    /** Regeneration was paused on the last tick: the next one that regenerates fires RegenEvent. */
+    boolean regenPaused;
     int lastDelta;
     long totalRegenerated;
     Climate climate = Climate.NEUTRAL;
+
+    SpendLog spendLog;
 
     RestState restState = RestState.NONE;
     double restMultiplier = 1.0;
@@ -101,6 +107,7 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     /* What the client last received, to sync only on visible changes */
     int syncedStamina = -1, syncedMax = -1, syncedStrain = -1, syncedMaxStrain = -1, syncedBonus = -1, syncedWeight = -1;
     boolean syncedExhausted, syncedDelayed;
+    final int[] syncedWeightParts = new int[5];
     RestState syncedRest = RestState.NONE;
     boolean forceSync = true;
 
@@ -129,6 +136,10 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     @Override
     public int weight() {
         return weight;
+    }
+
+    public int weightPart(int part) {
+        return weightParts[part];
     }
 
     @Override
@@ -234,6 +245,14 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
         return availableStamina() <= 0 && strainRoom(true, strainEnabled) <= 0;
     }
 
+    /**
+     * Nothing to tick: full, no Strain, bonus, drain, block, delay or exhaustion, and already initialized.
+     */
+    public boolean isAtRest() {
+        return initialized && stamina >= maxStamina && strain == 0 && regenDelay == 0 && !exhausted
+                && bonuses.isEmpty() && drains.isEmpty() && regenBlocks.isEmpty();
+    }
+
     /* Bonuses, drains, blocks */
 
     @Nullable
@@ -319,6 +338,18 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
             if (drains.get(i).blocksRegen) return true;
         }
         return false;
+    }
+
+    void logSpend(ResourceLocation source, int amount, long gameTime) {
+        if (spendLog == null) spendLog = new SpendLog();
+        spendLog.record(source, amount, gameTime);
+    }
+
+    /**
+     * Recent spends by source, or null if nothing was spent since the entity joined.
+     */
+    public @Nullable SpendLog spendLog() {
+        return spendLog;
     }
 
     /* Compat counters */

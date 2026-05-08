@@ -78,5 +78,7 @@
   "item.greenfeathers.feather_ring": "Anillo de Pluma",
   "item.greenfeathers.feather_ring.tooltip.ring": "Reduce a la mitad el peso de la armadura si lo llevas en un hueco de anillo.",
   "item.greenfeathers.feather_ring.tooltip.offhand": "Reduce a la mitad el peso de la armadura si lo llevas en la mano secundaria.",
-  "greenfeathers.armor_weight_multiplier": "Multiplicador de peso de armadura"
+  "greenfeathers.armor_weight_multiplier": "Multiplicador de peso de armadura",
+  "jade.greenfeathers.mount_stamina": "Resistencia: %s/%s plumas",
+  "config.jade.plugin_greenfeathers.mount_stamina": "Resistencia de monturas"
 }

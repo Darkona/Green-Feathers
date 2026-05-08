@@ -78,5 +78,7 @@
   "item.greenfeathers.feather_ring": "Anneau de Plume",
   "item.greenfeathers.feather_ring.tooltip.ring": "Divise par deux le poids de l'armure s'il est porté dans un emplacement d'anneau.",
   "item.greenfeathers.feather_ring.tooltip.offhand": "Divise par deux le poids de l'armure s'il est tenu dans la main secondaire.",
-  "greenfeathers.armor_weight_multiplier": "Multiplicateur de poids d'armure"
+  "greenfeathers.armor_weight_multiplier": "Multiplicateur de poids d'armure",
+  "jade.greenfeathers.mount_stamina": "Endurance : %s/%s plumes",
+  "config.jade.plugin_greenfeathers.mount_stamina": "Endurance des montures"
 }

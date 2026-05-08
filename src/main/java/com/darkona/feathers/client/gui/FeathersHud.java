@@ -1,11 +1,14 @@
 package com.darkona.feathers.client.gui;
 
 import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.client.ClientFeathersData;
+import com.darkona.feathers.client.SyncedFeathers;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.weight.ArmorWeights;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.overflowingbars.client.gui.RowCountRenderer;
 import net.minecraft.client.DeltaTracker;
@@ -15,6 +18,9 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
@@ -23,7 +29,8 @@ import static com.darkona.feathers.client.gui.Icons.*;
 /**
  * The feathers row, right above the food bar and stacked with the other right-side bars. Two feathers per icon;
  * past a full row, further feathers are drawn over it in the overflow color (layered), with a row count.
- * Grey icons mark feathers made unusable by armor weight, red ones Strain, golden rows bonus feathers.
+ * Grey icons mark feathers made unusable by armor weight, red ones Strain, golden rows bonus feathers. While riding a
+ * mount that has feathers, the row shows the mount's instead, in the mount's own colors.
  */
 public final class FeathersHud {
 
@@ -72,15 +79,21 @@ public final class FeathersHud {
         int x = graphics.guiWidth() / 2 + 91 - 9 + FeathersClientConfig.X_OFFSET.get();
         int y = graphics.guiHeight() - (stack ? gui.rightHeight : 49) + FeathersClientConfig.Y_OFFSET.get();
 
-        int bonusRows = (Stamina.toFeathersCeil(DATA.bonusStamina()) + FEATHERS_PER_ROW - 1) / FEATHERS_PER_ROW;
+        // Riding a mount that has feathers, only the mount's matter: they replace the rider's, in the mount's colors.
+        FeathersView mount = DATA.mount();
+        LivingEntity vehicle = player.getVehicle() instanceof LivingEntity living ? living : null;
+        boolean riding = vehicle != null && mount.hasFeathers() && mount.maxStamina() > 0;
+        FeathersView shown = riding ? mount : DATA;
+        int bonusRows = bonusRows(shown);
         // Reserve the space even while faded out, so the bars above don't jump.
         if (stack) gui.rightHeight += ROW_HEIGHT * (1 + bonusRows);
 
         if (alpha > 0) {
             RenderSystem.enableBlend();
             graphics.setColor(1f, 1f, 1f, alpha);
-            drawRow(graphics, player, x, y);
-            drawBonus(graphics, x, y - ROW_HEIGHT, bonusRows);
+            if (riding) drawRow(graphics, mount, null, FeatherColors.of(vehicle), null, x, y);
+            else drawRow(graphics, DATA, iconSet(player), ownTint(), player, x, y);
+            drawBonus(graphics, shown, x, y - ROW_HEIGHT, bonusRows);
             graphics.setColor(1f, 1f, 1f, 1f);
             RenderSystem.disableBlend();
         }
@@ -88,43 +101,126 @@ public final class FeathersHud {
         if (FeathersCommonConfig.DEBUG_MODE.get()) drawDebug(graphics, mc.font, player);
     }
 
-    private static void drawRow(GuiGraphics graphics, LocalPlayer player, int x, int y) {
-        int maxFeathers = DATA.maxFeathers();
-        int feathers = DATA.feathers();
-        Icons.Set set = iconSet(player);
+    private static int bonusRows(FeathersView view) {
+        return (Stamina.toFeathersCeil(view.bonusStamina()) + FEATHERS_PER_ROW - 1) / FEATHERS_PER_ROW;
+    }
+
+    /**
+     * One row of feathers: in {@code set}'s sprites, or, when {@code set} is null, tinted with {@code tint} (a body
+     * and outline color pair, see FeatherColors). {@code wearer} colors the armor weight by piece; null leaves it grey.
+     */
+    private static void drawRow(GuiGraphics graphics, FeathersView view, Icons.Set set, long tint, LivingEntity wearer, int x, int y) {
+        int maxFeathers = view.maxFeathers();
+        int feathers = view.feathers();
 
         // Background up to the maximum (one row; higher maximums are layered over it). Reddish while exhausted.
         int backgroundIcons = Math.min(ICONS_PER_ROW, (maxFeathers + 1) / 2);
-        if (DATA.exhausted()) graphics.setColor(1f, 0.55f, 0.55f, alpha);
-        for (int i = 0; i < backgroundIcons; i++) draw(graphics, x, y, i, set.background());
-        if (DATA.exhausted()) graphics.setColor(1f, 1f, 1f, alpha);
+        if (view.exhausted()) graphics.setColor(1f, 0.55f, 0.55f, alpha);
+        for (int i = 0; i < backgroundIcons; i++) draw(graphics, x, y, i, NORMAL.background());
+        if (view.exhausted()) graphics.setColor(1f, 1f, 1f, alpha);
 
-        // Feathers, layered: the first row in the state's color, every further row over it in the overflow color.
+        // Feathers, layered: the first row in its own color, every further row over it in a deeper shade of that color
+        // (a lighter one for dark colors), outlined like the first: black for sprites, the complement for tinted rows.
         int layers = Math.max(1, (feathers + FEATHERS_PER_ROW - 1) / FEATHERS_PER_ROW);
+        int base = set != null ? set.color() : FeatherColors.body(tint);
+        int edge = set != null ? 0 : FeatherColors.outline(tint);
         for (int layer = 0; layer < layers; layer++) {
             int inLayer = Math.min(FEATHERS_PER_ROW, feathers - layer * FEATHERS_PER_ROW);
-            drawFeathers(graphics, x, y, inLayer, layer == 0 ? set : OVERFLOW);
+            if (layer > 0) drawTintedFeathers(graphics, x, y, inLayer, FeatherColors.pair(FeatherColors.shade(base, layer), edge));
+            else if (set != null) drawFeathers(graphics, x, y, inLayer, set);
+            else drawTintedFeathers(graphics, x, y, inLayer, tint);
         }
 
         // Strain: red feathers growing over the empty row.
-        drawFeathers(graphics, x, y, Math.min(FEATHERS_PER_ROW, Stamina.toFeathersCeil(DATA.strain())), STRAINED);
+        drawFeathers(graphics, x, y, Math.min(FEATHERS_PER_ROW, Stamina.toFeathersCeil(view.strain())), STRAINED);
 
-        // Armor weight: the first feathers turn grey; spending stops when it reaches them.
-        drawFeathers(graphics, x, y, Math.min(FEATHERS_PER_ROW, DATA.weight()), ARMOR);
+        // Armor weight: the first feathers are held back; spending stops when it reaches them.
+        drawWeight(graphics, view, wearer, x, y);
 
-        if (regenFlashTicks >= 16) {
+        if (view == DATA && regenFlashTicks >= 16) {
             for (int i = 0; i < backgroundIcons; i++) draw(graphics, x, y, i, REGEN_OVERLAY);
         }
 
         if (layers > 1) drawRowCount(graphics, x, y, layers);
     }
 
-    private static void drawBonus(GuiGraphics graphics, int x, int y, int rows) {
-        int bonusFeathers = Stamina.toFeathersCeil(DATA.bonusStamina());
+    private static void drawBonus(GuiGraphics graphics, FeathersView view, int x, int y, int rows) {
+        int bonusFeathers = Stamina.toFeathersCeil(view.bonusStamina());
         for (int row = 0; row < rows; row++) {
             int inRow = Math.min(FEATHERS_PER_ROW, bonusFeathers - row * FEATHERS_PER_ROW);
             drawFeathers(graphics, x, y - row * ROW_HEIGHT, inRow, ENDURANCE);
         }
+    }
+
+    private static final EquipmentSlot[] WEIGHT_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+    private static final long WHITE = (long) 0xF2F2F2 << 32 | 0x3C3C3C;
+
+    /** Tinted colors for the configured feather color, or 0 when it has its own sprites. */
+    private static long ownTint() {
+        return FeathersClientConfig.FEATHER_COLOR.get() == FeathersClientConfig.FeatherColor.WHITE ? WHITE : 0;
+    }
+
+    /**
+     * Armor weight from the right, head to feet: each piece's share in that piece's colors (leather in its dye), and
+     * weight from other sources in grey.
+     */
+    private static void drawWeight(GuiGraphics graphics, FeathersView view, LivingEntity wearer, int x, int y) {
+        int weight = Math.min(FEATHERS_PER_ROW, view.weight());
+        if (weight <= 0) return;
+        if (wearer == null || !(view instanceof SyncedFeathers synced)) {
+            drawFeathers(graphics, x, y, weight, ARMOR);
+            return;
+        }
+        int icons = (weight + 1) / 2;
+        for (int i = 0; i < icons; i++) {
+            int first = partOf(synced, 2 * i);
+            int second = 2 * i + 1 < weight ? partOf(synced, 2 * i + 1) : -1;
+            if (second < 0) {
+                drawPart(graphics, x, y, i, true, first, wearer);
+            } else {
+                drawPart(graphics, x, y, i, false, second, wearer);
+                if (second != first) drawPart(graphics, x, y, i, true, first, wearer);
+            }
+        }
+    }
+
+    /** Which weight part (ArmorWeights.HEAD to OTHER) the {@code feather}-th weight feather belongs to. */
+    private static int partOf(SyncedFeathers synced, int feather) {
+        int end = 0;
+        for (int part = 0; part < ArmorWeights.PARTS; part++) {
+            end += synced.weightPart(part);
+            if (feather < end) return part;
+        }
+        return ArmorWeights.OTHER;
+    }
+
+    private static void drawPart(GuiGraphics graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer) {
+        ItemStack piece = part < WEIGHT_SLOTS.length ? wearer.getItemBySlot(WEIGHT_SLOTS[part]) : ItemStack.EMPTY;
+        if (piece.isEmpty()) draw(graphics, x, y, index, half ? ARMOR.half() : ARMOR.full());
+        else drawTinted(graphics, x, y, index, half, FeatherColors.of(piece));
+    }
+
+    private static void drawTintedFeathers(GuiGraphics graphics, int x, int y, int count, long tint) {
+        if (count <= 0) return;
+        int icons = (count + 1) / 2;
+        for (int i = 0; i < icons; i++) {
+            drawTinted(graphics, x, y, i, i == icons - 1 && (count & 1) == 1, tint);
+        }
+    }
+
+    /**
+     * A grey feather tinted with the pair's body color, outlined in its complementary color.
+     */
+    private static void drawTinted(GuiGraphics graphics, int x, int y, int index, boolean half, long tint) {
+        setColor(graphics, FeatherColors.body(tint));
+        draw(graphics, x, y, index, half ? TINT_BODY_HALF : TINT_BODY_FULL);
+        setColor(graphics, FeatherColors.outline(tint));
+        draw(graphics, x, y, index, half ? TINT_EDGE_HALF : TINT_EDGE_FULL);
+        graphics.setColor(1f, 1f, 1f, alpha);
+    }
+
+    private static void setColor(GuiGraphics graphics, int rgb) {
+        graphics.setColor(((rgb >> 16) & 255) / 255f, ((rgb >> 8) & 255) / 255f, (rgb & 255) / 255f, alpha);
     }
 
     /**
@@ -158,7 +254,11 @@ public final class FeathersHud {
         if (player.hasEffect(FeathersMobEffects.HOT)) return HOT;
         if (player.hasEffect(FeathersMobEffects.ENERGIZED)) return ENERGY;
         if (player.hasEffect(FeathersMobEffects.MOMENTUM)) return MOMENTUM;
-        return FeathersClientConfig.ALTERNATIVE_FEATHER_COLOR.get() ? GREEN : NORMAL;
+        return switch (FeathersClientConfig.FEATHER_COLOR.get()) {
+            case GREEN -> GREEN;
+            case BLUE -> NORMAL;
+            case WHITE -> null;
+        };
     }
 
     private static void drawDebug(GuiGraphics graphics, Font font, LocalPlayer player) {

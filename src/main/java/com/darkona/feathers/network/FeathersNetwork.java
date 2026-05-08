@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class FeathersNetwork {
 
-    private static final String PROTOCOL_VERSION = "3";
+    private static final String PROTOCOL_VERSION = "4";
 
     private FeathersNetwork() {}
 
@@ -29,8 +29,11 @@ public final class FeathersNetwork {
                 (payload, context) -> ClientFeathersData.acceptDebug(payload));
     }
 
-    public static void sendSync(ServerPlayer player, FeathersData data) {
-        send(player, SyncPayload.of(data));
+    /**
+     * Sends {@code entity}'s feathers (the player's own, or its mount's) to {@code player}.
+     */
+    public static void sendSync(ServerPlayer player, LivingEntity entity, FeathersData data) {
+        send(player, SyncPayload.of(entity.getId(), data));
     }
 
     public static void sendSpendDebug(LivingEntity entity, ResourceLocation source, int cost) {

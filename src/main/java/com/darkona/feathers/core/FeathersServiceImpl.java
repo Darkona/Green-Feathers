@@ -164,7 +164,8 @@ public final class FeathersServiceImpl implements FeathersService {
      */
     static int effectiveCost(LivingEntity entity, FeathersData data, ResourceLocation source, double baseCost) {
         AttributeInstance usage = entity.getAttribute(FeathersAttributes.USAGE_MULTIPLIER);
-        int cost = (int) Math.round(baseCost * (usage != null ? usage.getValue() : 1.0));
+        // Clamped before narrowing: an "everything" cost times a multiplier would wrap negative and cost nothing.
+        int cost = (int) Math.min(Integer.MAX_VALUE, Math.round(baseCost * (usage != null ? usage.getValue() : 1.0)));
         for (Extensions.ModifierEntry modifier : Extensions.modifiers()) {
             cost = modifier.modifier().modifyCost(entity, data, source, cost);
         }
@@ -240,7 +241,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     static void checkExhausted(LivingEntity entity, FeathersData data, boolean strainEnabled) {
-        if (!data.exhausted && FeathersCommonConfig.ENABLE_EXHAUSTION.get() && data.isSpent(strainEnabled)) {
+        if (!data.exhausted && data.maxStamina > 0 && FeathersCommonConfig.ENABLE_EXHAUSTION.get() && data.isSpent(strainEnabled)) {
             data.exhausted = true;
             NeoForge.EVENT_BUS.post(new ExhaustionEvent.Exhausted(entity));
         }

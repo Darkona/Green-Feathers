@@ -1,6 +1,7 @@
 package com.darkona.feathers.mount;
 
 import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.MountStats;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
@@ -41,9 +42,9 @@ public final class MountExertion {
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof LivingEntity mount) || mount instanceof Player || mount.level().isClientSide()
-                || !mount.isAlive() || !FeathersServiceImpl.isMount(mount)) return;
-
-        tickMount(mount);
+                || !mount.isAlive()) return;
+        if (FeathersServiceImpl.isMount(mount)) tickMount(mount);
+        else if (mount.tickCount % 100 == 0) clearSlowdown(mount);
     }
 
     /**
@@ -99,26 +100,34 @@ public final class MountExertion {
     /**
      * A jump (or a camel's dash) of {@code power} out of 100.
      */
-    public static void chargeJump(LivingEntity mount, int power) {
+    public static boolean chargeJump(LivingEntity mount, int power) {
         Player rider = riderOf(mount);
-        if (rider != null) chargeJump(mount, rider, power);
+        return rider == null || chargeJump(mount, rider, power);
     }
 
     /**
      * The jump's cost, for {@code rider}'s jump. Creative and spectator riders jump for free.
      */
-    public static void chargeJump(LivingEntity mount, Player rider, int power) {
-        if (!FeathersServiceImpl.isMount(mount) || rider.isCreative() || rider.isSpectator()) return;
-        double full = FeathersServiceImpl.mountStats(mount).jumpFeathers().orElseGet(FeathersCommonConfig.MOUNT_JUMP_FEATHERS);
-        double feathers = full * Math.clamp(power, 0, 100) / 100.0;
-        if (feathers > 0) FeathersAPI.spend(mount, JUMP, Stamina.ofFeathers(feathers));
+    public static boolean chargeJump(LivingEntity mount, Player rider, int power) {
+        if (!FeathersServiceImpl.isMount(mount) || rider.isCreative() || rider.isSpectator()) return true;
+        double feathers = fullJumpFeathers(mount) * Math.clamp(power, 0, 100) / 100.0;
+        return feathers <= 0 || FeathersAPI.spend(mount, JUMP, Stamina.ofFeathers(feathers)).allowed();
     }
 
     /**
-     * Whether the mount has the strength to jump: not exhausted.
+     * Whether the mount has the strength to jump: not exhausted, and a full jump's feathers at hand (feathers or strain
+     * room). Asked on both sides: a horse's jump is the rider's client's movement.
      */
     public static boolean canJump(LivingEntity mount) {
-        return !FeathersServiceImpl.isMount(mount) || !FeathersAPI.get(mount).exhausted();
+        if (!FeathersServiceImpl.isMount(mount)) return true;
+        FeathersView view = FeathersAPI.get(mount);
+        if (view.exhausted()) return false;
+        int room = view.availableStamina() + Math.max(0, view.maxStrain() - view.strain());
+        return room >= Stamina.ofFeathers(fullJumpFeathers(mount));
+    }
+
+    private static double fullJumpFeathers(LivingEntity mount) {
+        return FeathersServiceImpl.mountStats(mount).jumpFeathers().orElseGet(FeathersCommonConfig.MOUNT_JUMP_FEATHERS);
     }
 
     private static void updateSlowdown(LivingEntity mount) {
@@ -132,5 +141,11 @@ public final class MountExertion {
         } else {
             speed.removeModifier(EXHAUSTED_SLOWDOWN);
         }
+    }
+
+    /** Takes the slowdown off a creature that stopped being a mount (config or tags changed) while exhausted. */
+    private static void clearSlowdown(LivingEntity entity) {
+        AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed != null && speed.hasModifier(EXHAUSTED_SLOWDOWN)) speed.removeModifier(EXHAUSTED_SLOWDOWN);
     }
 }

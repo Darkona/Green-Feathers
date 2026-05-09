@@ -16,12 +16,14 @@ import com.darkona.feathers.mount.MountExertion;
 import com.darkona.feathers.mount.MountTraits;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.weight.ArmorWeights;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -114,7 +116,9 @@ public final class FeathersTicker {
 
     @SubscribeEvent
     public static void onWakeUp(PlayerWakeUpEvent event) {
-        if (FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get() && !event.getEntity().level().isClientSide()) {
+        // Only a night slept through: leaving the bed at once ("Leave Bed") wakes up too.
+        if (FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get() && !event.getEntity().level().isClientSide()
+                && event.getEntity().isSleepingLongEnough()) {
             FeathersServiceImpl.INSTANCE.reset(event.getEntity());
         }
     }
@@ -143,16 +147,33 @@ public final class FeathersTicker {
     static void refreshFromConfig(LivingEntity entity) {
         boolean player = entity instanceof Player;
         // A mount's max feathers is its own hidden trait, rolled once (see MountTraits); a player's comes from the config.
-        if (player) setBase(entity.getAttribute(FeathersAttributes.MAX_FEATHERS), FeathersCommonConfig.MAX_FEATHERS.get());
-        else MountTraits.ensureRolled(entity);
-        setBase(entity.getAttribute(FeathersAttributes.MAX_STRAIN), FeathersCommonConfig.MAX_STRAIN.get());
-        setBase(entity.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND), player ? FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()
-                : FeathersServiceImpl.mountStats(entity).regenPerSecond().orElseGet(FeathersCommonConfig.MOUNT_REGEN));
         FeathersData data = FeathersServiceImpl.data(entity);
+        if (player) configBase(entity, data, FeathersAttributes.MAX_FEATHERS, BASE_MAX, FeathersCommonConfig.MAX_FEATHERS.get());
+        else MountTraits.ensureRolled(entity);
+        configBase(entity, data, FeathersAttributes.MAX_STRAIN, BASE_STRAIN, FeathersCommonConfig.MAX_STRAIN.get());
+        configBase(entity, data, FeathersAttributes.FEATHERS_PER_SECOND, BASE_REGEN, player ? FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()
+                : FeathersServiceImpl.mountStats(entity).regenPerSecond().orElseGet(FeathersCommonConfig.MOUNT_REGEN));
         FeathersServiceImpl.ensureInitialized(entity, data);
         FeathersServiceImpl.refreshMaximums(entity, data);
         data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
         data.forceSync = true;
+    }
+
+    /* The config value each base was last set to, in the saved counters. */
+    private static final String BASE_MAX = "config_base.max_feathers";
+    private static final String BASE_STRAIN = "config_base.max_strain";
+    private static final String BASE_REGEN = "config_base.feathers_per_second";
+
+    /**
+     * Sets an attribute base from the config, unless something else (a command, the API) changed it since the config
+     * last set it: that value is kept across rejoins, dimension changes and config reloads.
+     */
+    private static void configBase(LivingEntity entity, FeathersData data, Holder<Attribute> attribute, String key, double value) {
+        AttributeInstance instance = entity.getAttribute(attribute);
+        if (instance == null) return;
+        if (data.counters.containsKey(key) && instance.getBaseValue() != data.getCounter(key)) return;
+        setBase(instance, value);
+        data.setCounter(key, value);
     }
 
     private static void setBase(AttributeInstance attribute, double value) {
@@ -196,9 +217,8 @@ public final class FeathersTicker {
 
             data.lastDelta = data.stamina - staminaBefore;
             boolean strained = data.strain > 0;
-            if (strainedBefore != strained) {
-                NeoForge.EVENT_BUS.post(strained ? new StrainEvent.Started(entity) : new StrainEvent.Cleared(entity));
-            }
+            // Strain only starts through a spend or drain, which posts Started itself; here it can only be paid back.
+            if (strainedBefore && !strained) NeoForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
             if (!strainEnabled && data.strain > 0) data.strain = 0;
 
             FeathersServiceImpl.checkExhausted(entity, data, strainEnabled);
@@ -376,13 +396,23 @@ public final class FeathersTicker {
      * when exhaustion is turned off.
      */
     static void checkRecovered(LivingEntity entity, FeathersData data) {
+        // Without a bar there is nothing to run out of or get back: no event pair every tick.
+        if (data.maxStamina <= 0) {
+            data.exhausted = false;
+            return;
+        }
         if (!data.exhausted) return;
         boolean recovered = !FeathersCommonConfig.ENABLE_EXHAUSTION.get()
-                || data.strain == 0 && data.availableStamina() >= data.maxStamina * FeathersCommonConfig.EXHAUSTION_RECOVERY.get();
+                || data.strain == 0 && data.availableStamina() >= usableMax(data) * FeathersCommonConfig.EXHAUSTION_RECOVERY.get();
         if (recovered) {
             data.exhausted = false;
             NeoForge.EVENT_BUS.post(new ExhaustionEvent.Recovered(entity));
         }
+    }
+
+    /** The part of the bar armor weight leaves usable: recovery is measured against it, or heavy armor never recovers. */
+    private static int usableMax(FeathersData data) {
+        return Math.max(0, data.maxStamina - Stamina.ofFeathers(data.weight));
     }
 
     /**

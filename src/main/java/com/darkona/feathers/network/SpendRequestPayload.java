@@ -32,6 +32,9 @@ public record SpendRequestPayload(ResourceLocation source, int stamina, boolean 
         // Clamped: a client can't pause its own regeneration for longer than any spend could.
         SpendOptions options = new SpendOptions(false, request.allowStrain, false, Math.max(-1, Math.min(request.regenDelayTicks, 1200)));
         FeathersAPI.spend(context.player(), request.source, request.stamina, options);
+        // The client already showed its own prediction: send the server's result back, whatever it charged (a
+        // refused spend, a usage multiplier, a stamina modifier), or a sub-feather difference would never sync.
+        FeathersAPI.sync(context.player());
     }
 
     @Override

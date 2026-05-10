@@ -17,6 +17,8 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
  */
 public final class LegendarySurvivalCompat {
 
+    private static final ThirstRegen.Keys LSO_KEYS = ThirstRegen.Keys.of("legendary_survival");
+
     public static final boolean LOADED = ModList.get().isLoaded("legendarysurvivaloverhaul");
 
     public static final int CLIMATE_PRIORITY = 80;
@@ -42,7 +44,7 @@ public final class LegendarySurvivalCompat {
     private static double regenFactor(LivingEntity entity, FeathersView feathers) {
         if (!FeathersCompatConfig.LSO.get() || !FeathersCompatConfig.LSO_THIRST.get() || !(entity instanceof Player player)) return 0.0;
 
-        float exhaustion = ThirstRegen.exhaustionSinceLastCall(player, feathers, "legendary_survival", FeathersCompatConfig.LSO_THIRST_EXHAUSTION.get());
+        float exhaustion = ThirstRegen.exhaustionSinceLastCall(player, feathers, LSO_KEYS, FeathersCompatConfig.LSO_THIRST_EXHAUSTION.get());
         if (exhaustion > 0) LegendarySurvivalBridge.addThirstExhaustion(player, exhaustion);
 
         return ThirstRegen.factor(LegendarySurvivalBridge.hydration(player), LegendarySurvivalBridge.saturation(player),

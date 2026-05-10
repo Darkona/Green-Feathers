@@ -3,6 +3,7 @@ package com.darkona.feathers.client.gui;
 import com.darkona.feathers.Feathers;
 import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -32,11 +33,13 @@ public final class FeatherColors {
     private static final Object2LongOpenHashMap<ResourceLocation> BY_TEXTURE = new Object2LongOpenHashMap<>();
     private static final Reference2LongOpenHashMap<Item> BY_ITEM = new Reference2LongOpenHashMap<>();
     private static final Int2IntOpenHashMap SHADES = new Int2IntOpenHashMap();
+    private static final Int2LongOpenHashMap BY_DYE = new Int2LongOpenHashMap();
 
     static {
         BY_TEXTURE.defaultReturnValue(UNKNOWN);
         BY_ITEM.defaultReturnValue(UNKNOWN);
         SHADES.defaultReturnValue(-1);
+        BY_DYE.defaultReturnValue(UNKNOWN);
     }
 
     private FeatherColors() {}
@@ -72,7 +75,7 @@ public final class FeatherColors {
      */
     public static long of(ItemStack stack) {
         DyedItemColor dye = stack.get(DataComponents.DYED_COLOR);
-        if (dye != null) return pair(dye.rgb());
+        if (dye != null) return ofColor(dye.rgb());
         Item item = stack.getItem();
         long cached = BY_ITEM.getLong(item);
         if (cached != UNKNOWN) return cached;
@@ -105,10 +108,28 @@ public final class FeatherColors {
         return shaded;
     }
 
+    /** Colors for a given color (a dye, a weight source's own): cached by color. */
+    public static long ofColor(int rgb) {
+        rgb &= 0xFFFFFF;
+        long cached = BY_DYE.get(rgb);
+        if (cached != UNKNOWN) return cached;
+        long computed = pair(rgb);
+        if (BY_DYE.size() >= 256) BY_DYE.clear();
+        BY_DYE.put(rgb, computed);
+        return computed;
+    }
+
+    /** Colors for an item without a stack at hand (a weight source's display item): its default stack's. */
+    public static long of(Item item) {
+        long cached = BY_ITEM.getLong(item);
+        return cached != UNKNOWN ? cached : of(item.getDefaultInstance());
+    }
+
     /** Resource packs changed: textures may have too. */
     public static void clear() {
         BY_TEXTURE.clear();
         BY_ITEM.clear();
+        BY_DYE.clear();
     }
 
     private static int dominantOfTexture(ResourceLocation texture) {

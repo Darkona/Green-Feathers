@@ -5,7 +5,7 @@ import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.mount.MountExertion;
 import com.darkona.feathers.mount.MountTraits;
 import net.minecraft.core.BlockPos;
@@ -79,7 +79,7 @@ public class MountTests {
         // The rider is passed in: a fake player can't really mount (it isn't in the level).
         int before = FeathersAPI.get(horse).stamina();
         MountExertion.chargeJump(horse, player(helper), 50);
-        int expected = Stamina.ofFeathers(FeathersCommonConfig.MOUNT_JUMP_FEATHERS.get() * 0.5);
+        int expected = Stamina.ofFeathers(FeathersServerConfig.MOUNT_JUMP_FEATHERS.get() * 0.5);
         helper.assertValueEqual(before - FeathersAPI.get(horse).stamina(), expected, "a half jump costs half a full jump");
         helper.succeed();
     }

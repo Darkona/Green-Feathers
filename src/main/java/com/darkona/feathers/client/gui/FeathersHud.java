@@ -7,8 +7,9 @@ import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.client.SyncedFeathers;
 import com.darkona.feathers.config.FeathersClientConfig;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.weight.ArmorWeights;
+import com.darkona.feathers.weight.WeightSplit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.overflowingbars.client.gui.RowCountRenderer;
 import net.minecraft.client.DeltaTracker;
@@ -17,9 +18,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 
@@ -91,14 +94,14 @@ public final class FeathersHud {
         if (alpha > 0) {
             RenderSystem.enableBlend();
             graphics.setColor(1f, 1f, 1f, alpha);
-            if (riding) drawRow(graphics, mount, null, FeatherColors.of(vehicle), null, x, y);
+            if (riding) drawRow(graphics, mount, null, FeatherColors.of(vehicle), vehicle, x, y);
             else drawRow(graphics, DATA, iconSet(player), ownTint(), player, x, y);
             drawBonus(graphics, shown, x, y - ROW_HEIGHT, bonusRows);
             graphics.setColor(1f, 1f, 1f, 1f);
             RenderSystem.disableBlend();
         }
 
-        if (FeathersCommonConfig.DEBUG_MODE.get()) drawDebug(graphics, mc.font, player);
+        if (FeathersServerConfig.DEBUG_MODE.get()) drawDebug(graphics, mc.font, player);
     }
 
     private static int bonusRows(FeathersView view) {
@@ -173,29 +176,48 @@ public final class FeathersHud {
         }
         int icons = (weight + 1) / 2;
         for (int i = 0; i < icons; i++) {
-            int first = partOf(synced, 2 * i);
-            int second = 2 * i + 1 < weight ? partOf(synced, 2 * i + 1) : -1;
+            int first = partOf(synced.weightSplit(), 2 * i);
+            int second = 2 * i + 1 < weight ? partOf(synced.weightSplit(), 2 * i + 1) : -1;
             if (second < 0) {
-                drawPart(graphics, x, y, i, true, first, wearer);
+                drawPart(graphics, x, y, i, true, first, wearer, synced.weightSplit());
             } else {
-                drawPart(graphics, x, y, i, false, second, wearer);
-                if (second != first) drawPart(graphics, x, y, i, true, first, wearer);
+                drawPart(graphics, x, y, i, false, second, wearer, synced.weightSplit());
+                if (second != first) drawPart(graphics, x, y, i, true, first, wearer, synced.weightSplit());
             }
         }
     }
 
-    /** Which weight part (ArmorWeights.HEAD to OTHER) the {@code feather}-th weight feather belongs to. */
-    private static int partOf(SyncedFeathers synced, int feather) {
+    /**
+     * Which share the {@code feather}-th weight feather belongs to, in drawing order: the armor pieces
+     * (ArmorWeights.HEAD to FEET), then the colored weight sources ({@link #SOURCE} + index), then the rest
+     * (ArmorWeights.OTHER).
+     */
+    private static int partOf(WeightSplit split, int feather) {
         int end = 0;
-        for (int part = 0; part < ArmorWeights.PARTS; part++) {
-            end += synced.weightPart(part);
+        for (int part = ArmorWeights.HEAD; part <= ArmorWeights.FEET; part++) {
+            end += split.part(part);
             if (feather < end) return part;
+        }
+        for (int source = 0, n = split.sourceCount(); source < n; source++) {
+            end += split.feathers(source);
+            if (feather < end) return SOURCE + source;
         }
         return ArmorWeights.OTHER;
     }
 
-    private static void drawPart(GuiGraphics graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer) {
-        ItemStack piece = part < WEIGHT_SLOTS.length ? wearer.getItemBySlot(WEIGHT_SLOTS[part]) : ItemStack.EMPTY;
+    /** Shares from here on are colored weight sources. */
+    private static final int SOURCE = ArmorWeights.PARTS;
+
+    private static void drawPart(GuiGraphics graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer, WeightSplit split) {
+        if (part >= SOURCE) {
+            int tint = split.tint(part - SOURCE);
+            drawTinted(graphics, x, y, index, half, tint >= 0 ? FeatherColors.ofColor(tint) : FeatherColors.of(BuiltInRegistries.ITEM.byId(-tint - 1)));
+            return;
+        }
+        // A mount's armor is weighed as its chest piece (see ArmorWeights.totalWeight).
+        EquipmentSlot slot = part == ArmorWeights.CHEST && !(wearer instanceof Player) ? EquipmentSlot.BODY
+                : part < WEIGHT_SLOTS.length ? WEIGHT_SLOTS[part] : null;
+        ItemStack piece = slot != null ? wearer.getItemBySlot(slot) : ItemStack.EMPTY;
         if (piece.isEmpty()) draw(graphics, x, y, index, half ? ARMOR.half() : ARMOR.full());
         else drawTinted(graphics, x, y, index, half, FeatherColors.of(piece));
     }
@@ -240,12 +262,19 @@ public final class FeathersHud {
         graphics.blit(ICONS, x - index * 8, y - wave, icon.x(), icon.y(), icon.width(), icon.height(), 256, 256);
     }
 
+    /** "x2", "x3"...: drawn every frame, built once. */
+    private static final String[] ROW_COUNTS = new String[64];
+
+    static {
+        for (int i = 0; i < ROW_COUNTS.length; i++) ROW_COUNTS[i] = "x" + i;
+    }
+
     private static void drawRowCount(GuiGraphics graphics, int x, int y, int layers) {
         Font font = Minecraft.getInstance().font;
         if (OVERFLOWING_BARS) {
             RowCountRenderer.drawBarRowCount(graphics, x + 18, y, layers, true, font);
         } else {
-            graphics.drawString(font, "x" + layers, x + 11, y + 1, 0xFFFFFF);
+            graphics.drawString(font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, 0xFFFFFF);
         }
     }
 

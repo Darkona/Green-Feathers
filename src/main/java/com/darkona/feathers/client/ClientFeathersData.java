@@ -5,7 +5,7 @@ import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.client.ClientFeathersService;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.network.SpendDebugPayload;
 import com.darkona.feathers.network.SpendRequestPayload;
@@ -119,7 +119,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
     public SpendResult predictSpend(int cost, boolean allowStrain) {
         if (!synced) return SpendResult.EXEMPT;
         if (exhausted) return SpendResult.EXHAUSTED;
-        int strainRoom = allowStrain && FeathersCommonConfig.ENABLE_STRAIN.get() ? Math.max(0, maxStrain - strain) : 0;
+        int strainRoom = allowStrain && FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, maxStrain - strain) : 0;
         if (cost > availableStamina() + strainRoom) return SpendResult.INSUFFICIENT;
 
         int fromBonus = Math.min(bonus, cost);
@@ -128,7 +128,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         int fromStamina = Math.min(Math.max(0, stamina - Stamina.ofFeathers(weight)), left);
         stamina -= fromStamina;
         strain += left - fromStamina;
-        regenDelay = Math.max(regenDelay, FeathersCommonConfig.DEFAULT_USAGE_COOLDOWN.get());
+        regenDelay = Math.max(regenDelay, FeathersServerConfig.DEFAULT_USAGE_COOLDOWN.get());
         return SpendResult.OK;
     }
 

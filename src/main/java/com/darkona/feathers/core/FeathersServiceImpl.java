@@ -21,9 +21,10 @@ import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersDataMaps;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.spi.FeathersService;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.weight.ArmorWeights;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -81,10 +82,38 @@ public final class FeathersServiceImpl implements FeathersService {
      * {@code greenfeathers:mount_stats} data map: modpacks can give feathers to any creature with data alone.
      */
     public static boolean isMount(LivingEntity entity) {
-        if (entity instanceof Player || !FeathersCommonConfig.ENABLE_MOUNTS.get() || entity.getType().is(FeathersIds.NO_FEATHERS)) return false;
+        if (entity instanceof Player || !FeathersServerConfig.ENABLE_MOUNTS.get()) return false;
+        // Asked for every living entity every tick: the verdict is per type, worked out once and kept until tags,
+        // data maps or the config change (see invalidateMountTypes).
+        int id = BuiltInRegistries.ENTITY_TYPE.getId(entity.getType());
+        byte[] verdicts = mountTypes;
+        if (verdicts.length == 0) {
+            invalidateMountTypes();
+            verdicts = mountTypes;
+        }
+        if (id < 0 || id >= verdicts.length) return computeMount(entity);
+        byte verdict = verdicts[id];
+        if (verdict == UNKNOWN_TYPE) {
+            verdict = computeMount(entity) ? MOUNT_TYPE : NOT_MOUNT_TYPE;
+            // A benign race: both threads of a singleplayer game write the same answer.
+            verdicts[id] = verdict;
+        }
+        return verdict == MOUNT_TYPE;
+    }
+
+    private static final byte UNKNOWN_TYPE = 0, MOUNT_TYPE = 1, NOT_MOUNT_TYPE = 2;
+    private static volatile byte[] mountTypes = new byte[0];
+
+    private static boolean computeMount(LivingEntity entity) {
+        if (entity.getType().is(FeathersIds.NO_FEATHERS)) return false;
         boolean mount = entity instanceof AbstractHorse || entity.getType().is(FeathersIds.MOUNTS)
                 || entity.getType().builtInRegistryHolder().getData(FeathersDataMaps.MOUNT_STATS) != null;
         return mount && entity.getAttribute(FeathersAttributes.MAX_FEATHERS) != null;
+    }
+
+    /** Tags, data maps or the config changed: every entity type's mount verdict is worked out again. */
+    public static void invalidateMountTypes() {
+        mountTypes = new byte[BuiltInRegistries.ENTITY_TYPE.size()];
     }
 
     /**
@@ -136,7 +165,7 @@ public final class FeathersServiceImpl implements FeathersService {
             data.stamina = data.maxStamina;
             data.fresh = false;
         }
-        data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
+        data.weight = ArmorWeights.totalWeight(entity, data.weightSplit);
         data.forceSync = true;
     }
 
@@ -185,7 +214,7 @@ public final class FeathersServiceImpl implements FeathersService {
 
         FeathersData data = data(entity);
         ensureInitialized(entity, data);
-        boolean strainEnabled = FeathersCommonConfig.ENABLE_STRAIN.get();
+        boolean strainEnabled = FeathersServerConfig.ENABLE_STRAIN.get();
 
         if (data.exhausted && !options.ignoreExhaustion()) return SpendResult.EXHAUSTED;
 
@@ -212,7 +241,7 @@ public final class FeathersServiceImpl implements FeathersService {
         applyRegenDelay(data, options);
 
         NeoForge.EVENT_BUS.post(new SpendEvent.Post(entity, source, cost, SpendResult.OK));
-        if (FeathersCommonConfig.DEBUG_MODE.get()) {
+        if (FeathersServerConfig.DEBUG_MODE.get()) {
             Feathers.LOGGER.info("{} spent {} stamina on {}", entity.getName().getString(), cost, source);
             FeathersNetwork.sendSpendDebug(entity, source, cost);
         }
@@ -220,13 +249,13 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     private static void applyRegenDelay(FeathersData data, SpendOptions options) {
-        int delay = options.regenDelayTicks() < 0 ? FeathersCommonConfig.DEFAULT_USAGE_COOLDOWN.get() : options.regenDelayTicks();
-        data.regenDelay = Math.min(data.regenDelay + delay, FeathersCommonConfig.MAX_COOLDOWN.get() * 20);
+        int delay = options.regenDelayTicks() < 0 ? FeathersServerConfig.DEFAULT_USAGE_COOLDOWN.get() : options.regenDelayTicks();
+        data.regenDelay = Math.min(data.regenDelay + delay, FeathersServerConfig.MAX_COOLDOWN.get() * 20);
     }
 
     private static SpendResult simulateAgainst(FeathersView view, int cost, SpendOptions options) {
         if (view.exhausted() && !options.ignoreExhaustion()) return SpendResult.EXHAUSTED;
-        int room = options.allowStrain() && FeathersCommonConfig.ENABLE_STRAIN.get() ? Math.max(0, view.maxStrain() - view.strain()) : 0;
+        int room = options.allowStrain() && FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, view.maxStrain() - view.strain()) : 0;
         return cost <= view.availableStamina() + room ? SpendResult.OK : SpendResult.INSUFFICIENT;
     }
 
@@ -241,7 +270,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     static void checkExhausted(LivingEntity entity, FeathersData data, boolean strainEnabled) {
-        if (!data.exhausted && data.maxStamina > 0 && FeathersCommonConfig.ENABLE_EXHAUSTION.get() && data.isSpent(strainEnabled)) {
+        if (!data.exhausted && data.maxStamina > 0 && FeathersServerConfig.ENABLE_EXHAUSTION.get() && data.isSpent(strainEnabled)) {
             data.exhausted = true;
             NeoForge.EVENT_BUS.post(new ExhaustionEvent.Exhausted(entity));
         }
@@ -266,7 +295,7 @@ public final class FeathersServiceImpl implements FeathersService {
         if (drain == null) {
             if (data.exhausted) return SpendResult.EXHAUSTED;
             int firstTick = effectiveCost(entity, data, source, Math.ceil(staminaPerTick));
-            if (!data.canPay(firstTick, options.allowStrain(), FeathersCommonConfig.ENABLE_STRAIN.get())) return SpendResult.INSUFFICIENT;
+            if (!data.canPay(firstTick, options.allowStrain(), FeathersServerConfig.ENABLE_STRAIN.get())) return SpendResult.INSUFFICIENT;
             drain = new FeathersData.Drain(source);
             data.drains.add(drain);
             NeoForge.EVENT_BUS.post(new DrainEvent.Started(entity, source, staminaPerTick));
@@ -398,7 +427,7 @@ public final class FeathersServiceImpl implements FeathersService {
     public void recalculateWeight(LivingEntity entity) {
         if (!supports(entity) || onClient(entity)) return;
         FeathersData data = data(entity);
-        data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
+        data.weight = ArmorWeights.totalWeight(entity, data.weightSplit);
     }
 
     /* Extension points */

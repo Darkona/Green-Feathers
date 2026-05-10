@@ -1,13 +1,13 @@
 package com.darkona.feathers.weight;
 
+import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.WeightSource;
 import com.darkona.feathers.api.event.ArmorWeightEvent;
 import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersDataMaps;
 import com.darkona.feathers.api.registry.FeathersEnchantments;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.Extensions;
-import com.darkona.feathers.Feathers;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
@@ -20,14 +20,16 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.common.NeoForge;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -80,7 +82,7 @@ public final class ArmorWeights {
         materialPieceRules.clear();
         materialRules.clear();
 
-        for (String rule : FeathersCommonConfig.ARMOR_WEIGHTS.get()) {
+        for (String rule : FeathersServerConfig.ARMOR_WEIGHTS.get()) {
             int eq = rule.lastIndexOf('=');
             if (eq <= 0) {
                 Feathers.LOGGER.warn("Armor weight rule '{}' has no '=weight' part, ignored.", rule);
@@ -155,7 +157,7 @@ public final class ArmorWeights {
                 weight = materialRules.getInt(material);
                 if (weight != UNRESOLVED) return weight;
             }
-            return (int) Math.round(armor.getDefense() * FeathersCommonConfig.UNLISTED_ARMOR_WEIGHT_PER_DEFENSE.get());
+            return (int) Math.round(armor.getDefense() * FeathersServerConfig.UNLISTED_ARMOR_WEIGHT_PER_DEFENSE.get());
         }
         return 0;
     }
@@ -168,7 +170,7 @@ public final class ArmorWeights {
         if (base == 0) return 0;
         int lightweight = enchantmentLevel(FeathersEnchantments.LIGHTWEIGHT, stack);
         int heavy = enchantmentLevel(FeathersEnchantments.HEAVY, stack);
-        double lightness = Math.max(0.0, 1.0 - lightweight * FeathersCommonConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
+        double lightness = Math.max(0.0, 1.0 - lightweight * FeathersServerConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
         return base * lightness * (1 + heavy);
     }
 
@@ -183,22 +185,42 @@ public final class ArmorWeights {
     }
 
     /**
-     * Same, and splits the total between the armor pieces (head to feet) and everything else into {@code parts}
-     * (length {@link #PARTS}), scaled like the total and rounded so they add up to it.
+     * Same, and divides the total into {@code split} (when not null): each armor piece, each weight source with a
+     * color of its own, and the rest, scaled like the total and rounded so they add up to it.
      */
-    public static int totalWeight(LivingEntity entity, int[] parts) {
-        if (parts != null) Arrays.fill(parts, 0);
-        if (!FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) return 0;
+    public static int totalWeight(LivingEntity entity, @Nullable WeightSplit split) {
+        if (split != null) split.clear();
+        if (!FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.get()) return 0;
 
         double head = pieceWeight(entity.getItemBySlot(EquipmentSlot.HEAD));
         double chest = pieceWeight(entity.getItemBySlot(EquipmentSlot.CHEST));
+        // A mount's armor (horse armor) covers its body: it counts as its chest piece.
+        if (!(entity instanceof Player)) chest += pieceWeight(entity.getItemBySlot(EquipmentSlot.BODY));
         double legs = pieceWeight(entity.getItemBySlot(EquipmentSlot.LEGS));
         double feet = pieceWeight(entity.getItemBySlot(EquipmentSlot.FEET));
+        double raw = head + chest + legs + feet;
         double other = 0;
-        for (Extensions.WeightEntry source : Extensions.weightSources()) {
-            other += source.source().weight(entity);
+        if (split != null) {
+            split.shares.add(head);
+            split.shares.add(chest);
+            split.shares.add(legs);
+            split.shares.add(feet);
+            split.shares.add(0);
         }
-        double raw = head + chest + legs + feet + other;
+        for (Extensions.WeightEntry entry : Extensions.weightSources()) {
+            double weight = entry.source().weight(entity);
+            if (weight <= 0) continue;
+            raw += weight;
+            int tint = split != null ? tintOf(entry.source(), entity) : NO_TINT;
+            if (tint == NO_TINT) {
+                other += weight;
+            } else {
+                split.shares.add(weight);
+                split.sources.add(tint);
+                split.sources.add(0);
+            }
+        }
+        if (split != null) split.shares.set(OTHER, other);
 
         double weight = NeoForge.EVENT_BUS.post(new ArmorWeightEvent(entity, raw)).getWeight();
 
@@ -206,47 +228,68 @@ public final class ArmorWeights {
         if (multiplier != null) weight *= multiplier.getValue();
 
         int total = Math.max(0, (int) Math.round(weight));
-        if (parts != null && total > 0) {
+        if (split != null && total > 0) {
             if (raw <= 0) {
-                parts[OTHER] = total;
+                split.parts[OTHER] = total;
             } else {
-                double scale = weight / raw;
-                split(total, parts, head * scale, chest * scale, legs * scale, feet * scale, other * scale);
+                round(split, total, weight / raw);
             }
         }
         return total;
     }
 
+    private static final int NO_TINT = Integer.MIN_VALUE;
+
+    /** A source's own color, its item's (as {@code -(id + 1)}, see {@link WeightSplit#tint}), or none. */
+    private static int tintOf(WeightSource source, LivingEntity entity) {
+        int color = source.color(entity);
+        if (color != WeightSource.NO_COLOR) return color & 0xFFFFFF;
+        Item item = source.displayItem(entity);
+        if (item == null || item == Items.AIR) return NO_TINT;
+        return -(BuiltInRegistries.ITEM.getId(item) + 1);
+    }
+
     /**
-     * Rounds the shares to whole feathers adding up to {@code total}: floors first, then the largest remainders.
+     * Rounds the shares, times {@code scale}, to whole feathers adding up to {@code total}: floors first, then the
+     * largest remainders.
      */
-    private static void split(int total, int[] parts, double... shares) {
+    private static void round(WeightSplit split, int total, double scale) {
+        int count = split.shares.size();
         int assigned = 0;
-        for (int i = 0; i < PARTS; i++) {
-            parts[i] = (int) Math.floor(shares[i]);
-            assigned += parts[i];
+        for (int i = 0; i < count; i++) {
+            int floor = (int) Math.floor(split.shares.getDouble(i) * scale);
+            setFeathers(split, i, floor);
+            assigned += floor;
         }
         while (assigned < total) {
             int best = 0;
             double bestRemainder = -1;
-            for (int i = 0; i < PARTS; i++) {
-                double remainder = shares[i] - parts[i];
+            for (int i = 0; i < count; i++) {
+                double remainder = split.shares.getDouble(i) * scale - feathers(split, i);
                 if (remainder > bestRemainder) {
                     bestRemainder = remainder;
                     best = i;
                 }
             }
-            parts[best]++;
+            setFeathers(split, best, feathers(split, best) + 1);
             assigned++;
         }
-        while (assigned > total) {
-            for (int i = PARTS - 1; i >= 0 && assigned > total; i--) {
-                if (parts[i] > 0) {
-                    parts[i]--;
-                    assigned--;
-                }
-            }
+        for (int i = count - 1; i >= 0 && assigned > total; i--) {
+            int feathers = feathers(split, i);
+            int taken = Math.min(feathers, assigned - total);
+            setFeathers(split, i, feathers - taken);
+            assigned -= taken;
         }
+    }
+
+    /** Share {@code i}: a part below {@link #PARTS}, a colored source after. */
+    private static int feathers(WeightSplit split, int i) {
+        return i < PARTS ? split.parts[i] : split.sources.getInt(2 * (i - PARTS) + 1);
+    }
+
+    private static void setFeathers(WeightSplit split, int i, int feathers) {
+        if (i < PARTS) split.parts[i] = feathers;
+        else split.sources.set(2 * (i - PARTS) + 1, feathers);
     }
 
     /**

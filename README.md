@@ -10,19 +10,19 @@ Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers
 ## How it plays
 
 - **Feathers come back on their own**, a little every second, after a short pause once you've spent some.
-- **Push past empty.** When you run out you can keep going into red *Strain* feathers. Regeneration pays Strain
+- **Push past empty.** When you run out you can keep going into red *strain* feathers. Regeneration pays strain
   back before anything else, slowly, so overdoing it leaves you drained for a while.
 - **Rest to recover.** Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods)
-  pays Strain back faster. Sleep restores everything.
+  pays strain back faster. Sleep restores everything.
 - **Exhaustion.** Spend absolutely everything and you're exhausted: no exerting yourself until you've caught your
   breath.
 - **Weather and climate matter.** Cold weather slows your recovery. Heat makes everything cost double, and the
   Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
-- **Heavy armor weighs you down** (optional). Every piece greys out some feathers you can't use. Netherite is heavy;
-  the *Lightweight* enchantment and the *Feather Ring* help.
+- **Heavy armor weighs you down** (optional). Every piece holds back some feathers you can't use, shown in that
+  piece's own color, head to feet. Netherite is heavy; the *Lightweight* enchantment and the *Feather Ring* help.
 - **Mounts tire too** (optional). Horses, donkeys, mules and camels have their own feathers, shown instead of yours
-  while you ride, in hay-bale colors. Galloping and jumping tire them slowly; an exhausted mount slows down and
-  can't jump. Like speed and health, each animal is born with its own stamina, and foals take after their parents.
+  while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount
+  slows down and can't jump. Horse armor weighs a little too. Like speed and health, each animal is born with its own stamina, and foals take after their parents.
 - **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
 On its own, Green Feathers makes sprinting and jumping cost feathers. Install
@@ -51,8 +51,11 @@ Supported out of the box, each switchable in the config:
 
 ## Configuration
 
-Everything is configurable in `config/feathers/`: how many feathers, how fast they come back, Strain, exhaustion,
+Everything is configurable in `config/feathers/`: how many feathers, how fast they come back, strain, exhaustion,
 each effect, resting, armor weights per item or material, basic sprint/jump costs, mounts, each compat, and the HUD.
+`Feathers-Server.toml` and `Feathers-Compat.toml` are server configs: a server sends its own to every player who
+joins, so everyone plays by the same rules (modpacks set their defaults in `defaultconfigs/`). `Feathers-Client.toml`
+is yours: the HUD, and the feather color (green, blue or white).
 Operators can inspect and adjust with `/feathers info|set|reset|max|regen|spend|debug`; `debug` shows what spent
 feathers recently, by source.
 
@@ -87,6 +90,13 @@ if (FeathersAPI.spend(player, MY_DASH, Stamina.ofFeathers(3)).allowed()) dash(pl
 
 // A continuous cost: call every tick while it lasts, stop when it's refused.
 if (!FeathersAPI.startDrain(player, MY_GLIDE, Stamina.perTick(1.5)).allowed()) stopGliding(player);
+
+// Extra weight, drawn after the boots in the backpack's own colors.
+FeathersAPI.registerWeightSource(MY_BACKPACK, new WeightSource() {
+    public double weight(LivingEntity entity) { return backpackWeight(entity); }
+    public Item displayItem(LivingEntity entity) { return MyItems.BACKPACK.get(); }
+});
+// Call FeathersAPI.recalculateWeight(entity) when the backpack's weight changes.
 ```
 
 Costs can be fractions of a feather. The API also covers pausing regeneration, temporary bonus feathers, rest

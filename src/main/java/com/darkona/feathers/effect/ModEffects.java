@@ -5,7 +5,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatCompat;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -36,7 +36,7 @@ public final class ModEffects {
         EFFECTS.register("endurance", () -> new FeathersMobEffect(MobEffectCategory.BENEFICIAL, 0xFFFF00) {
             @Override
             public boolean canApply(LivingEntity entity) {
-                return super.canApply(entity) && FeathersCommonConfig.ENABLE_ENDURANCE.get();
+                return super.canApply(entity) && FeathersServerConfig.ENABLE_ENDURANCE.get();
             }
 
             /** Eight golden feathers per level, for as long as the effect lasts or until spent. */
@@ -55,7 +55,7 @@ public final class ModEffects {
         EFFECTS.register("cold", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0xB6FFFF) {
             @Override
             public boolean canApply(LivingEntity entity) {
-                if (!super.canApply(entity) || !FeathersCommonConfig.ENABLE_COLD.get()) return false;
+                if (!super.canApply(entity) || !FeathersServerConfig.ENABLE_COLD.get()) return false;
                 if (!ColdSweatCompat.canApplyCold(entity)) return false;
                 // Cold and Heat never coexist: the climate swaps one for the other, potions can't stack them.
                 return !entity.hasEffect(FeathersMobEffects.ENERGIZED) && !entity.hasEffect(FeathersMobEffects.HOT);
@@ -68,7 +68,7 @@ public final class ModEffects {
         EFFECTS.register("hot", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0x7E5D48) {
             @Override
             public boolean canApply(LivingEntity entity) {
-                if (!super.canApply(entity) || !FeathersCommonConfig.ENABLE_HEAT.get() || isProtectedFromHeat(entity)) return false;
+                if (!super.canApply(entity) || !FeathersServerConfig.ENABLE_HEAT.get() || isProtectedFromHeat(entity)) return false;
                 if (!ColdSweatCompat.canApplyHeat(entity)) return false;
                 return !entity.hasEffect(FeathersMobEffects.MOMENTUM) && !entity.hasEffect(FeathersMobEffects.COLD);
             }
@@ -77,14 +77,14 @@ public final class ModEffects {
         EFFECTS.register("fatigued", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0xFF0048) {
             @Override
             public boolean canApply(LivingEntity entity) {
-                return super.canApply(entity) && FeathersCommonConfig.ENABLE_FATIGUE.get() && !isProtectedFromHeat(entity);
+                return super.canApply(entity) && FeathersServerConfig.ENABLE_FATIGUE.get() && !isProtectedFromHeat(entity);
             }
         }.addAttributeModifier(MAX_FEATHERS, id("effect.fatigued"), -4.0, ADD_VALUE));
 
         EFFECTS.register("momentum", () -> new FeathersMobEffect(MobEffectCategory.BENEFICIAL, 0x7E5684) {
             @Override
             public boolean canApply(LivingEntity entity) {
-                return super.canApply(entity) && FeathersCommonConfig.ENABLE_MOMENTUM.get();
+                return super.canApply(entity) && FeathersServerConfig.ENABLE_MOMENTUM.get();
             }
         // Half the cost at level I, 35% at II, never below 20%: never free.
         }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.momentum"), ADD_MULTIPLIED_TOTAL, amplifier -> Math.max(-0.8, -0.5 - 0.15 * amplifier)));
@@ -93,7 +93,7 @@ public final class ModEffects {
         EFFECTS.register("strain", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0x7E4488) {
             @Override
             public boolean canApply(LivingEntity entity) {
-                return super.canApply(entity) && FeathersCommonConfig.ENABLE_STRAIN.get();
+                return super.canApply(entity) && FeathersServerConfig.ENABLE_STRAIN.get();
             }
         }.addAttributeModifier(FEATHERS_PER_SECOND, id("effect.strain"), -0.75, ADD_MULTIPLIED_TOTAL));
 

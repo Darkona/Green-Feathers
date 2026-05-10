@@ -4,7 +4,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -30,7 +30,7 @@ public final class BasicExertion {
     private BasicExertion() {}
 
     public static boolean isActive() {
-        return !ACTIONS_OF_STAMINA && FeathersCommonConfig.ENABLE_BASIC_EXERTION.get();
+        return !ACTIONS_OF_STAMINA && FeathersServerConfig.ENABLE_BASIC_EXERTION.get();
     }
 
     @SubscribeEvent
@@ -38,7 +38,7 @@ public final class BasicExertion {
         Player player = event.getEntity();
         if (player.level().isClientSide() || !isActive() || !player.isSprinting() || player.isPassenger()) return;
 
-        double perSecond = FeathersCommonConfig.SPRINT_FEATHERS_PER_SECOND.get();
+        double perSecond = FeathersServerConfig.SPRINT_FEATHERS_PER_SECOND.get();
         if (perSecond <= 0) return;
 
         SpendResult result = FeathersAPI.startDrain(player, SPRINT, Stamina.perTick(perSecond));
@@ -48,7 +48,7 @@ public final class BasicExertion {
     @SubscribeEvent
     public static void onJump(LivingEvent.LivingJumpEvent event) {
         if (event.getEntity().level().isClientSide() || !isActive() || !(event.getEntity() instanceof Player player)) return;
-        double feathers = FeathersCommonConfig.JUMP_FEATHERS.get();
+        double feathers = FeathersServerConfig.JUMP_FEATHERS.get();
         if (feathers > 0) FeathersAPI.spend(player, JUMP, Stamina.ofFeathers(feathers));
     }
 }

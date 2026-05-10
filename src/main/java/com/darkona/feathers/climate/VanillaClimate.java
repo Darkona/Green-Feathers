@@ -1,7 +1,7 @@
 package com.darkona.feathers.climate;
 
 import com.darkona.feathers.api.Climate;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -25,7 +25,7 @@ public final class VanillaClimate {
         if (entity.isInPowderSnow || entity.isInWaterOrRain()) return Climate.NEUTRAL;
         if (!level.isDay() || !level.canSeeSky(pos)) return Climate.NEUTRAL;
 
-        return level.getBiome(pos).value().getModifiedClimateSettings().temperature() >= FeathersCommonConfig.HOT_TEMPERATURE.get()
+        return level.getBiome(pos).value().getModifiedClimateSettings().temperature() >= FeathersServerConfig.HOT_TEMPERATURE.get()
                 ? Climate.HOT : Climate.NEUTRAL;
     }
 
@@ -37,6 +37,6 @@ public final class VanillaClimate {
         if (!level.isRaining() || !level.canSeeSky(pos)) return false;
         Biome biome = level.getBiome(pos).value();
         if (biome.getPrecipitationAt(pos) == Biome.Precipitation.NONE) return false;
-        return biome.coldEnoughToSnow(pos) || biome.getModifiedClimateSettings().temperature() < FeathersCommonConfig.COLD_TEMPERATURE.get();
+        return biome.coldEnoughToSnow(pos) || biome.getModifiedClimateSettings().temperature() < FeathersServerConfig.COLD_TEMPERATURE.get();
     }
 }

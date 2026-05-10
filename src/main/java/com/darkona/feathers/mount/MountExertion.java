@@ -6,7 +6,7 @@ import com.darkona.feathers.api.MountStats;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.core.FeathersTicker;
@@ -59,7 +59,7 @@ public final class MountExertion {
             if (rider != null && !rider.isCreative() && !rider.isSpectator()) gallop(mount);
             FeathersTicker.tick(mount);
         }
-        updateSlowdown(mount);
+        updateSlowdown(mount, data);
     }
 
     public static boolean isSlowedDown(LivingEntity mount) {
@@ -89,10 +89,10 @@ public final class MountExertion {
 
     private static void gallop(LivingEntity mount) {
         MountStats stats = FeathersServiceImpl.mountStats(mount);
-        double perSecond = stats.gallopFeathersPerSecond().orElseGet(FeathersCommonConfig.MOUNT_GALLOP_FEATHERS_PER_SECOND);
+        double perSecond = stats.gallopFeathersPerSecond().orElseGet(FeathersServerConfig.MOUNT_GALLOP_FEATHERS_PER_SECOND);
         if (perSecond <= 0) return;
         Vec3 motion = mount.getDeltaMovement();
-        double speed = stats.gallopSpeed().orElseGet(FeathersCommonConfig.MOUNT_GALLOP_SPEED);
+        double speed = stats.gallopSpeed().orElseGet(FeathersServerConfig.MOUNT_GALLOP_SPEED);
         if (motion.x * motion.x + motion.z * motion.z < speed * speed) return;
         FeathersAPI.startDrain(mount, GALLOP, Stamina.perTick(perSecond));
     }
@@ -127,17 +127,19 @@ public final class MountExertion {
     }
 
     private static double fullJumpFeathers(LivingEntity mount) {
-        return FeathersServiceImpl.mountStats(mount).jumpFeathers().orElseGet(FeathersCommonConfig.MOUNT_JUMP_FEATHERS);
+        return FeathersServiceImpl.mountStats(mount).jumpFeathers().orElseGet(FeathersServerConfig.MOUNT_JUMP_FEATHERS);
     }
 
-    private static void updateSlowdown(LivingEntity mount) {
+    private static void updateSlowdown(LivingEntity mount, FeathersData data) {
+        // Every tick for every mount: the attribute is only touched when exhaustion flips.
+        boolean exhausted = data.exhausted();
+        if (exhausted == data.mountSlowed) return;
+        data.mountSlowed = exhausted;
         AttributeInstance speed = mount.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speed == null) return;
-        boolean exhausted = FeathersAPI.get(mount).exhausted();
-        if (exhausted == speed.hasModifier(EXHAUSTED_SLOWDOWN)) return;
+        if (speed == null || exhausted == speed.hasModifier(EXHAUSTED_SLOWDOWN)) return;
         if (exhausted) {
             speed.addTransientModifier(new AttributeModifier(EXHAUSTED_SLOWDOWN,
-                    -FeathersCommonConfig.MOUNT_EXHAUSTED_SLOWDOWN.get(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+                    -FeathersServerConfig.MOUNT_EXHAUSTED_SLOWDOWN.get(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         } else {
             speed.removeModifier(EXHAUSTED_SLOWDOWN);
         }

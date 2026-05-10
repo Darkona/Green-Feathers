@@ -2,7 +2,7 @@ package com.darkona.feathers.climate;
 
 import com.darkona.feathers.api.Climate;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.Extensions;
 import com.darkona.feathers.effect.FeathersMobEffect;
 import net.minecraft.core.Holder;
@@ -30,8 +30,8 @@ public final class ClimateEffects {
      * Severe heat overrides every provider: burning and the Nether are severe whatever a temperature mod says.
      */
     public static Climate evaluate(LivingEntity entity) {
-        if (FeathersCommonConfig.FATIGUE_FROM_BURNING.get() && (entity.isOnFire() || entity.isInLava())) return Climate.SCORCHING;
-        if (FeathersCommonConfig.FATIGUE_FROM_NETHER.get() && entity.level().dimension() == Level.NETHER) return Climate.SCORCHING;
+        if (FeathersServerConfig.FATIGUE_FROM_BURNING.get() && (entity.isOnFire() || entity.isInLava())) return Climate.SCORCHING;
+        if (FeathersServerConfig.FATIGUE_FROM_NETHER.get() && entity.level().dimension() == Level.NETHER) return Climate.SCORCHING;
 
         for (Extensions.ClimateEntry entry : Extensions.climates()) {
             Climate climate = entry.provider().getClimate(entity);
@@ -52,9 +52,9 @@ public final class ClimateEffects {
         if (climate != Climate.COLD && climate != Climate.NEUTRAL) entity.removeEffect(FeathersMobEffects.COLD);
         if (climate == Climate.COLD) entity.removeEffect(FeathersMobEffects.HOT);
 
-        if (FeathersCommonConfig.ENABLE_COLD.get()) update(entity, FeathersMobEffects.COLD, climate == Climate.COLD);
-        if (FeathersCommonConfig.ENABLE_HEAT.get()) update(entity, FeathersMobEffects.HOT, climate.isHot());
-        if (FeathersCommonConfig.ENABLE_FATIGUE.get()) update(entity, FeathersMobEffects.FATIGUE, climate == Climate.SCORCHING);
+        if (FeathersServerConfig.ENABLE_COLD.get()) update(entity, FeathersMobEffects.COLD, climate == Climate.COLD);
+        if (FeathersServerConfig.ENABLE_HEAT.get()) update(entity, FeathersMobEffects.HOT, climate.isHot());
+        if (FeathersServerConfig.ENABLE_FATIGUE.get()) update(entity, FeathersMobEffects.FATIGUE, climate == Climate.SCORCHING);
     }
 
     /**
@@ -71,7 +71,7 @@ public final class ClimateEffects {
             }
         } else if (permanent) {
             entity.removeEffect(effect);
-            int linger = FeathersCommonConfig.EFFECT_LINGER.get();
+            int linger = FeathersServerConfig.EFFECT_LINGER.get();
             if (linger > 0) entity.addEffect(new MobEffectInstance(effect, linger, 0, false, true));
         }
     }

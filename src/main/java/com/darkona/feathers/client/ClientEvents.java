@@ -7,7 +7,7 @@ import com.darkona.feathers.basic.BasicExertion;
 import com.darkona.feathers.client.gui.FeatherColors;
 import com.darkona.feathers.client.gui.FeathersHud;
 import com.darkona.feathers.config.FeathersClientConfig;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -91,11 +91,25 @@ public final class ClientEvents {
     /**
      * Shows how much an armor piece weighs, counting its enchantments.
      */
+    /** Icon strings by weight in half icons: a tooltip is rebuilt every frame while hovered. */
+    private static final String[] WEIGHT_ICONS = new String[41];
+
+    private static String weightIcons(int halves) {
+        if (halves < WEIGHT_ICONS.length && WEIGHT_ICONS[halves] != null) return WEIGHT_ICONS[halves];
+        StringBuilder icons = new StringBuilder();
+        for (int i = 2; i <= halves + 1; i += 2) {
+            icons.append(i - 1 == halves ? "b" : "a ");
+        }
+        String built = icons.reverse().toString();
+        if (halves < WEIGHT_ICONS.length) WEIGHT_ICONS[halves] = built;
+        return built;
+    }
+
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
         if (!(stack.getItem() instanceof ArmorItem) || !FeathersClientConfig.DISPLAY_WEIGHTS.get()
-                || !FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get()) return;
+                || !FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.get()) return;
 
         double weight = FeathersAPI.getPieceWeight(stack);
         if (weight <= 0) return;
@@ -103,11 +117,7 @@ public final class ClientEvents {
         if (FeathersClientConfig.VISUAL_WEIGHTS.get()) {
             // The feather font maps 'a' to a full feather icon and 'b' to a half one; a weight point is half an icon.
             int halves = Math.max(1, (int) Math.round(weight));
-            StringBuilder icons = new StringBuilder();
-            for (int i = 2; i <= halves + 1; i += 2) {
-                icons.append(i - 1 == halves ? "b" : "a ");
-            }
-            event.getToolTip().add(Component.literal(icons.reverse().toString()).withStyle(Style.EMPTY.withFont(FEATHER_FONT)));
+            event.getToolTip().add(Component.literal(weightIcons(halves)).withStyle(Style.EMPTY.withFont(FEATHER_FONT)));
         } else {
             String shown = weight == Math.rint(weight) ? Integer.toString((int) weight) : "%.1f".formatted(weight);
             event.getToolTip().add(Component.translatable("text.greenfeathers.tooltip", shown).withStyle(ChatFormatting.BLUE));

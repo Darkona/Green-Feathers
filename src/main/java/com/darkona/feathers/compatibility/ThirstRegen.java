@@ -26,32 +26,39 @@ public final class ThirstRegen {
 
     /**
      * How much thirst the feathers regenerated since the last call cost, in the compat's own unit. Tracked in the
-     * player's feathers counters under {@code key}, so fractions carry over.
+     * player's feathers counters under {@code key}'s names, so fractions carry over.
      *
      * @return whole units to charge now
      */
-    public static int owedSinceLastCall(Player player, FeathersView feathers, String key, double costPerFeather) {
+    public static int owedSinceLastCall(Player player, FeathersView feathers, Keys key, double costPerFeather) {
         FeathersData data = FeathersServiceImpl.data(player);
         double regenerated = feathers.totalRegenerated();
-        double since = regenerated - data.getCounter(key + ".last_regenerated");
-        data.setCounter(key + ".last_regenerated", regenerated);
+        double since = regenerated - data.getCounter(key.lastRegenerated());
+        data.setCounter(key.lastRegenerated(), regenerated);
         if (costPerFeather <= 0 || since <= 0) return 0;
 
-        double owed = data.getCounter(key + ".owed") + since / Stamina.PER_FEATHER * costPerFeather;
+        double owed = data.getCounter(key.owed()) + since / Stamina.PER_FEATHER * costPerFeather;
         int whole = (int) owed;
-        data.setCounter(key + ".owed", owed - whole);
+        data.setCounter(key.owed(), owed - whole);
         return whole;
     }
 
     /**
      * Like {@link #owedSinceLastCall}, for mods that charge fractional exhaustion instead of whole points.
      */
-    public static float exhaustionSinceLastCall(Player player, FeathersView feathers, String key, double exhaustionPerFeather) {
+    public static float exhaustionSinceLastCall(Player player, FeathersView feathers, Keys key, double exhaustionPerFeather) {
         FeathersData data = FeathersServiceImpl.data(player);
         double regenerated = feathers.totalRegenerated();
-        double since = regenerated - data.getCounter(key + ".last_regenerated");
-        data.setCounter(key + ".last_regenerated", regenerated);
+        double since = regenerated - data.getCounter(key.lastRegenerated());
+        data.setCounter(key.lastRegenerated(), regenerated);
         if (exhaustionPerFeather <= 0 || since <= 0) return 0f;
         return (float) (since / Stamina.PER_FEATHER * exhaustionPerFeather);
+    }
+
+    /** A compat's counter names, built once: these calls run every 20 ticks per player. */
+    public record Keys(String lastRegenerated, String owed) {
+        public static Keys of(String compat) {
+            return new Keys(compat + ".last_regenerated", compat + ".owed");
+        }
     }
 }

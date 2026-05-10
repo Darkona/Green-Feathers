@@ -1,5 +1,6 @@
 package com.darkona.feathers.core;
 
+import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.event.DrainEvent;
 import com.darkona.feathers.api.event.ExhaustionEvent;
@@ -8,9 +9,8 @@ import com.darkona.feathers.api.event.StrainEvent;
 import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
-import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.climate.ClimateEffects;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.effect.ModEffects;
 import com.darkona.feathers.mount.MountExertion;
 import com.darkona.feathers.mount.MountTraits;
@@ -39,9 +39,8 @@ import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.registries.datamaps.DataMapsUpdatedEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-
-import java.util.Arrays;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 
@@ -78,8 +77,9 @@ public final class FeathersTicker {
     }
 
     public static void onConfigChanged(ModConfigEvent event) {
-        if (event.getConfig().getSpec() != FeathersCommonConfig.SPEC || event instanceof ModConfigEvent.Unloading) return;
+        if (event.getConfig().getSpec() != FeathersServerConfig.SPEC || event instanceof ModConfigEvent.Unloading) return;
         ArmorWeights.invalidate();
+        FeathersServiceImpl.invalidateMountTypes();
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) server.execute(() -> server.getPlayerList().getPlayers().forEach(FeathersTicker::refreshFromConfig));
     }
@@ -117,7 +117,7 @@ public final class FeathersTicker {
     @SubscribeEvent
     public static void onWakeUp(PlayerWakeUpEvent event) {
         // Only a night slept through: leaving the bed at once ("Leave Bed") wakes up too.
-        if (FeathersCommonConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get() && !event.getEntity().level().isClientSide()
+        if (FeathersServerConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get() && !event.getEntity().level().isClientSide()
                 && event.getEntity().isSleepingLongEnough()) {
             FeathersServiceImpl.INSTANCE.reset(event.getEntity());
         }
@@ -136,26 +136,33 @@ public final class FeathersTicker {
     @SubscribeEvent
     public static void onTagsUpdated(TagsUpdatedEvent event) {
         ArmorWeights.invalidate();
+        FeathersServiceImpl.invalidateMountTypes();
         if (event.getUpdateCause() != TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) return;
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) server.getPlayerList().getPlayers().forEach(FeathersServiceImpl.INSTANCE::recalculateWeight);
     }
 
+    /** The mount_stats data map decides which creatures are mounts. */
+    @SubscribeEvent
+    public static void onDataMapsUpdated(DataMapsUpdatedEvent event) {
+        FeathersServiceImpl.invalidateMountTypes();
+    }
+
     /**
-     * Attribute bases come from the common config.
+     * Attribute bases come from the server config.
      */
     static void refreshFromConfig(LivingEntity entity) {
         boolean player = entity instanceof Player;
         // A mount's max feathers is its own hidden trait, rolled once (see MountTraits); a player's comes from the config.
         FeathersData data = FeathersServiceImpl.data(entity);
-        if (player) configBase(entity, data, FeathersAttributes.MAX_FEATHERS, BASE_MAX, FeathersCommonConfig.MAX_FEATHERS.get());
+        if (player) configBase(entity, data, FeathersAttributes.MAX_FEATHERS, BASE_MAX, FeathersServerConfig.MAX_FEATHERS.get());
         else MountTraits.ensureRolled(entity);
-        configBase(entity, data, FeathersAttributes.MAX_STRAIN, BASE_STRAIN, FeathersCommonConfig.MAX_STRAIN.get());
-        configBase(entity, data, FeathersAttributes.FEATHERS_PER_SECOND, BASE_REGEN, player ? FeathersCommonConfig.REGEN_FEATHERS_PER_SECOND.get()
-                : FeathersServiceImpl.mountStats(entity).regenPerSecond().orElseGet(FeathersCommonConfig.MOUNT_REGEN));
+        configBase(entity, data, FeathersAttributes.MAX_STRAIN, BASE_STRAIN, FeathersServerConfig.MAX_STRAIN.get());
+        configBase(entity, data, FeathersAttributes.FEATHERS_PER_SECOND, BASE_REGEN, player ? FeathersServerConfig.REGEN_FEATHERS_PER_SECOND.get()
+                : FeathersServiceImpl.mountStats(entity).regenPerSecond().orElseGet(FeathersServerConfig.MOUNT_REGEN));
         FeathersServiceImpl.ensureInitialized(entity, data);
         FeathersServiceImpl.refreshMaximums(entity, data);
-        data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
+        data.weight = ArmorWeights.totalWeight(entity, data.weightSplit);
         data.forceSync = true;
     }
 
@@ -198,7 +205,7 @@ public final class FeathersTicker {
 
         if (!FeathersServiceImpl.isExempt(entity)) {
             long now = entity.level().getGameTime();
-            boolean strainEnabled = FeathersCommonConfig.ENABLE_STRAIN.get();
+            boolean strainEnabled = FeathersServerConfig.ENABLE_STRAIN.get();
             int staminaBefore = data.stamina;
             boolean strainedBefore = data.strain > 0;
 
@@ -237,7 +244,7 @@ public final class FeathersTicker {
         double value = multiplier != null ? multiplier.getValue() : 1.0;
         if (value != data.lastWeightMultiplier) {
             data.lastWeightMultiplier = value;
-            data.weight = ArmorWeights.totalWeight(entity, data.weightParts);
+            data.weight = ArmorWeights.totalWeight(entity, data.weightSplit);
         }
 
         if (entity.hasEffect(FeathersMobEffects.ENDURANCE) && data.bonus(ModEffects.ENDURANCE_BONUS) == null) {
@@ -272,7 +279,7 @@ public final class FeathersTicker {
         data.lastY = y;
         data.lastZ = z;
 
-        if (!FeathersCommonConfig.ENABLE_REST.get()) {
+        if (!FeathersServerConfig.ENABLE_REST.get()) {
             data.restState = RestState.NONE;
             data.restMultiplier = 1.0;
             return;
@@ -284,11 +291,11 @@ public final class FeathersTicker {
         double multiplier;
         if (entity.isPassenger()) {
             data.restState = RestState.SITTING;
-            multiplier = FeathersCommonConfig.REST_SITTING_MULTIPLIER.get();
-        } else if (data.stillTicks >= FeathersCommonConfig.REST_STILL_TICKS.get()) {
+            multiplier = FeathersServerConfig.REST_SITTING_MULTIPLIER.get();
+        } else if (data.stillTicks >= FeathersServerConfig.REST_STILL_TICKS.get()) {
             boolean crouching = entity.isCrouching();
             data.restState = crouching ? RestState.CROUCHING : RestState.STILL;
-            multiplier = crouching ? FeathersCommonConfig.REST_CROUCHING_MULTIPLIER.get() : FeathersCommonConfig.REST_STILL_MULTIPLIER.get();
+            multiplier = crouching ? FeathersServerConfig.REST_CROUCHING_MULTIPLIER.get() : FeathersServerConfig.REST_STILL_MULTIPLIER.get();
         } else {
             data.restState = RestState.NONE;
             multiplier = 1.0;
@@ -344,7 +351,7 @@ public final class FeathersTicker {
         double perTick = attribute != null ? Stamina.perTick(attribute.getValue()) : 0.0;
 
         if (perTick > 0) {
-            boolean hungry = entity instanceof Player player && FeathersCommonConfig.REGEN_USES_HUNGER.get()
+            boolean hungry = entity instanceof Player player && FeathersServerConfig.REGEN_USES_HUNGER.get()
                     && player.getFoodData().getFoodLevel() <= HUNGRY_FOOD_LEVEL;
             if (blocked || hungry) {
                 data.regenCarry = 0;
@@ -355,7 +362,7 @@ public final class FeathersTicker {
                 if (NeoForge.EVENT_BUS.post(new RegenEvent(entity)).isCanceled()) return;
                 data.regenPaused = false;
             }
-            if (FeathersCommonConfig.REST_BOOSTS_REGEN.get()) perTick *= data.restMultiplier;
+            if (FeathersServerConfig.REST_BOOSTS_REGEN.get()) perTick *= data.restMultiplier;
         }
 
         data.regenCarry += perTick;
@@ -375,7 +382,7 @@ public final class FeathersTicker {
         int recovered = 0;
         if (data.strain > 0) {
             // Resting pays Strain back faster; don't apply it twice when it already boosted regeneration.
-            double rest = FeathersCommonConfig.REST_BOOSTS_REGEN.get() ? 1.0 : data.restMultiplier;
+            double rest = FeathersServerConfig.REST_BOOSTS_REGEN.get() ? 1.0 : data.restMultiplier;
             int recovery = (int) Math.round(regen * rest);
             recovered = Math.min(data.strain, recovery);
             data.strain -= recovered;
@@ -386,8 +393,8 @@ public final class FeathersTicker {
         data.stamina += gained;
         data.totalRegenerated += gained + recovered;
 
-        if (entity instanceof Player player && FeathersCommonConfig.REGEN_USES_HUNGER.get() && gained + recovered > 0) {
-            player.causeFoodExhaustion((float) ((gained + recovered) / (double) Stamina.PER_FEATHER * FeathersCommonConfig.HUNGER_PER_FEATHER.get()));
+        if (entity instanceof Player player && FeathersServerConfig.REGEN_USES_HUNGER.get() && gained + recovered > 0) {
+            player.causeFoodExhaustion((float) ((gained + recovered) / (double) Stamina.PER_FEATHER * FeathersServerConfig.HUNGER_PER_FEATHER.get()));
         }
     }
 
@@ -402,8 +409,8 @@ public final class FeathersTicker {
             return;
         }
         if (!data.exhausted) return;
-        boolean recovered = !FeathersCommonConfig.ENABLE_EXHAUSTION.get()
-                || data.strain == 0 && data.availableStamina() >= usableMax(data) * FeathersCommonConfig.EXHAUSTION_RECOVERY.get();
+        boolean recovered = !FeathersServerConfig.ENABLE_EXHAUSTION.get()
+                || data.strain == 0 && data.availableStamina() >= usableMax(data) * FeathersServerConfig.EXHAUSTION_RECOVERY.get();
         if (recovered) {
             data.exhausted = false;
             NeoForge.EVENT_BUS.post(new ExhaustionEvent.Recovered(entity));
@@ -438,7 +445,7 @@ public final class FeathersTicker {
                 : MountExertion.riderOf(entity) instanceof ServerPlayer rider ? rider : null;
         if (player == null) return;
 
-        int shownStamina = FeathersCommonConfig.DEBUG_MODE.get() ? data.stamina : Stamina.toFeathers(data.stamina);
+        int shownStamina = FeathersServerConfig.DEBUG_MODE.get() ? data.stamina : Stamina.toFeathers(data.stamina);
         int shownStrain = Stamina.toFeathersCeil(data.strain);
         int shownBonus = Stamina.toFeathersCeil(data.bonusStamina());
         boolean delayed = data.regenDelay > 0;
@@ -446,7 +453,7 @@ public final class FeathersTicker {
         if (!data.forceSync && shownStamina == data.syncedStamina && data.maxStamina == data.syncedMax
                 && shownStrain == data.syncedStrain && data.maxStrain == data.syncedMaxStrain && shownBonus == data.syncedBonus
                 && data.weight == data.syncedWeight && data.exhausted == data.syncedExhausted && delayed == data.syncedDelayed
-                && data.restState == data.syncedRest && Arrays.equals(data.weightParts, data.syncedWeightParts)) return;
+                && data.restState == data.syncedRest && data.weightSplit.sameAs(data.syncedWeightSplit)) return;
 
         data.forceSync = false;
         data.syncedStamina = shownStamina;
@@ -458,7 +465,7 @@ public final class FeathersTicker {
         data.syncedExhausted = data.exhausted;
         data.syncedDelayed = delayed;
         data.syncedRest = data.restState;
-        System.arraycopy(data.weightParts, 0, data.syncedWeightParts, 0, data.weightParts.length);
+        data.syncedWeightSplit.copyFrom(data.weightSplit);
         FeathersNetwork.sendSync(player, entity, data);
     }
 }

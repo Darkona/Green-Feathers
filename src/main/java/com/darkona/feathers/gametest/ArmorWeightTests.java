@@ -4,7 +4,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersEnchantments;
 import com.darkona.feathers.api.registry.FeathersIds;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.weight.ArmorWeights;
@@ -46,12 +46,12 @@ public class ArmorWeightTests {
 
     /** Armor weights are off by default; these tests switch them on while they run. */
     private static void withWeights(GameTestHelper helper, Runnable test) {
-        boolean before = FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.get();
-        FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.set(true);
+        boolean before = FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.get();
+        FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.set(true);
         try {
             test.run();
         } finally {
-            FeathersCommonConfig.ENABLE_ARMOR_WEIGHTS.set(before);
+            FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.set(before);
         }
         helper.succeed();
     }

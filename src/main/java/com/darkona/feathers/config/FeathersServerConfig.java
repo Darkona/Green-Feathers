@@ -8,7 +8,7 @@ import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
 import java.util.List;
 
-public final class FeathersCommonConfig {
+public final class FeathersServerConfig {
 
     public static final ModConfigSpec SPEC;
 
@@ -218,7 +218,7 @@ public final class FeathersCommonConfig {
                         "  minecraft:iron_chestplate=3      one item",
                         "  #mymod:heavy_armor=6            every item in an item tag",
                         "  (the greenfeathers:armor_weight data map, which mods and datapacks can ship, comes here)",
-                        "  @minecraft:iron/chestplate=3    one piece of an armor material (helmet, chestplate, leggings, boots)",
+                        "  @minecraft:iron/chestplate=3    one piece of an armor material (helmet, chestplate, leggings, boots, body for horse armor)",
                         "  @minecraft:iron=2               every piece of an armor material",
                         "Armor that matches nothing weighs its defense points times unlisted_armor_weight_per_defense.")
                 .defineListAllowEmpty("armor_weights", List.of(
@@ -228,7 +228,12 @@ public final class FeathersCommonConfig {
                         "@minecraft:gold=2",
                         "@minecraft:iron=2",
                         "@minecraft:diamond=3",
-                        "@minecraft:netherite=4"), () -> "", o -> o instanceof String);
+                        "@minecraft:netherite=4",
+                        // Horse armor: light, since nothing raises a mount's feathers yet.
+                        "@minecraft:leather/body=1",
+                        "@minecraft:gold/body=1",
+                        "@minecraft:iron/body=2",
+                        "@minecraft:diamond/body=2"), () -> "", o -> o instanceof String);
 
         UNLISTED_ARMOR_WEIGHT_PER_DEFENSE = builder
                 .comment("Weight of armor no rule or data map covers, per point of defense. 0 makes it weightless.")
@@ -307,5 +312,5 @@ public final class FeathersCommonConfig {
         SPEC = builder.build();
     }
 
-    private FeathersCommonConfig() {}
+    private FeathersServerConfig() {}
 }

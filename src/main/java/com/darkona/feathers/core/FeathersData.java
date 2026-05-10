@@ -4,6 +4,7 @@ import com.darkona.feathers.api.Climate;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.weight.WeightSplit;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import net.minecraft.core.HolderLookup;
@@ -79,8 +80,8 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     int maxStamina;
     int maxStrain;
     int weight;
-    /** The weight split by armor piece, head to feet, then other sources (see ArmorWeights.PARTS). */
-    final int[] weightParts = new int[5];
+    /** The weight split by armor piece, head to feet, colored weight sources and the rest. */
+    final WeightSplit weightSplit = new WeightSplit();
     double lastWeightMultiplier = Double.NaN;
     boolean initialized;
     /** Never loaded from a save: starts with full feathers once the maximum is known. */
@@ -107,9 +108,11 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     /* What the client last received, to sync only on visible changes */
     int syncedStamina = -1, syncedMax = -1, syncedStrain = -1, syncedMaxStrain = -1, syncedBonus = -1, syncedWeight = -1;
     boolean syncedExhausted, syncedDelayed;
-    final int[] syncedWeightParts = new int[5];
+    final WeightSplit syncedWeightSplit = new WeightSplit();
     RestState syncedRest = RestState.NONE;
     boolean forceSync = true;
+    /** Whether the exhausted-mount slowdown is on; not saved, like the transient modifier it mirrors. */
+    public boolean mountSlowed;
 
     /* FeathersView */
 
@@ -139,7 +142,11 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     public int weightPart(int part) {
-        return weightParts[part];
+        return weightSplit.part(part);
+    }
+
+    public WeightSplit weightSplit() {
+        return weightSplit;
     }
 
     @Override

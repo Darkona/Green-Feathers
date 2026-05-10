@@ -17,6 +17,8 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
  */
 public final class ToughAsNailsCompat {
 
+    private static final ThirstRegen.Keys TAN_KEYS = ThirstRegen.Keys.of("tough_as_nails");
+
     public static final boolean LOADED = ModList.get().isLoaded("toughasnails");
 
     /** Below Cold Sweat, above Legendary Survival Overhaul, Serene Seasons and the vanilla climate. */
@@ -48,7 +50,7 @@ public final class ToughAsNailsCompat {
         if (!FeathersCompatConfig.TAN.get() || !FeathersCompatConfig.TAN_THIRST.get() || !(entity instanceof Player player)
                 || !ToughAsNailsBridge.thirstEnabled()) return 0.0;
 
-        float exhaustion = ThirstRegen.exhaustionSinceLastCall(player, feathers, "tough_as_nails", FeathersCompatConfig.TAN_THIRST_EXHAUSTION.get());
+        float exhaustion = ThirstRegen.exhaustionSinceLastCall(player, feathers, TAN_KEYS, FeathersCompatConfig.TAN_THIRST_EXHAUSTION.get());
         if (exhaustion > 0) ToughAsNailsBridge.addThirstExhaustion(player, exhaustion);
 
         return ThirstRegen.factor(ToughAsNailsBridge.thirst(player), ToughAsNailsBridge.hydration(player),

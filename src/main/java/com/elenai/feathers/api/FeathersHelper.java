@@ -4,7 +4,7 @@ import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.client.ClientFeathers;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 
@@ -19,7 +19,7 @@ public final class FeathersHelper {
 
     @Deprecated
     public static boolean spendFeathers(int amount) {
-        return spendFeathers(amount, FeathersCommonConfig.DEFAULT_USAGE_COOLDOWN.get());
+        return spendFeathers(amount, FeathersServerConfig.DEFAULT_USAGE_COOLDOWN.get());
     }
 
     /**

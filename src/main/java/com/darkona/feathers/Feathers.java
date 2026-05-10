@@ -11,7 +11,7 @@ import com.darkona.feathers.compatibility.sereneseasons.SereneSeasonsCompat;
 import com.darkona.feathers.compatibility.thirst.ThirstCompat;
 import com.darkona.feathers.compatibility.toughasnails.ToughAsNailsCompat;
 import com.darkona.feathers.config.FeathersClientConfig;
-import com.darkona.feathers.config.FeathersCommonConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.config.FeathersCompatConfig;
 import com.darkona.feathers.core.FeathersAttachments;
 import com.darkona.feathers.core.FeathersServiceImpl;
@@ -39,8 +39,8 @@ public final class Feathers {
     public Feathers(IEventBus modEventBus, ModContainer modContainer) {
         FeathersAPI.setService(FeathersServiceImpl.INSTANCE);
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, FeathersCommonConfig.SPEC, "feathers/Feathers-Common.toml");
-        modContainer.registerConfig(ModConfig.Type.COMMON, FeathersCompatConfig.SPEC, "feathers/Feathers-Compat.toml");
+        modContainer.registerConfig(ModConfig.Type.SERVER, FeathersServerConfig.SPEC, "feathers/Feathers-Server.toml");
+        modContainer.registerConfig(ModConfig.Type.SERVER, FeathersCompatConfig.SPEC, "feathers/Feathers-Compat.toml");
         modContainer.registerConfig(ModConfig.Type.CLIENT, FeathersClientConfig.SPEC, "feathers/Feathers-Client.toml");
 
         ModAttributes.register(modEventBus);

@@ -21,7 +21,7 @@ public final class FeathersServerConfig {
     public static final BooleanValue REGEN_USES_HUNGER;
     public static final DoubleValue HUNGER_PER_FEATHER;
 
-    /* Exhaustion and Strain */
+    /* Exhaustion and strain */
     public static final BooleanValue ENABLE_STRAIN;
     public static final IntValue MAX_STRAIN;
     public static final BooleanValue ENABLE_EXHAUSTION;
@@ -87,7 +87,7 @@ public final class FeathersServerConfig {
                 .defineInRange("regen_feathers_per_second", 0.4, -40.0, 40.0);
 
         SLEEPING_ALWAYS_RESTORES_FEATHERS = builder
-                .comment("Waking up restores all feathers and clears Strain and exhaustion.")
+                .comment("Sleeping through the night restores all feathers and clears strain and exhaustion.")
                 .define("sleeping_restores_all_feathers", true);
 
         DEFAULT_USAGE_COOLDOWN = builder
@@ -112,22 +112,22 @@ public final class FeathersServerConfig {
 
         ENABLE_STRAIN = builder
                 .comment("Strain: when feathers run out, keep exerting by overspending into red 'negative' feathers, up to",
-                        "max_strained_feathers. Regeneration pays the Strain back first, slowly; resting speeds it up.",
+                        "max_strained_feathers. Regeneration pays the strain back first, slowly; resting speeds it up.",
                         "Mods can still ask for a spend that never strains.")
                 .define("strain_enabled", true);
 
         MAX_STRAIN = builder
-                .comment("How far into Strain a player can go, in feathers. Base of the greenfeathers:max_strain attribute.")
+                .comment("How far into strain a player can go, in feathers. Base of the greenfeathers:max_strain attribute.")
                 .defineInRange("max_strained_feathers", 6, 1, 1000);
 
         ENABLE_EXHAUSTION = builder
-                .comment("Exhaustion: once a player has nothing left to spend (no feathers, and no Strain room when Strain is",
+                .comment("Exhaustion: once a player has nothing left to spend (no feathers, and no strain room when strain is",
                         "on), they are exhausted and can't exert again until they recover exhaustion_recovery of the bar.",
                         "Off: they can spend again as soon as anything regenerates.")
                 .define("exhaustion_enabled", true);
 
         EXHAUSTION_RECOVERY = builder
-                .comment("Share of the maximum feathers to regain, with no Strain left, before exhaustion ends.")
+                .comment("Share of the maximum feathers to regain, with no strain left, before exhaustion ends.")
                 .defineInRange("exhaustion_recovery", 0.3, 0.0, 1.0);
 
         builder.pop();
@@ -181,7 +181,7 @@ public final class FeathersServerConfig {
         builder.push("resting");
 
         ENABLE_REST = builder
-                .comment("Resting speeds up paying back Strain: standing still, crouching still, or sitting (riding a boat,",
+                .comment("Resting speeds up paying back strain: standing still, crouching still, or sitting (riding a boat,",
                         "a mount, or a seat from another mod). Mods can add rest bonuses through the API; the best one applies.")
                 .define("rest_enabled", true);
 
@@ -202,7 +202,7 @@ public final class FeathersServerConfig {
                 .defineInRange("rest_sitting_multiplier", 2.0, 1.0, 20.0);
 
         REST_BOOSTS_REGEN = builder
-                .comment("Resting also speeds up normal regeneration, not only Strain recovery.")
+                .comment("Resting also speeds up normal regeneration, not only strain recovery.")
                 .define("rest_boosts_regen", false);
 
         builder.pop();

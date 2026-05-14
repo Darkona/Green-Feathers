@@ -34,9 +34,9 @@ movement mods like ParCool, Paragliders and Better Combat.
 
 It stacks neatly with the other bars on the right: food, air bubbles, thirst.
 
-| ![With Cold Sweat and Thirst Was Taken](wiki/images/hud-thirst.png) | ![Underwater in iron armor](wiki/images/hud-underwater-armor.png) |
+| ![With Thirst Was Taken, Cold Sweat and AppleSkin](wiki/images/compat-thirst.png) | ![Riding a camel](wiki/images/mount-camel.png) |
 |---|---|
-| With Cold Sweat and Thirst Was Taken | Underwater, in iron armor (grey = weight) |
+| With Thirst Was Taken, Cold Sweat and AppleSkin | Riding a camel: its feathers, in its colors |
 
 Supported out of the box, each switchable in the config:
 

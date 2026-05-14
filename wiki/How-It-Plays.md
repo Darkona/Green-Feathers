@@ -10,15 +10,27 @@ several times in a row lengthens the pause, up to a limit.
 
 The color is yours to pick in the client config: green, blue (like Elenai's original) or white (chicken feathers).
 
+| ![Green feathers](images/color-green.png) | ![Blue feathers](images/color-blue.png) | ![White feathers](images/color-white.png) |
+|---|---|---|
+| Green | Blue | White |
+
+![More than 20 feathers, layered](images/layers.png)
+
+*More than 20 feathers: a second layer over the first, and the count on the right.*
+
 ## Strain
 
 When you run out you can keep going into red *strain* feathers, up to a limit (6 by default). Regeneration pays
 strain back before anything else, slowly, so overdoing it leaves you drained for a while.
 
+![Two red strain feathers](images/strain.png)
+
 ## Exhaustion
 
 Spend absolutely everything (no feathers and no strain room left) and you're exhausted: no exerting yourself until
 you've regained part of your bar (30% by default) with no strain left.
+
+![Exhausted: the bar is spent and the strain is full](images/exhausted.png)
 
 ## Resting
 
@@ -35,6 +47,10 @@ faster. Sleeping through the night restores everything.
 With a temperature or seasons mod installed, that mod decides when you're cold or hot (see
 [Compatibility](Compatibility)).
 
+| ![Hot](images/hot.png) | ![Cold](images/cold.png) | ![Hot and fatigued](images/fatigued.png) |
+|---|---|---|
+| Hot: everything costs double | Cold: slower recovery | Fatigued: 4 feathers fewer |
+
 ## Armor weight (optional)
 
 Every armor piece holds back some feathers you can't use. They are drawn from the right, head to feet, each in its
@@ -45,6 +61,10 @@ piece's own color (leather in its dye). Netherite is heavy.
 - Other mods can add weight of their own, such as a backpack, drawn after the boots in its own colors.
 
 Turn it on with `armor_weights_enabled` in the server config.
+
+![An iron helmet, a diamond chestplate, gold leggings and red leather boots](images/armor.png)
+
+*Iron helmet, diamond chestplate, gold leggings and red leather boots: each piece holds back feathers in its own color.*
 
 ## Mounts (optional)
 
@@ -57,6 +77,12 @@ after their parents. Horse armor weighs a little: leather and gold 1 feather, ir
 
 Modpacks can give feathers to other creatures (see [Modpack Makers](Modpack-Makers)).
 
+| ![Riding a white horse](images/mount-white.png) | ![Riding a black horse](images/mount-black.png) |
+|---|---|
+| A white horse | A black horse |
+| ![A horse in diamond armor](images/mount-armor.png) | ![Riding a camel](images/mount-camel.png) |
+| Diamond horse armor weighs 2 feathers | A camel |
+
 ## Potions
 
 | Potion | Effect |
@@ -65,3 +91,7 @@ Modpacks can give feathers to other creatures (see [Modpack Makers](Modpack-Make
 | Energy | Faster recovery |
 | Momentum | Cheaper actions |
 | Cooling | Protects from heat |
+
+| ![Endurance](images/endurance.png) | ![Energized](images/energized.png) | ![Momentum](images/momentum.png) |
+|---|---|---|
+| Endurance | Energized | Momentum |

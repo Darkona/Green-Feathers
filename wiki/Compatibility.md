@@ -2,9 +2,11 @@
 
 Green Feathers stacks neatly with the other bars on the right: food, air bubbles, thirst.
 
-| ![With Cold Sweat and Thirst Was Taken](images/hud-thirst.png) | ![Underwater in iron armor](images/hud-underwater-armor.png) |
+| ![With Thirst Was Taken, Cold Sweat and AppleSkin](images/compat-thirst.png) | ![With Tough As Nails, Serene Seasons and AppleSkin](images/compat-tan.png) |
 |---|---|
-| With Cold Sweat and Thirst Was Taken | Underwater, in iron armor (grey = weight) |
+| Thirst Was Taken, Cold Sweat and AppleSkin | Tough As Nails, Serene Seasons and AppleSkin |
+| ![Underwater in iron armor](images/underwater.png) | ![Jade showing a horse's stamina](images/jade.png) |
+| Underwater in iron armor: feathers above the air bubbles | Jade shows a mount's stamina |
 
 Supported out of the box, each with its own switch in `Feathers-Compat.toml`:
 

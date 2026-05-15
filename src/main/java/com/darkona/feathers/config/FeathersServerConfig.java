@@ -20,6 +20,8 @@ public final class FeathersServerConfig {
     public static final IntValue MAX_COOLDOWN;
     public static final BooleanValue REGEN_USES_HUNGER;
     public static final DoubleValue HUNGER_PER_FEATHER;
+    public static final DoubleValue SATURATION_REGEN_BONUS;
+    public static final DoubleValue HUNGER_REGEN_PENALTY;
 
     /* Exhaustion and strain */
     public static final BooleanValue ENABLE_STRAIN;
@@ -105,6 +107,16 @@ public final class FeathersServerConfig {
         HUNGER_PER_FEATHER = builder
                 .comment("Food exhaustion per regenerated feather when regen_uses_hunger is on. 4.0 exhaustion = one hunger point.")
                 .defineInRange("hunger_exhaustion_per_feather", 0.3, 0.0, 40.0);
+
+        SATURATION_REGEN_BONUS = builder
+                .comment("Regeneration multiplier with a full food bar and saturation left: 1.5 regenerates 50% faster.",
+                        "1.0 turns it off.")
+                .defineInRange("saturation_regen_bonus", 1.0, 1.0, 10.0);
+
+        HUNGER_REGEN_PENALTY = builder
+                .comment("Regeneration multiplier at 6 hunger points or less: 0.5 regenerates at half speed, 0.0 stops it.",
+                        "1.0 turns it off. With regen_uses_hunger on, regeneration already stops there.")
+                .defineInRange("hunger_regen_penalty", 1.0, 0.0, 1.0);
 
         builder.pop();
 

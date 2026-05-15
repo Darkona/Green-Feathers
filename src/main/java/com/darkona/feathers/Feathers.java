@@ -16,6 +16,7 @@ import com.darkona.feathers.config.FeathersCompatConfig;
 import com.darkona.feathers.core.FeathersAttachments;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.core.FeathersTicker;
+import com.darkona.feathers.core.HungerRegen;
 import com.darkona.feathers.effect.ModEffects;
 import com.darkona.feathers.item.ModItems;
 import com.darkona.feathers.network.FeathersNetwork;
@@ -60,6 +61,7 @@ public final class Feathers {
 
         // Built-in extensions go through the same API as other mods' do.
         ClimateEffects.registerBuiltIn();
+        HungerRegen.registerBuiltIn();
         ColdSweatCompat.init();
         ThirstCompat.init();
         ToughAsNailsCompat.init();

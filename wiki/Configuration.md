@@ -60,6 +60,16 @@ Targets can be mounts too.
 	# Default: 0.3
 	# Range: 0.0 ~ 40.0
 	hunger_exhaustion_per_feather = 0.3
+	#Regeneration multiplier with a full food bar and saturation left: 1.5 regenerates 50% faster.
+	#1.0 turns it off.
+	# Default: 1.0
+	# Range: 1.0 ~ 10.0
+	saturation_regen_bonus = 1.0
+	#Regeneration multiplier at 6 hunger points or less: 0.5 regenerates at half speed, 0.0 stops it.
+	#1.0 turns it off. With regen_uses_hunger on, regeneration already stops there.
+	# Default: 1.0
+	# Range: 0.0 ~ 1.0
+	hunger_regen_penalty = 1.0
 
 [exhaustion_and_strain]
 	#Strain: when feathers run out, keep exerting by overspending into red 'negative' feathers, up to

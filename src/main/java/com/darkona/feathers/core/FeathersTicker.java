@@ -54,7 +54,6 @@ public final class FeathersTicker {
     private static final int ATTRIBUTE_INTERVAL = 10;
     private static final int REGEN_FACTOR_INTERVAL = 20;
     private static final double STILL_EPSILON_SQR = 1.0E-4;
-    private static final int HUNGRY_FOOD_LEVEL = 6;
     private static final ResourceLocation REGEN_FACTORS = id("regen_factors");
 
     private FeathersTicker() {}
@@ -352,7 +351,7 @@ public final class FeathersTicker {
 
         if (perTick > 0) {
             boolean hungry = entity instanceof Player player && FeathersServerConfig.REGEN_USES_HUNGER.get()
-                    && player.getFoodData().getFoodLevel() <= HUNGRY_FOOD_LEVEL;
+                    && player.getFoodData().getFoodLevel() <= HungerRegen.HUNGRY_FOOD_LEVEL;
             if (blocked || hungry) {
                 data.regenCarry = 0;
                 data.regenPaused = true;

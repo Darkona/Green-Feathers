@@ -37,6 +37,12 @@ you've regained part of your bar (30% by default) with no strain left.
 Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back
 faster. Sleeping through the night restores everything.
 
+## Food (optional)
+
+A well-fed body recovers faster: with a full food bar and saturation left, feathers come back quicker (`saturation_regen_bonus` in the server config). Go hungry, 6 hunger points (3 drumsticks) or less, and they come back slower (`hunger_regen_penalty`). Both are off by default. Only players eat; mounts are unaffected.
+
+With `regen_uses_hunger` on, regenerating costs food like healing does, and stops altogether once you're that hungry.
+
 ## Weather and climate
 
 - **Cold** weather slows your recovery.

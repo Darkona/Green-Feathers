@@ -1,181 +1,248 @@
-buildscript {
-    repositories {
-        // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
 plugins {
-    id 'eclipse'
-    id 'idea'
+    id 'java-library'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'idea'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.141'
 }
 
-apply plugin: 'org.spongepowered.mixin'
-
-version = mod_version
+version = "${minecraft_version}-${mod_version}"
 group = mod_group_id
 
 base {
     archivesName = mod_id
 }
 
+// Minecraft 1.20.1 runs on Java 17: compile for it and run the game on it.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.withSourcesJar()
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
-    copyIdeResources = true
+// Test-only data, on the classpath only when running the GameTests: src/gametest/resources as is (it wins over the
+// mod's files at the same path), and for data maps, which take one file per namespace from each pack, the mod's own
+// entries merged with the test entries from src/gametest/datamaps.
+if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
+    def mergedDataMaps = layout.buildDirectory.dir('gametest-datamaps')
+    def mergeTestDataMaps = tasks.register('mergeTestDataMaps') {
+        def modMaps = file('src/main/resources/data/greenfeathers/data_maps/entity_type')
+        def testMaps = file('src/gametest/datamaps')
+        inputs.dir(modMaps)
+        inputs.dir(testMaps)
+        outputs.dir(mergedDataMaps)
+        doLast {
+            def slurper = new groovy.json.JsonSlurper()
+            testMaps.eachFile { testFile ->
+                def modFile = new File(modMaps, testFile.name)
+                def merged = modFile.exists() ? slurper.parse(modFile) : [replace: false, values: [:]]
+                merged.values.putAll(slurper.parse(testFile).values)
+                def out = mergedDataMaps.get().file("data/greenfeathers/data_maps/entity_type/${testFile.name}").asFile
+                out.parentFile.mkdirs()
+                out.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(merged))
+            }
+        }
+    }
+    sourceSets.main.resources.srcDirs = [files(mergedDataMaps).builtBy(mergeTestDataMaps), 'src/gametest/resources'] + sourceSets.main.resources.srcDirs
+    tasks.named('processResources', ProcessResources) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+}
+
+// The public API lives in its own source set and ships twice: inside the mod jar, and alone as
+// greenfeathers-api for other mods to compile against.
+sourceSets {
+    api
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Curios'
+        url = 'https://maven.theillusivec4.top/'
+        content { includeGroup 'top.theillusivec4.curios' }
+    }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+}
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+    addModdingDependenciesTo(sourceSets.api)
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
     runs {
         client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+            client()
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
-
+        // Headless client straight into a copy of a world: scripts or `xvfb-run ./gradlew runBootCheck`.
+        bootCheck {
+            client()
+            gameDirectory = project.file('run')
+            programArguments.addAll '--width', '1920', '--height', '1080', '--quickPlaySingleplayer', 'gfboot'
+        }
         server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+            server()
+            programArgument '--nogui'
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
-
         gameTestServer {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+            type = 'gameTestServer'
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'mixin.env.remapRefMap', 'true'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
 
-        data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.api)
         }
     }
 }
 
-// Include resources generated by data generators.
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
+}
 
-repositories {
-    maven { // CurseForge
-        url "https://www.cursemaven.com"
-    }
-    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+configurations {
+    localRuntime
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+obfuscation {
+    // modLocalRuntime: compat mods on the dev runtime only, remapped like the other mod dependencies.
+    createRemappingConfiguration(configurations.localRuntime)
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation sourceSets.api.output
 
-    implementation fg.deobf("curse.maven:configured-457570:${configured_file_id}")
-    implementation fg.deobf("curse.maven:serene-seasons-291874:${serene_seasons_file_id}")
-    implementation fg.deobf("curse.maven:cold-sweat-506194:${cold_sweat_file_id}-sources-5387214")
-    implementation fg.deobf("curse.maven:thirst-was-taken-679270:${thirst_was_taken_file_id}")
-
-    compileOnly("curse.maven:overflowing-bars-852662:4578581")
-    implementation fg.deobf("curse.maven:player-animator-658587:${player_animator_file_id}")
-    implementation fg.deobf("curse.maven:elenai-dodge-442962:${elenai_dodge_file_id}")
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    runtimeOnly fg.deobf("curse.maven:jei-238222:5101366")
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    // Forge 47 doesn't ship MixinExtras: bundled in the jar.
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}"))
+
+    // Optional compat: every use sits behind a ModList check.
+    modCompileOnly "maven.modrinth:cold-sweat:${cold_sweat_version}"
+    modCompileOnly "maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"
+    modCompileOnly "maven.modrinth:tough-as-nails:${tough_as_nails_version}"
+    modCompileOnly "maven.modrinth:serene-seasons:${serene_seasons_version}"
+    modCompileOnly "maven.modrinth:glitchcore:${glitchcore_version}"
+    modCompileOnly "maven.modrinth:legendary-survival-overhaul:${lso_version}"
+    modCompileOnly "maven.modrinth:overflowing-bars:${overflowing_bars_version}"
+    modCompileOnly "maven.modrinth:puzzles-lib:${puzzles_lib_version}"
+    modCompileOnly "top.theillusivec4.curios:curios-forge:${curios_version}:api"
+    modCompileOnly "maven.modrinth:jade:${jade_version}"
+    modLocalRuntime "top.theillusivec4.curios:curios-forge:${curios_version}"
 }
 
-
-def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
-def replaceProperties = [
-        minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
-        forge_version       : forge_version, forge_version_range: forge_version_range,
-        loader_version_range: loader_version_range,
-        mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-        mod_authors         : mod_authors, mod_description: mod_description
+// Compat mods on the dev runtime, for boot checks and GameTests with them loaded:
+//   ./gradlew runGameTestServer -Pcompat=coldsweat,thirst,overflowingbars
+//   ./gradlew runGameTestServer -Pcompat=toughasnails,sereneseasons
+def compatRuntime = [
+        coldsweat      : ["maven.modrinth:cold-sweat:${cold_sweat_version}"],
+        thirst         : ["maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"],
+        toughasnails   : ["maven.modrinth:tough-as-nails:${tough_as_nails_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
+        sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
+        lso            : ["maven.modrinth:legendary-survival-overhaul:${lso_version}"],
+        appleskin      : ["maven.modrinth:appleskin:${appleskin_version}"],
+        jade           : ["maven.modrinth:jade:${jade_version}"],
+        naturalist     : ["maven.modrinth:naturalist:${naturalist_version}", "maven.modrinth:geckolib:${geckolib_version}"],
+        overflowingbars: ["maven.modrinth:overflowing-bars:${overflowing_bars_version}", "maven.modrinth:puzzles-lib:${puzzles_lib_version}"],
 ]
-processResources {
+if (project.hasProperty('compat')) {
+    dependencies {
+        project.property('compat').toString().split(',').each { name ->
+            def coordinates = compatRuntime[name.trim()]
+            if (coordinates == null) throw new GradleException("Unknown compat '${name}'. Known: ${compatRuntime.keySet().join(', ')}")
+            coordinates.each { modLocalRuntime it }
+        }
+    }
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            forge_version          : forge_version,
+            forge_version_range    : forge_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
     inputs.properties replaceProperties
-    replaceProperties.put 'project', project
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
-    filesMatching(resourceTargets) {
-        expand replaceProperties
-    }
+tasks.named('jar', Jar) {
+    from sourceSets.api.output
+    manifest.attributes('MixinConfigs': "${mod_id}.mixins.json")
+}
+tasks.named('sourcesJar', Jar) {
+    from sourceSets.api.allSource
 }
 
-// Example for how to get properties into the manifest for reading at runtime.
-jar {
-    manifest {
-        attributes([
-                "Specification-Title"     : mod_id,
-                "Specification-Vendor"    : mod_authors,
-                "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : mod_authors,
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
+var apiJar = tasks.register('apiJar', Jar) {
+    archiveBaseName = "${mod_id}-api"
+    from sourceSets.api.output
 }
+var apiSourcesJar = tasks.register('apiSourcesJar', Jar) {
+    archiveBaseName = "${mod_id}-api"
+    archiveClassifier = 'sources'
+    from sourceSets.api.allSource
+}
+// Mods run on SRG names in production: the API jar is remapped like the mod jar (build/devlibs holds the named one).
+apiJar.configure { destinationDirectory = layout.buildDirectory.dir('devlibs') }
+var reobfApiJar = tasks.register('reobfApiJar', net.neoforged.moddevgradle.legacyforge.tasks.RemapJar) {
+    input = apiJar.flatMap { it.archiveFile }
+    archiveBaseName = "${mod_id}-api"
+    destinationDirectory = layout.buildDirectory.dir('libs')
+    libraries.from(sourceSets.api.compileClasspath)
+    obfuscation.configureNamedToSrgOperation(remapOperation)
+}
+tasks.named('assemble') { dependsOn reobfApiJar, apiSourcesJar }
 
-
-jar.finalizedBy('reobfJar')
-
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact jar
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+        register('api', MavenPublication) {
+            artifactId = "${mod_id}-api"
+            artifact reobfApiJar
+            artifact apiSourcesJar
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            url = "file://${project.projectDir}/repo"
         }
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }

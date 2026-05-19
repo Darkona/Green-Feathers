@@ -1,168 +1,162 @@
 package com.darkona.feathers.client;
 
-import com.darkona.feathers.api.Constants;
-import com.darkona.feathers.api.FeathersAPI;
-import com.darkona.feathers.api.IFeathers;
-import com.darkona.feathers.api.IModifier;
-import com.darkona.feathers.attributes.FeathersAttributes;
-import com.darkona.feathers.capability.FeathersCapabilities;
-import com.darkona.feathers.config.FeathersClientConfig;
-import com.darkona.feathers.effect.effects.EnduranceEffect;
-import com.darkona.feathers.effect.effects.StrainEffect;
-import com.darkona.feathers.networking.packet.FeatherSTCDebugPacket;
-import lombok.Getter;
-import lombok.Setter;
+import com.darkona.feathers.api.FeathersView;
+import com.darkona.feathers.api.SpendOptions;
+import com.darkona.feathers.api.SpendResult;
+import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.client.ClientFeathersService;
+import com.darkona.feathers.config.FeathersServerConfig;
+import com.darkona.feathers.core.FeathersServiceImpl;
+import com.darkona.feathers.data.DataMaps;
+import com.darkona.feathers.network.DataMapsPayload;
+import com.darkona.feathers.network.FeathersNetwork;
+import com.darkona.feathers.network.SpendDebugPayload;
+import com.darkona.feathers.network.SpendRequestPayload;
+import com.darkona.feathers.network.SyncPayload;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Objects;
+/**
+ * The local player's feathers (this view) and those of the mount it rides, as last synced, with local predictions
+ * for the player until the next sync. Client thread only.
+ */
+public final class ClientFeathersData extends SyncedFeathers implements ClientFeathersService, FeathersServiceImpl.ClientBridge {
 
-@Setter
-@Getter
-public class ClientFeathersData {
+    public static final ClientFeathersData INSTANCE = new ClientFeathersData();
 
-    public static final int fadeDebugTicks = 40;
-    //Use singleton for sanity
-    private static ClientFeathersData instance;
-    public int fadeDebugUse = 40;
-    public int fadeDebugGain = 40;
-    private int stamina = 2000;
-    private int feathers = 0;
-    private int maxStamina = 2000;
-    private int maxFeathers = 0;
-    private int staminaDelta = 0;
-    private int previousFeathers = 0;
-    private int enduranceFeathers = 0;
-    private int weight = 0;
-    private int animationCooldown = 0;
-    private int fadeCooldown = 0;
-    private int strainFeathers = 0;
-    private int cooldown = 0;
-    private int strainStamina = 0;
-    private boolean hot = false;
-    private boolean cold = false;
-    private boolean energized = false;
-    private boolean momentum = false;
-    private boolean fatigued = false;
-    private boolean endurance = false;
-    private boolean strained = false;
-    private List<IModifier> deltaMods;
-    private List<IModifier> usageMods;
-    private int usedFeathers = 0;
-    private int gainedFeathers = 0;
-    private String reasonGain = "";
-    private String reasonUse = "";
-    private boolean used = false;
-    private boolean gained = false;
+    /** How long a debug spend line stays on the overlay. */
+    public static final int DEBUG_LINE_TICKS = 60;
+
+    private final SyncedFeathers mount = new SyncedFeathers();
+    private int mountId = -1;
+    /** The local player was seen riding {@link #mountId}. */
+    private boolean mountSeated;
+
+    private ResourceLocation lastSpendSource;
+    private int lastSpendCost;
+    private int lastSpendTicks;
 
     private ClientFeathersData() {}
 
-    public static ClientFeathersData getInstance() {
-        if (instance == null) {
-            instance = new ClientFeathersData();
-        }
-        return instance;
-    }
-
-    public void setExtendedDebugInfo(FeatherSTCDebugPacket packet) {
-        usedFeathers = packet.getUsedFeathers();
-        gainedFeathers = packet.getGainedFeathers();
-        gained = packet.isGained();
-        used = packet.isUsed();
-        if (gained) reasonGain = packet.getReason();
-        if (used) reasonUse = packet.getReason();
-    }
-
-    public void update(Player player, IFeathers f) {
-
-        stamina = f.getStamina();
-        maxStamina = f.getMaxStamina();
-        feathers = f.getFeathers();
-        maxFeathers = f.getMaxFeathers();
-        staminaDelta = f.getStaminaDelta();
-        weight = f.getWeight();
-        cooldown = f.getCooldown();
-        deltaMods = f.getStaminaDeltaModifierList();
-        usageMods = f.getFeatherUsageModifiersList();
-        strainStamina = f.getCounter(StrainEffect.STRAIN_COUNTER).intValue();
-        synchronizeEffects(player);
-
-        strainFeathers = (int) Math.ceil(f.getCounter(StrainEffect.STRAIN_COUNTER));
-        enduranceFeathers = (int) Math.ceil(f.getCounter(EnduranceEffect.ENDURANCE_COUNTER));
-        fadeDebugUse--;
-        fadeDebugGain--;
-
-    }
-
-    private void synchronizeEffects(Player player) {
-        hot = FeathersAPI.isHot(player);
-        endurance = FeathersAPI.isEnduring(player);
-        cold = FeathersAPI.isCold(player);
-        energized = FeathersAPI.isEnergized(player);
-        momentum = FeathersAPI.isMomentum(player);
-        fatigued = FeathersAPI.isFatigued(player);
-        strained = FeathersAPI.isStrained(player);
-    }
-
-    public boolean hasFullStamina() {
-        return stamina >= maxStamina;
-    }
-
-    public boolean hasFeathers() {
-        return feathers > 0;
-    }
-
-    public boolean hasFullFeathers() {
-        return feathers >= maxFeathers;
-    }
-
-    public boolean hasWeight() {
-        return weight > 0;
-    }
-
-    public boolean isOverflowing() {
-        return feathers > maxFeathers;
-    }
-
-    public void tick() {
-        var player = Minecraft.getInstance().player;
-
-        if (player != null)
-            player.getCapability(FeathersCapabilities.PLAYER_FEATHERS).ifPresent(f -> update(player, f));
-
-        if (animationCooldown > 0) animationCooldown--;
-
-        if (feathers != previousFeathers) {
-            if (feathers > previousFeathers && FeathersClientConfig.REGEN_EFFECT.get() && animationCooldown <= 0) {
-                animationCooldown = 18;
-            }
-            previousFeathers = feathers;
-        }
-
-        if (FeathersClientConfig.FADE_WHEN_FULL.get()) {
-            int cooldown = fadeCooldown;
-            if (feathers == getMaxFeathers() || enduranceFeathers > 0) {
-                fadeCooldown = cooldown < FeathersClientConfig.FADE_COOLDOWN.get() ? fadeCooldown + 1 : 0;
-            }
+    public static void accept(SyncPayload payload) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && payload.entityId() != player.getId()) {
+            if (payload.entityId() != INSTANCE.mountId) INSTANCE.mountSeated = false;
+            INSTANCE.mountId = payload.entityId();
+            INSTANCE.mount.apply(payload);
+        } else {
+            INSTANCE.apply(payload);
         }
     }
 
-    public int getStrainFeathers() {
-        return strainFeathers > 0 ? strainFeathers / Constants.STAMINA_PER_FEATHER : 0;
+    /**
+     * The server's data maps. In singleplayer the integrated server already loaded them into the same game.
+     */
+    public static void acceptDataMaps(DataMapsPayload payload) {
+        if (Minecraft.getInstance().getSingleplayerServer() == null) DataMaps.accept(payload.raw());
     }
 
-    public int getAvailableFeathers() {
-        return feathers - weight;
+    public static void acceptDebug(SpendDebugPayload payload) {
+        INSTANCE.lastSpendSource = payload.source();
+        INSTANCE.lastSpendCost = payload.cost();
+        INSTANCE.lastSpendTicks = DEBUG_LINE_TICKS;
     }
 
-    public String getRegenAttrValue() {
-        assert Minecraft.getInstance().player != null;
-        return Objects.requireNonNull(Minecraft.getInstance().player.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get())).getValue() + " f/s";
+    /**
+     * Forgets everything on leaving a world.
+     */
+    @Override
+    void clear() {
+        super.clear();
+        mount.clear();
+        mountId = -1;
+        mountSeated = false;
+        lastSpendSource = null;
     }
 
-    public String getStaminaUsageMultiplier() {
-        var p = Minecraft.getInstance().player;
-        return p != null ? FeathersAPI.getPlayerFeatherRegenerationPerSecond(Minecraft.getInstance().player) + " f/s": "0 f/s";
+    @Override
+    void tick() {
+        super.tick();
+        mount.tick();
+        if (lastSpendTicks > 0) lastSpendTicks--;
+        // The mount's feathers only mean something while riding it. The server can send them a moment before the
+        // client sees the rider seated: they're only dropped once the player rode it and got off, or rides another.
+        if (mountId == -1) return;
+        LocalPlayer player = Minecraft.getInstance().player;
+        Entity vehicle = player != null ? player.getVehicle() : null;
+        if (vehicle != null && vehicle.getId() == mountId) {
+            mountSeated = true;
+        } else if (mountSeated || vehicle != null) {
+            mount.clear();
+            mountId = -1;
+            mountSeated = false;
+        }
+    }
+
+    /**
+     * The feathers of the mount the local player rides, or {@link FeathersView#NONE}.
+     */
+    public FeathersView mount() {
+        return mountSeated && mount.hasFeathers() ? mount : FeathersView.NONE;
+    }
+
+    public ResourceLocation lastSpendSource() {
+        return lastSpendTicks > 0 ? lastSpendSource : null;
+    }
+
+    public int lastSpendCost() {
+        return lastSpendCost;
+    }
+
+    /* ClientFeathersService, and the common service's client bridge */
+
+    @Override
+    public FeathersView local() {
+        return this;
+    }
+
+    @Override
+    public @Nullable FeathersView clientView(LivingEntity entity) {
+        if (entity == Minecraft.getInstance().player) return this;
+        return entity.getId() == mountId && mount.hasFeathers() ? mount : null;
+    }
+
+    @Override
+    public boolean isLocalPlayer(LivingEntity entity) {
+        return entity == Minecraft.getInstance().player;
+    }
+
+    /**
+     * Pays locally the way the server would (bonus, stamina, then Strain) so the HUD reacts at once.
+     */
+    @Override
+    public SpendResult predictSpend(int cost, boolean allowStrain) {
+        if (!synced) return SpendResult.EXEMPT;
+        if (exhausted) return SpendResult.EXHAUSTED;
+        int strainRoom = allowStrain && FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, maxStrain - strain) : 0;
+        if (cost > availableStamina() + strainRoom) return SpendResult.INSUFFICIENT;
+
+        int fromBonus = Math.min(bonus, cost);
+        bonus -= fromBonus;
+        int left = cost - fromBonus;
+        int fromStamina = Math.min(Math.max(0, stamina - Stamina.ofFeathers(weight)), left);
+        stamina -= fromStamina;
+        strain += left - fromStamina;
+        regenDelay = Math.max(regenDelay, FeathersServerConfig.DEFAULT_USAGE_COOLDOWN.get());
+        return SpendResult.OK;
+    }
+
+    @Override
+    public void requestSpend(ResourceLocation source, int stamina, SpendOptions options) {
+        FeathersNetwork.CHANNEL.sendToServer(new SpendRequestPayload(source, stamina, options.allowStrain(), options.regenDelayTicks()));
+    }
+
+    @Override
+    public FeathersView localView() {
+        return this;
     }
 }

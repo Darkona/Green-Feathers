@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " F ",
+    "G G",
+    " G "
+  ],
+  "key": {
+    "F": { "item": "minecraft:feather" },
+    "G": { "item": "minecraft:gold_ingot" }
+  },
+  "result": {
+    "item": "greenfeathers:feather_ring",
+    "count": 1
+  }
+}

@@ -1,38 +1,66 @@
 # Green Feathers
 
-Green Feathers is a fork of Feathers, a stamina mod for Minecraft. It add Stamina in the form of Feathers that can be consumed to do things by other mods through an API. Green Feathers provides the Stamina system, regeneration and methods to alter, spend, and otherwise make use of the system. It aims to be highly configurable and easy to use by other mods.
+**Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods
+decide cost feathers. Run out and you can push on for a while, at a price.
 
-## Installation
+Minecraft 1.20.1 · Forge · based on Elenai's Feathers
 
-Simply drag and drop the mod downloaded from the files section *URL PENDING* into your mods folder after installing [Minecraft Forge](files.minecraftforge.net).
-The mods folder is located at  ```%appdata%/.minecraft/mods```.
+![Feathers above the food bar, with a golden row of Endurance feathers](wiki/images/hud.png)
 
-## Developer Information
+## How it plays
 
-Adding support to Green Feathers is easy. To import it, simply add this line to your ```build.gradle``` file's ```repositories```.
+- **Feathers come back on their own**, a little every second, after a short pause once you've spent some.
+- **Push past empty.** When you run out you can keep going into red *strain* feathers. Regeneration pays strain
+  back before anything else, slowly, so overdoing it leaves you drained for a while.
+- **Rest to recover.** Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods)
+  pays strain back faster. Sleep restores everything.
+- **Exhaustion.** Spend absolutely everything and you're exhausted: no exerting yourself until you've caught your
+  breath.
+- **Weather and climate matter.** Cold weather slows your recovery. Heat makes everything cost double, and the
+  Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
+- **Heavy armor weighs you down** (optional). Every piece holds back some feathers you can't use, shown in that
+  piece's own color, head to feet. Netherite is heavy; the *Lightweight* enchantment and the *Feather Ring* help.
+- **Mounts tire too** (optional). Horses, donkeys, mules and camels have their own feathers, shown instead of yours
+  while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount
+  slows down and can't jump. Horse armor weighs a little too. Like speed and health, each animal is born with its
+  own stamina, and foals take after their parents.
+- **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
-```gradle
-repositories {
-     maven { url "https://www.cursemaven.com" }
-}
-```
-And this to your project's dependencies.
-```gradle
-dependencies {
-	implementation fg.deobf("curse.maven:feathers-PENDING:FILE_VERSION") 
-}
-```
-Where ```FILE_VERSION``` is the file ID of the version you want to use. You can find this by opening the URL of an Feathers file download and looking at the url. The numbers at the end are the file ID.
+On its own, Green Feathers makes sprinting and jumping cost feathers. Install
+[Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and
+movement mods like ParCool, Paragliders and Better Combat.
 
-Then simply run your gradle setup commands as normal, e.g. ```gradlew genEclipseRuns``` then ```gradlew eclipse```.
+## Plays well with others
 
-You now have access to Feathers API and code! The API is pretty self explanatory but if you need any help, feel free to private message me [here](https://www.curseforge.com/members/elenaidev/followers)!
+It stacks neatly with the other bars on the right: food, air bubbles, thirst.
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+| ![With Thirst Was Taken, Cold Sweat and AppleSkin](wiki/images/compat-thirst.png) | ![Riding a camel](wiki/images/mount-camel.png) |
+|---|---|
+| With Thirst Was Taken, Cold Sweat and AppleSkin | Riding a camel: its feathers, in its colors |
 
-Please make sure to update tests as appropriate.
+Supported out of the box, each switchable in the config:
+
+| Mod | What it does with feathers |
+|---|---|
+| Cold Sweat | Your body temperature decides when you're cold or overheating |
+| Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
+| Legendary Survival Overhaul | The same, from its temperature and hydration |
+| Thirst Was Taken | Being thirsty slows recovery, being well quenched speeds it up |
+| Serene Seasons | Winter outdoors is cold, summer sun is hot |
+| Curios | The Feather Ring goes in a ring slot |
+| AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
+
+## Documentation
+
+The [wiki](https://github.com/Darkona/Green-Feathers/wiki) has the details:
+
+- [How It Plays](https://github.com/Darkona/Green-Feathers/wiki/How-It-Plays): every mechanic, with the numbers.
+- [Configuration](https://github.com/Darkona/Green-Feathers/wiki/Configuration): every option, and the `/feathers` command.
+- [Modpack Makers](https://github.com/Darkona/Green-Feathers/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
+- [Mod Developers](https://github.com/Darkona/Green-Feathers/wiki/Mod-Developers): the API, to spend feathers from your own mod.
+
+The wiki describes the Minecraft 1.21.1 version. What is different on 1.20.1 (file paths, API types, what isn't available) is in the [changelog](CHANGELOG.md).
 
 ## License
-[Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 
+[GNU GPL v3](LICENSE).

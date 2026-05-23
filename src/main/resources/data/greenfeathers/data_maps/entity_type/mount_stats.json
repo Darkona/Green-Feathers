@@ -1,0 +1,172 @@
+{
+  "replace": false,
+  "values": {
+    "#mobwrangler:rideables": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "mr_mob_wrangler"
+        }
+      ],
+      "gallop_speed": 0.1
+    },
+    "naturalist:ostrich": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "naturalist"
+        }
+      ]
+    },
+    "naturalist:giraffe": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "naturalist"
+        }
+      ]
+    },
+    "naturalist:elephant": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "naturalist"
+        }
+      ],
+      "min_feathers": 30,
+      "max_feathers": 50
+    },
+    "alexsmobs:elephant": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ],
+      "min_feathers": 30,
+      "max_feathers": 50
+    },
+    "alexsmobs:tusklin": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ]
+    },
+    "alexsmobs:grizzly_bear": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ]
+    },
+    "alexsmobs:komodo_dragon": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ],
+      "gallop_speed": 0.15
+    },
+    "alexsmobs:laviathan": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 60
+    },
+    "alexsmobs:endergrade": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "alexsmobs"
+        }
+      ]
+    },
+    "wan_ancient_beasts:soarer": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "wan_ancient_beasts"
+        }
+      ]
+    },
+    "dmr:dragon": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "dmr"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:royal_red": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:overworld_drake": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:butterfly_leviathan": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "wyrmroost:silver_glider": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "wyrmroost"
+        }
+      ],
+      "min_feathers": 40,
+      "max_feathers": 70,
+      "gallop_feathers_per_second": 0.05
+    },
+    "mounts_of_mayhem:nautilus": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "mounts_of_mayhem"
+        }
+      ]
+    },
+    "mounts_of_mayhem:zombie_nautilus": {
+      "forge:conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "mounts_of_mayhem"
+        }
+      ]
+    }
+  }
+}

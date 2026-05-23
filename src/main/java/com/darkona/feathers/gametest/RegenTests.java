@@ -1,0 +1,134 @@
+package com.darkona.feathers.gametest;
+
+import com.darkona.feathers.api.DrainOptions;
+import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.api.SpendOptions;
+import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.registry.FeathersIds;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+import static com.darkona.feathers.api.registry.FeathersIds.id;
+import static com.darkona.feathers.gametest.TestSupport.assertFalse;
+import static com.darkona.feathers.gametest.TestSupport.assertTrue;
+import static com.darkona.feathers.gametest.TestSupport.assertValueEqual;
+import static com.darkona.feathers.gametest.TestSupport.player;
+import static com.darkona.feathers.gametest.TestSupport.tick;
+
+/**
+ * Regeneration, its pauses, and continuous drains. Default regeneration: 0.4 feathers/s = 20 stamina a tick.
+ */
+@GameTestHolder(FeathersIds.MOD_ID)
+@PrefixGameTestTemplate(false)
+public class RegenTests {
+
+    private static final ResourceLocation TEST = id("test");
+    private static final ResourceLocation OTHER = id("other");
+
+    private static ServerPlayer emptyPlayer(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.setStamina(player, 0);
+        return player;
+    }
+
+    @GameTest(template = "empty")
+    public static void regenerationRefills(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        tick(player, 50);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 1000, "one feather after 50 ticks at 0.4 f/s");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void verySlowRegenerationStillAddsUp(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        FeathersAPI.setBaseRegenPerSecond(player, 0.01);
+        tick(player, 100);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 50, "0.01 f/s for 5 s: fractions carry over");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void spendingPausesRegeneration(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        FeathersAPI.setStamina(player, 5000);
+        FeathersAPI.spend(player, TEST, 1000, SpendOptions.DEFAULT.withRegenDelay(20));
+        tick(player, 20);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 4000, "no regeneration during the delay");
+        tick(player, 5);
+        assertTrue(helper, FeathersAPI.get(player).stamina() > 4000, "regeneration resumes after the delay");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void regenerationPaysStrainBackFirst(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(21), SpendOptions.DEFAULT.withRegenDelay(0));
+        tick(player, 25);
+        // 20 on the first tick, then 5 a tick once the Strained effect cuts regeneration by 75%.
+        assertValueEqual(helper, FeathersAPI.get(player).strain(), 1000 - 20 - 24 * 5, "strain after 25 ticks of payback");
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 0, "no stamina while strained");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void regenerationBlocksAreKeptPerSource(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        FeathersAPI.blockRegen(player, TEST, -1);
+        FeathersAPI.blockRegen(player, OTHER, -1);
+        FeathersAPI.unblockRegen(player, TEST);
+        tick(player, 10);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 0, "still blocked by the other source");
+        FeathersAPI.unblockRegen(player, OTHER);
+        tick(player, 10);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 200, "regenerating once both are gone");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void drainsPayEveryTickAndStopWhenEmpty(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.setStamina(player, 500);
+        FeathersAPI.startDrain(player, TEST, 100, DrainOptions.DEFAULT.withoutStrain().withTimeout(0));
+        tick(player, 3);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 200, "after three ticks of 100");
+        tick(player, 2);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 0, "drained");
+        tick(player, 1);
+        assertFalse(helper, FeathersAPI.isDraining(player, TEST), "the drain stops when it can't pay");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void fractionalDrainsCarryOver(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.startDrain(player, TEST, 12.5, DrainOptions.DEFAULT.withTimeout(0));
+        tick(player, 8);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20) - 100, "8 ticks of 12.5");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void forgottenDrainsTimeOut(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.startDrain(player, TEST, 10);
+        helper.runAfterDelay(10, () -> {
+            tick(player, 1);
+            assertFalse(helper, FeathersAPI.isDraining(player, TEST), "a drain nobody refreshes times out");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty")
+    public static void freeActionsCanStillPauseRegeneration(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        FeathersAPI.spend(player, TEST, 0, SpendOptions.DEFAULT.withRegenDelay(20));
+        tick(player, 20);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 0, "a free action with a delay pauses regeneration");
+        helper.succeed();
+    }
+}

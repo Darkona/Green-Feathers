@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -61,8 +62,10 @@ public final class FeatherColors {
         try {
             texture = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity).getTextureLocation(entity);
         } catch (RuntimeException e) {
-            return pair(LEATHER);
+            texture = null;
         }
+        // Some modded renderers have no texture to give: neutral leather, cached like any other.
+        if (texture == null) texture = MissingTextureAtlasSprite.getLocation();
         long cached = BY_TEXTURE.getLong(texture);
         if (cached != UNKNOWN) return cached;
         long computed = pair(dominantOfTexture(texture));

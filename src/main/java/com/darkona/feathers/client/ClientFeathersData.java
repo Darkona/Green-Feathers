@@ -31,6 +31,8 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
 
     private final SyncedFeathers mount = new SyncedFeathers();
     private int mountId = -1;
+    /** The local player was seen riding {@link #mountId}. */
+    private boolean mountSeated;
 
     private ResourceLocation lastSpendSource;
     private int lastSpendCost;
@@ -41,6 +43,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
     public static void accept(SyncPayload payload) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && payload.entityId() != player.getId()) {
+            if (payload.entityId() != INSTANCE.mountId) INSTANCE.mountSeated = false;
             INSTANCE.mountId = payload.entityId();
             INSTANCE.mount.apply(payload);
         } else {
@@ -62,6 +65,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         super.clear();
         mount.clear();
         mountId = -1;
+        mountSeated = false;
         lastSpendSource = null;
     }
 
@@ -70,12 +74,17 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         super.tick();
         mount.tick();
         if (lastSpendTicks > 0) lastSpendTicks--;
-        // The mount's feathers only mean something while riding it.
+        // The mount's feathers only mean something while riding it. The server can send them a moment before the
+        // client sees the rider seated: they're only dropped once the player rode it and got off, or rides another.
+        if (mountId == -1) return;
         LocalPlayer player = Minecraft.getInstance().player;
         Entity vehicle = player != null ? player.getVehicle() : null;
-        if (mountId != -1 && (vehicle == null || vehicle.getId() != mountId)) {
+        if (vehicle != null && vehicle.getId() == mountId) {
+            mountSeated = true;
+        } else if (mountSeated || vehicle != null) {
             mount.clear();
             mountId = -1;
+            mountSeated = false;
         }
     }
 
@@ -83,7 +92,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
      * The feathers of the mount the local player rides, or {@link FeathersView#NONE}.
      */
     public FeathersView mount() {
-        return mount.hasFeathers() ? mount : FeathersView.NONE;
+        return mountSeated && mount.hasFeathers() ? mount : FeathersView.NONE;
     }
 
     public ResourceLocation lastSpendSource() {

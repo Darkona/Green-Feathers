@@ -121,8 +121,13 @@ public final class MountExertion {
     public static boolean canJump(LivingEntity mount) {
         if (!FeathersServiceImpl.isMount(mount)) return true;
         FeathersView view = FeathersAPI.get(mount);
+        // A client that hasn't heard the mount's feathers yet (the sync can land before the rider is seated) lets the
+        // server decide, instead of grounding the mount.
+        if (!view.hasFeathers()) return true;
         if (view.exhausted()) return false;
-        int room = view.availableStamina() + Math.max(0, view.maxStrain() - view.strain());
+        // Strain room only counts where the jump's spend could use it.
+        int strainRoom = FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, view.maxStrain() - view.strain()) : 0;
+        int room = view.availableStamina() + strainRoom;
         return room >= Stamina.ofFeathers(fullJumpFeathers(mount));
     }
 

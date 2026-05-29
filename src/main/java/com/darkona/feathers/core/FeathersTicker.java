@@ -200,6 +200,9 @@ public final class FeathersTicker {
      */
     public static void tick(LivingEntity entity) {
         FeathersData data = FeathersServiceImpl.data(entity);
+        // A creature that became a mount after it joined (mounts turned on, a datapack reload) missed onJoin: roll its
+        // trait and set its bases now.
+        if (!data.initialized && !(entity instanceof Player)) refreshFromConfig(entity);
         FeathersServiceImpl.ensureInitialized(entity, data);
 
         if (!FeathersServiceImpl.isExempt(entity)) {

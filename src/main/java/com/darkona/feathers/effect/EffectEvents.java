@@ -3,6 +3,7 @@ package com.darkona.feathers.effect;
 import com.darkona.feathers.api.registry.FeathersIds;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
@@ -25,12 +26,18 @@ public final class EffectEvents {
 
     @SubscribeEvent
     public static void onAdded(MobEffectEvent.Added event) {
-        if (event.getEffectInstance().getEffect().value() instanceof FeathersMobEffect effect && !event.getEntity().level().isClientSide()) {
-            effect.onApplied(event.getEntity(), event.getEffectInstance());
+        MobEffectInstance added = event.getEffectInstance(), old = event.getOldEffectInstance();
+        // Fired before the merge: the entity keeps its current instance unless the new one is stronger, or as strong and
+        // longer (MobEffectInstance.update), so a weaker potion mustn't replace what the stronger one gave.
+        if (old != null && (added.getAmplifier() < old.getAmplifier()
+                || added.getAmplifier() == old.getAmplifier() && added.getDuration() <= old.getDuration())) return;
+        if (added.getEffect().value() instanceof FeathersMobEffect effect && !event.getEntity().level().isClientSide()) {
+            effect.onApplied(event.getEntity(), added);
         }
     }
 
-    @SubscribeEvent
+    /** Last: another mod may cancel the removal, and then the effect (and its bonus) stays. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRemoved(MobEffectEvent.Remove event) {
         ended(event.getEntity(), event.getEffectInstance());
     }

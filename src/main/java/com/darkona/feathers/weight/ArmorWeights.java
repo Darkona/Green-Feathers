@@ -89,6 +89,10 @@ public final class ArmorWeights {
                 continue;
             }
             String target = rule.substring(0, eq).trim();
+            if (target.isEmpty()) {
+                Feathers.LOGGER.warn("Armor weight rule '{}' has nothing before '=', ignored.", rule);
+                continue;
+            }
             int weight;
             try {
                 weight = Math.max(0, Integer.parseInt(rule.substring(eq + 1).trim()));

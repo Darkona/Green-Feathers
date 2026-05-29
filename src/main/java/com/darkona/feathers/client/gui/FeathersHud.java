@@ -1,5 +1,6 @@
 package com.darkona.feathers.client.gui;
 
+import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.Stamina;
@@ -42,7 +43,8 @@ public final class FeathersHud {
     private static final int ICONS_PER_ROW = 10;
     private static final int FEATHERS_PER_ROW = ICONS_PER_ROW * 2;
     private static final int ROW_HEIGHT = 10;
-    private static final boolean OVERFLOWING_BARS = ModList.get().isLoaded("overflowingbars");
+    /** Off for good if the installed Overflowing Bars doesn't have the renderer this was built against. */
+    private static boolean overflowingBars = ModList.get().isLoaded("overflowingbars");
 
     private static final ClientFeathersData DATA = ClientFeathersData.INSTANCE;
 
@@ -271,11 +273,19 @@ public final class FeathersHud {
 
     private static void drawRowCount(GuiGraphics graphics, int x, int y, int layers) {
         Font font = Minecraft.getInstance().font;
-        if (OVERFLOWING_BARS) {
-            RowCountRenderer.drawBarRowCount(graphics, x + 18, y, layers, true, font);
-        } else {
-            graphics.drawString(font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, 0xFFFFFF);
+        if (overflowingBars) {
+            try {
+                // Its count is value / maxRowCount: rows of one each, so the layer count comes out as is.
+                RowCountRenderer.drawBarRowCount(graphics, x + 18, y, layers, true, 1, font);
+                // It resets the color, fade included.
+                graphics.setColor(1f, 1f, 1f, alpha);
+                return;
+            } catch (LinkageError e) {
+                overflowingBars = false;
+                Feathers.LOGGER.warn("Overflowing Bars' row count renderer isn't compatible, using the built-in one", e);
+            }
         }
+        graphics.drawString(font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, 0xFFFFFF);
     }
 
     private static Icons.Set iconSet(LocalPlayer player) {

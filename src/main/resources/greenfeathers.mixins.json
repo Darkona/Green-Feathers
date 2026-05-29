@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.darkona.feathers.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "greenfeathers.refmap.json",
+  "mixins": [
+    "AbstractHorseMixin",
+    "ServerGamePacketListenerImplMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

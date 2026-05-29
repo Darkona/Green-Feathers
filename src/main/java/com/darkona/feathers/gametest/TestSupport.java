@@ -1,0 +1,146 @@
+package com.darkona.feathers.gametest;
+
+import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.api.FeathersView;
+import com.darkona.feathers.config.FeathersCompatConfig;
+import com.darkona.feathers.core.FeathersData;
+import com.darkona.feathers.core.FeathersServiceImpl;
+import com.darkona.feathers.core.FeathersTicker;
+import com.darkona.feathers.api.registry.FeathersIds;
+import com.electronwill.nightconfig.core.file.FileWatcher;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTestAssertException;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.config.ConfigTracker;
+import net.minecraftforge.fml.config.ModConfig;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Players for feathers tests. Vanilla's mock server player reports itself as creative, which feathers exempt by
+ * design, so these are Forge fake players in survival. They aren't ticked by the server: tests tick them.
+ */
+final class TestSupport {
+
+    private TestSupport() {}
+
+    /** Compat switches, off while ordinary tests run so a thirst or temperature mod on the runtime can't skew them. */
+    private static final List<ForgeConfigSpec.BooleanValue> COMPATS = List.of(FeathersCompatConfig.COLD_SWEAT, FeathersCompatConfig.THIRST,
+            FeathersCompatConfig.TAN, FeathersCompatConfig.SEASONS);
+
+    static {
+        stopWatchingConfigFiles();
+        COMPATS.forEach(value -> value.set(false));
+    }
+
+    /**
+     * Tests switch config values on and off, and every change rewrites the file. Forge's file watcher would reload
+     * each one on its own thread, racing the tests (and sometimes reading a half-written file), so the watch on the
+     * mod's server config files does nothing while tests run. Forge removes the watch itself when the server stops.
+     */
+    private static void stopWatchingConfigFiles() {
+        for (ModConfig config : ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.SERVER)) {
+            if (!FeathersIds.MOD_ID.equals(config.getModId())) continue;
+            try {
+                FileWatcher.defaultInstance().setWatch(config.getFullPath(), () -> {});
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+    }
+
+    /**
+     * Runs {@code test} with every compat switched on.
+     */
+    static void withCompat(Runnable test) {
+        COMPATS.forEach(value -> value.set(true));
+        try {
+            test.run();
+        } finally {
+            COMPATS.forEach(value -> value.set(false));
+        }
+    }
+
+    static ServerPlayer player(GameTestHelper helper) {
+        ServerPlayer player = new TestPlayer(helper.getLevel(), new GameProfile(UUID.randomUUID(), "feathers-test"));
+        player.moveTo(helper.absoluteVec(Vec3.ZERO));
+        FeathersAPI.get(player);
+        return player;
+    }
+
+    /**
+     * Forge 40's FakePlayer reports 0, 0, 0 as its position wherever it is, and a 1.18.2 ServerPlayer moves through its
+     * connection, which a FakePlayer's ignores: tests that place the player need both to be real.
+     */
+    private static final class TestPlayer extends FakePlayer {
+
+        TestPlayer(ServerLevel level, GameProfile profile) {
+            super(level, profile);
+        }
+
+        @Override
+        public void moveTo(double x, double y, double z) {
+            moveTo(x, y, z, getYRot(), getXRot());
+        }
+
+        @Override
+        public Vec3 position() {
+            return new Vec3(getX(), getY(), getZ());
+        }
+
+        @Override
+        public BlockPos blockPosition() {
+            return new BlockPos(getBlockX(), getBlockY(), getBlockZ());
+        }
+    }
+
+    static void tick(ServerPlayer player, int ticks) {
+        for (int i = 0; i < ticks; i++) {
+            FeathersTicker.tick(player);
+            player.tickCount++;
+        }
+    }
+
+    /**
+     * The player's feathers as they would come back from a save.
+     */
+    static FeathersView saveAndLoad(GameTestHelper helper, ServerPlayer player) {
+        CompoundTag tag = FeathersServiceImpl.data(player).serializeNBT();
+        FeathersData loaded = new FeathersData();
+        loaded.deserializeNBT(tag);
+        return loaded;
+    }
+
+    /**
+     * What later versions' {@code GameTestHelper.assertValueEqual} does.
+     */
+    static <N> void assertValueEqual(GameTestHelper helper, N actual, N expected, String name) {
+        if (!actual.equals(expected)) {
+            throw new GameTestAssertException("Expected " + name + " to be " + expected + ", but was " + actual);
+        }
+    }
+
+    /**
+     * What later versions' {@code GameTestHelper.assertTrue} does.
+     */
+    static void assertTrue(GameTestHelper helper, boolean condition, String message) {
+        if (!condition) throw new GameTestAssertException(message);
+    }
+
+    /**
+     * What later versions' {@code GameTestHelper.assertFalse} does.
+     */
+    static void assertFalse(GameTestHelper helper, boolean condition, String message) {
+        if (condition) throw new GameTestAssertException(message);
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "values": {
+    "minecraft:pig": {
+      "min_feathers": 40,
+      "max_feathers": 40,
+      "regen_feathers_per_second": 2.0,
+      "jump_feathers": 3.0
+    }
+  }
+}

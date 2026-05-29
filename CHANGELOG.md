@@ -61,8 +61,9 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 ### For mod developers
 
 - A separate API jar: spend, drain and read feathers, add regeneration factors and weight sources, and listen to events.
+- The old API of Elenai's Feathers (`com.elenai.feathers.api.FeathersHelper`) is gone: use `FeathersAPI` on the server or `ClientFeathers` on the client.
 
 ## Planned
 
-- Ports of this version to Minecraft 1.20.1 (Forge 47), 1.19.2 (Forge 43) and 1.18.2 (Forge 40), each with the latest stable versions of the supported mods.
+- A port to Minecraft 26.2 (NeoForge).
 - The wiki gets a section per Minecraft version where the versions differ.

@@ -67,6 +67,7 @@ Each one only does something when its mod is installed, and can be turned off in
 ### For mod developers
 
 - A separate API jar, `greenfeathers-api`: spend, drain and read feathers, add regeneration factors, climate providers, stamina modifiers and weight sources, and listen to events.
+- The old API of Elenai's Feathers (`com.elenai.feathers.api.FeathersHelper`) is gone: use `FeathersAPI` on the server or `ClientFeathers` on the client.
 - The same API as 1.21.1, with the changes Forge 1.18.2 needs (the same as on 1.19.2 and 1.20.1, plus one):
   - Attributes, effects and enchantments are `RegistryObject`s (`FeathersAttributes.MAX_FEATHERS.get()`), not `DeferredHolder`s.
   - Events go on `MinecraftForge.EVENT_BUS`. `SpendEvent.Post#getSpendResult` replaces `getResult`, which Forge's `Event` already has.

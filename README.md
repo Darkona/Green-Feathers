@@ -52,12 +52,12 @@ Supported out of the box, each switchable in the config:
 
 ## Documentation
 
-The [wiki](https://github.com/Darkona/Green-Feathers/wiki) has the details:
+The [wiki](https://github.com/Darkona/green-feathers/wiki) has the details:
 
-- [How It Plays](https://github.com/Darkona/Green-Feathers/wiki/How-It-Plays): every mechanic, with the numbers.
-- [Configuration](https://github.com/Darkona/Green-Feathers/wiki/Configuration): every option, and the `/feathers` command.
-- [Modpack Makers](https://github.com/Darkona/Green-Feathers/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
-- [Mod Developers](https://github.com/Darkona/Green-Feathers/wiki/Mod-Developers): the API, to spend feathers from your own mod.
+- [How It Plays](https://github.com/Darkona/green-feathers/wiki/How-It-Plays): every mechanic, with the numbers.
+- [Configuration](https://github.com/Darkona/green-feathers/wiki/Configuration): every option, and the `/feathers` command.
+- [Modpack Makers](https://github.com/Darkona/green-feathers/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
+- [Mod Developers](https://github.com/Darkona/green-feathers/wiki/Mod-Developers): the API, to spend feathers from your own mod.
 
 ## License
 

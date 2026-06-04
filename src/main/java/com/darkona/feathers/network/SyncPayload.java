@@ -68,6 +68,11 @@ public record SyncPayload(int entityId, int stamina, int maxStamina, int strain,
                 data.weight(), data.regenDelay(), data.exhausted(), data.restState(), weightParts(data));
     }
 
+    /** An empty bar: what a creature that stopped being a mount shows. */
+    public static SyncPayload none(int entityId) {
+        return new SyncPayload(entityId, 0, 0, 0, 0, 0, 0, 0, false, RestState.NONE, new int[ArmorWeights.PARTS]);
+    }
+
     /** A copy: in singleplayer the payload reaches the client thread without being encoded. */
     private static int[] weightParts(FeathersData data) {
         return data.weightSplit().toArray();

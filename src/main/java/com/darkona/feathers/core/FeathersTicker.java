@@ -438,6 +438,38 @@ public final class FeathersTicker {
     }
 
     /**
+     * Undoes what the feathers left on a creature that stopped being a mount (mounts turned off, its type left the
+     * mounts tag or data map): Strain, exhaustion, the slowdown flag, the Strained effect this mod put on it, and the
+     * rider's HUD row. Its stamina and rolled trait stay, for when it becomes a mount again; it is set up anew then.
+     * Only creatures that had feathers are touched, and only once. Public for tests.
+     */
+    public static void releaseExMount(LivingEntity entity) {
+        if (!entity.hasData(FeathersAttachments.FEATHERS)) return;
+        FeathersData data = FeathersServiceImpl.data(entity);
+        MobEffectInstance effect = entity.getEffect(FeathersMobEffects.STRAINED);
+        // Ours is infinite and without particles; one from a command or another mod is left alone.
+        boolean ownEffect = effect != null && effect.isInfiniteDuration() && !effect.isVisible();
+        if (!ownEffect && !data.initialized && data.strain == 0 && !data.exhausted && !data.mountSlowed && data.syncedMax <= 0) return;
+
+        if (ownEffect) entity.removeEffect(FeathersMobEffects.STRAINED);
+        if (data.strain > 0) {
+            data.strain = 0;
+            NeoForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
+        }
+        if (data.exhausted) {
+            data.exhausted = false;
+            NeoForge.EVENT_BUS.post(new ExhaustionEvent.Recovered(entity));
+        }
+        data.mountSlowed = false;
+        data.drains.clear();
+        // Becoming a mount again reads the config and attributes afresh (see tick).
+        data.initialized = false;
+        if (data.syncedMax > 0 && MountExertion.riderOf(entity) instanceof ServerPlayer rider) FeathersNetwork.sendNoFeathers(rider, entity);
+        data.syncedMax = -1;
+        data.forceSync = true;
+    }
+
+    /**
      * Sends the client a snapshot when something it shows changed: whole feathers, Strain, bonus, weight, maximums,
      * exhaustion, the regeneration pause, rest.
      */

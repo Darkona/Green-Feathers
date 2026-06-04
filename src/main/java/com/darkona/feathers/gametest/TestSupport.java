@@ -27,7 +27,7 @@ final class TestSupport {
 
     /** Compat switches, off while ordinary tests run so a thirst or temperature mod on the runtime can't skew them. */
     private static final List<ModConfigSpec.BooleanValue> COMPATS = List.of(FeathersCompatConfig.COLD_SWEAT, FeathersCompatConfig.THIRST,
-            FeathersCompatConfig.TAN, FeathersCompatConfig.LSO, FeathersCompatConfig.SEASONS);
+            FeathersCompatConfig.BLUE_DROPLETS, FeathersCompatConfig.TAN, FeathersCompatConfig.LSO, FeathersCompatConfig.SEASONS);
 
     static {
         COMPATS.forEach(value -> value.set(false));

@@ -30,6 +30,7 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 
 - Horses, donkeys, mules and camels have their own feathers, shown instead of yours while you ride, in the animal's colors.
 - Galloping and jumping tire them; an exhausted mount slows down and can't jump.
+- An animal that stops counting as a mount (config or datapack change) drops its strain, exhaustion and slowdown.
 - Each animal is born with its own stamina, and foals take after their parents.
 - Horse armor weighs a little.
 - Which animals count, and their stats, set by datapack.
@@ -43,12 +44,17 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 - Feathers above the food bar, colored by state: normal, cold, hot, strained, energized, momentum, endurance.
 - Feathers beyond one row stack in layers of stronger shades.
 - Weight feathers drawn in each source's color.
+- Every feather is drawn from grayscale sprites (body, half body, outline, shine, empty slot) tinted with a body and an outline color, instead of a hand-drawn set per color. Each state keeps its own shape: crystal feathers when cold or with Momentum, a glint when energized, its own stripe for strain.
+- Cold puts frost over the feathers, as in the first Green Feathers. The flames overlay is available to styles and resource packs.
+- The feathers move like hearts: a wave while Energized, a shake when only a few are left, a pulse (or a shake) while strained. Each is set in the client config (`[animations]`), and the low threshold too.
+- Resource packs can recolor any state, change its shape or overlay, or give it sprites of their own, with `assets/greenfeathers/feather_styles.json` (see the Resource Packs wiki page).
 - Armor tooltips show the item's weight.
 
 ### Compatibility
 
 - Cold Sweat, Tough As Nails, Legendary Survival Overhaul: their body temperature decides cold and heat; their thirst or hydration affects regeneration.
-- Thirst Was Taken: thirst slows regeneration, being well quenched speeds it up.
+- Blue Droplets, the maintained continuation of Thirst Was Taken: thirst slows regeneration, being well quenched speeds it up, and regenerating can cost thirst (optional). Players with thirst turned off are not affected.
+- Thirst Was Taken: the same, for packs still on the original mod.
 - Serene Seasons: winter outdoors is cold, summer sun is hot.
 - Curios: the Feather Ring goes in a ring slot.
 - AppleSkin, Overflowing Bars, Jade: sit nicely alongside the feathers.
@@ -61,6 +67,8 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 ### For mod developers
 
 - A separate API jar: spend, drain and read feathers, add regeneration factors and weight sources, and listen to events.
+- Feather styles (`com.darkona.feathers.api.client`): register a `FeatherStyle` (body and border color, variant, overlay, optional sprites) and a `FeatherStyleProvider` that picks it for the player by condition, by priority. New shapes and overlays with `FeatherVariants`, from Green Feathers' 56x72 sheet layout or a texture of any size in multiples of 8. Green Feathers' own states use the same registry.
+- Feather animations: a `FeatherAnimationProvider` picks a wave, shake or pulse for the row (the player's or their mount's) by condition, by priority. Green Feathers' own triggers use the same path.
 - The old API of Elenai's Feathers (`com.elenai.feathers.api.FeathersHelper`) is gone: use `FeathersAPI` on the server or `ClientFeathers` on the client.
 
 ## Planned

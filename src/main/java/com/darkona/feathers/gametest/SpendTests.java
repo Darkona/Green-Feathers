@@ -7,6 +7,7 @@ import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
+import net.minecraft.commands.Commands;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -44,6 +45,33 @@ public class SpendTests {
         SpendResult result = FeathersAPI.spend(player, TEST, Stamina.ofFeathers(25), SpendOptions.DEFAULT.withoutStrain());
         helper.assertValueEqual(result, SpendResult.INSUFFICIENT, "spend beyond the bar without Strain");
         helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "stamina after a refused spend");
+        helper.succeed();
+    }
+
+    /**
+     * Huge amounts saturate instead of wrapping into negative (free) spends; the command refuses what doesn't fit.
+     */
+    @GameTest(template = "empty")
+    public static void hugeAmountsSaturate(GameTestHelper helper) {
+        helper.assertValueEqual(Stamina.ofFeathers(3_000_000.0), Integer.MAX_VALUE, "huge feathers");
+        helper.assertValueEqual(Stamina.ofFeathers(-3_000_000.0), Integer.MIN_VALUE, "huge negative feathers");
+        helper.assertValueEqual(Stamina.ofFeathers(Double.POSITIVE_INFINITY), Integer.MAX_VALUE, "infinite feathers");
+        helper.assertValueEqual(Stamina.ofFeathers(Double.NaN), 0, "NaN feathers");
+        helper.assertValueEqual(Stamina.ofFeathers(3_000_000), Integer.MAX_VALUE, "huge whole feathers");
+        helper.assertValueEqual(Stamina.ofFeathers(-3_000_000), Integer.MIN_VALUE, "huge negative whole feathers");
+        helper.assertValueEqual(Stamina.toFeathersCeil(Integer.MIN_VALUE), -2_147_483, "ceiling of the lowest stamina");
+        helper.assertValueEqual(Stamina.toFeathersCeil(1), 1, "ceiling of a sliver");
+
+        ServerPlayer player = player(helper);
+        helper.assertValueEqual(FeathersAPI.spend(player, TEST, Stamina.ofFeathers(3_000_000.0)), SpendResult.INSUFFICIENT, "a huge spend");
+        helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "stamina after a huge spend");
+
+        var server = helper.getLevel().getServer();
+        var dispatcher = server.getCommands().getDispatcher();
+        var source = server.createCommandSourceStack();
+        helper.assertTrue(Commands.getParseException(dispatcher.parse("feathers spend @s 3000000", source)) != null, "the command refuses 3000000 feathers");
+        helper.assertTrue(Commands.getParseException(dispatcher.parse("feathers set @s 3000000", source)) != null, "and setting them");
+        helper.assertTrue(Commands.getParseException(dispatcher.parse("feathers spend @s 2000000", source)) == null, "the command takes 2000000 feathers");
         helper.succeed();
     }
 

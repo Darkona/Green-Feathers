@@ -4,11 +4,16 @@ import com.darkona.feathers.Feathers;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.Stamina;
-import com.darkona.feathers.api.registry.FeathersMobEffects;
+import com.darkona.feathers.api.client.FeatherAnimation;
+import com.darkona.feathers.api.client.FeatherAnimations;
+import com.darkona.feathers.api.client.FeatherStyle;
+import com.darkona.feathers.api.client.FeatherStyles;
+import com.darkona.feathers.api.client.FeatherVariants;
 import com.darkona.feathers.client.ClientFeathersData;
 import com.darkona.feathers.client.SyncedFeathers;
 import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.config.FeathersServerConfig;
+import com.darkona.feathers.style.FeatherStylePack;
 import com.darkona.feathers.weight.ArmorWeights;
 import com.darkona.feathers.weight.WeightSplit;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,6 +26,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -33,13 +39,18 @@ import static com.darkona.feathers.client.gui.Icons.*;
 /**
  * The feathers row, right above the food bar and stacked with the other right-side bars. Two feathers per icon;
  * past a full row, further feathers are drawn over it in the overflow color (layered), with a row count.
- * Grey icons mark feathers made unusable by armor weight, red ones Strain, golden rows bonus feathers. While riding a
+ * Grey icons mark feathers made unusable by armor weight, red ones strain, golden rows bonus feathers. While riding a
  * mount that has feathers, the row shows the mount's instead, in the mount's own colors.
+ * <p>
+ * Every feather is grayscale sprites tinted with a body and a border color, in its style's variant (see
+ * {@link FeatherStyle}), with the style's overlay over the row: the player's by the style providers or the configured
+ * color, the rest by their fixed style ids. Styles and the row's animation are resolved once per client tick; drawing
+ * changes color once per run of same-colored feathers.
  */
 public final class FeathersHud {
 
     public static final ResourceLocation LAYER_ID = id("feathers");
-    private static final ResourceLocation ICONS = id("textures/gui/icons.png");
+    private static final ResourceLocation ICONS = FeatherVariants.SHEET;
     private static final int ICONS_PER_ROW = 10;
     private static final int FEATHERS_PER_ROW = ICONS_PER_ROW * 2;
     private static final int ROW_HEIGHT = 10;
@@ -51,9 +62,30 @@ public final class FeathersHud {
     /* Animation state, advanced once per client tick by tickAnimations. */
     private static int previousFeathers;
     private static int regenFlashTicks;
-    private static int energizedWave;
     private static int fullTicks;
     private static float alpha = 1.0f;
+    /** The row's animation: its kind (null for none), and where it is. */
+    private static FeatherAnimation.Kind motion;
+    private static float motionSpeed;
+    private static int motionAmplitude;
+    private static float wave;
+    private static float shakeClock;
+    private static float pulsePhase;
+    /** How far toward white the feathers are brightened this tick (PULSE). */
+    private static float pulse;
+
+    /* Styles, resolved once per client tick by refreshStyles. */
+    private static final FeatherStyle FALLBACK = FeatherStyle.opaque(0x00B53A, 0x000000);
+    private static final Look OWN = new Look().set(FALLBACK);
+    private static final Look STRAIN = new Look().set(FALLBACK);
+    private static final Look ENDURANCE = new Look().set(FALLBACK);
+    private static final Look ARMOR = new Look().set(FALLBACK);
+    private static final Look EMPTY = new Look().set(FALLBACK);
+    private static final Look EXHAUSTED = new Look().set(FALLBACK);
+    /** The plain feather, recolored per draw for texture-tinted feathers. */
+    private static final Look TINTED = new Look().set(FALLBACK);
+    /** FeatherColors' pairs are RGB: full alpha on top. */
+    private static final int OPAQUE = 0xFF000000;
 
     private FeathersHud() {}
 
@@ -64,13 +96,42 @@ public final class FeathersHud {
         if (regenFlashTicks > 0) regenFlashTicks--;
 
         LocalPlayer player = Minecraft.getInstance().player;
-        energizedWave = player != null && FeathersAPI.isEnergized(player) ? (energizedWave >= 100 ? -40 : energizedWave + 2) : 0;
+        if (player != null) {
+            refreshStyles(player);
+            FeathersView mount = DATA.mount();
+            boolean riding = player.getVehicle() instanceof LivingEntity && mount.hasFeathers() && mount.maxStamina() > 0;
+            animate(riding ? FeatherAnimations.select((LivingEntity) player.getVehicle(), mount) : FeatherAnimations.select(player, DATA));
+        }
 
         fullTicks = DATA.stamina() >= DATA.maxStamina() && DATA.bonusStamina() == 0 && DATA.strain() == 0 ? fullTicks + 1 : 0;
         if (FeathersClientConfig.FADE_WHEN_FULL.get() && fullTicks >= FeathersClientConfig.FADE_COOLDOWN.get()) {
             alpha = Math.max(0f, alpha - 1f / FeathersClientConfig.FADE_OUT_DURATION.get());
         } else {
             alpha = Math.min(1f, alpha + 1f / FeathersClientConfig.FADE_IN_DURATION.get());
+        }
+    }
+
+    /** Starts, keeps or stops the row's animation and moves it one tick on. */
+    private static void animate(FeatherAnimation animation) {
+        FeatherAnimation.Kind kind = animation != null ? animation.kind() : null;
+        if (kind != motion) {
+            motion = kind;
+            wave = 0;
+            shakeClock = 0;
+            pulsePhase = 0;
+        }
+        pulse = 0;
+        if (kind == null) return;
+        motionSpeed = animation.speed();
+        motionAmplitude = Math.round(animation.amplitude());
+        switch (kind) {
+            // Past the row's end, a short pause before it starts again.
+            case WAVE -> wave = wave >= ICONS_PER_ROW * ROW_HEIGHT ? -40 : wave + 2 * motionSpeed;
+            case SHAKE -> shakeClock += motionSpeed;
+            case PULSE -> {
+                pulsePhase = (pulsePhase + motionSpeed * Mth.TWO_PI / 20f) % Mth.TWO_PI;
+                pulse = Math.min(1f, animation.amplitude()) * (0.5f - 0.5f * Mth.cos(pulsePhase));
+            }
         }
     }
 
@@ -96,8 +157,12 @@ public final class FeathersHud {
         if (alpha > 0) {
             RenderSystem.enableBlend();
             graphics.setColor(1f, 1f, 1f, alpha);
-            if (riding) drawRow(graphics, mount, null, FeatherColors.of(vehicle), vehicle, x, y);
-            else drawRow(graphics, DATA, iconSet(player), ownTint(), player, x, y);
+            if (riding) {
+                long tint = FeatherColors.of(vehicle);
+                drawRow(graphics, mount, TINTED.colors(OPAQUE | FeatherColors.body(tint), OPAQUE | FeatherColors.outline(tint)), false, vehicle, x, y);
+            } else {
+                drawRow(graphics, DATA, OWN, true, player, x, y);
+            }
             drawBonus(graphics, shown, x, y - ROW_HEIGHT, bonusRows);
             graphics.setColor(1f, 1f, 1f, 1f);
             RenderSystem.disableBlend();
@@ -111,39 +176,39 @@ public final class FeathersHud {
     }
 
     /**
-     * One row of feathers: in {@code set}'s sprites, or, when {@code set} is null, tinted with {@code tint} (a body
-     * and outline color pair, see FeatherColors). {@code wearer} colors the armor weight by piece; null leaves it grey.
+     * One row of feathers in {@code look} (its overlay only when {@code overlay}). {@code wearer} colors the armor weight
+     * by piece; null leaves it grey.
      */
-    private static void drawRow(GuiGraphics graphics, FeathersView view, Icons.Set set, long tint, LivingEntity wearer, int x, int y) {
+    private static void drawRow(GuiGraphics graphics, FeathersView view, Look look, boolean overlay, LivingEntity wearer, int x, int y) {
         int maxFeathers = view.maxFeathers();
         int feathers = view.feathers();
+        int body = look.body;
+        int border = look.border;
 
-        // Background up to the maximum (one row; higher maximums are layered over it). Reddish while exhausted.
+        // Empty slots up to the maximum (one row; higher maximums are layered over it). Reddish while exhausted.
         int backgroundIcons = Math.min(ICONS_PER_ROW, (maxFeathers + 1) / 2);
-        if (view.exhausted()) graphics.setColor(1f, 0.55f, 0.55f, alpha);
-        for (int i = 0; i < backgroundIcons; i++) draw(graphics, x, y, i, NORMAL.background());
-        if (view.exhausted()) graphics.setColor(1f, 1f, 1f, alpha);
+        drawSlots(graphics, x, y, backgroundIcons, view.exhausted() ? EXHAUSTED : EMPTY);
 
         // Feathers, layered: the first row in its own color, every further row over it in a deeper shade of that color
-        // (a lighter one for dark colors), outlined like the first: black for sprites, the complement for tinted rows.
+        // (a lighter one for dark colors), outlined like the first.
         int layers = Math.max(1, (feathers + FEATHERS_PER_ROW - 1) / FEATHERS_PER_ROW);
-        int base = set != null ? set.color() : FeatherColors.body(tint);
-        int edge = set != null ? 0 : FeatherColors.outline(tint);
         for (int layer = 0; layer < layers; layer++) {
             int inLayer = Math.min(FEATHERS_PER_ROW, feathers - layer * FEATHERS_PER_ROW);
-            if (layer > 0) drawTintedFeathers(graphics, x, y, inLayer, FeatherColors.pair(FeatherColors.shade(base, layer), edge));
-            else if (set != null) drawFeathers(graphics, x, y, inLayer, set);
-            else drawTintedFeathers(graphics, x, y, inLayer, tint);
+            int layerBody = layer == 0 ? body : (body & 0xFF000000) | FeatherColors.shade(body & 0xFFFFFF, layer);
+            drawFeathers(graphics, x, y, inLayer, layerBody, border, look);
         }
 
         // Strain: red feathers growing over the empty row.
-        drawFeathers(graphics, x, y, Math.min(FEATHERS_PER_ROW, Stamina.toFeathersCeil(view.strain())), STRAINED);
+        drawFeathers(graphics, x, y, Math.min(FEATHERS_PER_ROW, Stamina.toFeathersCeil(view.strain())), STRAIN);
 
         // Armor weight: the first feathers are held back; spending stops when it reaches them.
         drawWeight(graphics, view, wearer, x, y);
 
+        // Frost, flames: over the whole row, like the old frozen feathers.
+        if (overlay && look.overlay) drawOverlay(graphics, x, y, backgroundIcons, look);
+
         if (view == DATA && regenFlashTicks >= 16) {
-            for (int i = 0; i < backgroundIcons; i++) draw(graphics, x, y, i, REGEN_OVERLAY);
+            for (int i = 0; i < backgroundIcons; i++) draw(graphics, ICONS, FeatherVariants.SHEET_WIDTH, FeatherVariants.SHEET_HEIGHT, x, y, i, REGEN_OVERLAY_U, 0);
         }
 
         if (layers > 1) drawRowCount(graphics, x, y, layers);
@@ -158,12 +223,6 @@ public final class FeathersHud {
     }
 
     private static final EquipmentSlot[] WEIGHT_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
-    private static final long WHITE = (long) 0xF2F2F2 << 32 | 0x3C3C3C;
-
-    /** Tinted colors for the configured feather color, or 0 when it has its own sprites. */
-    private static long ownTint() {
-        return FeathersClientConfig.FEATHER_COLOR.get() == FeathersClientConfig.FeatherColor.WHITE ? WHITE : 0;
-    }
 
     /**
      * Armor weight from the right, head to feet: each piece's share in that piece's colors (leather in its dye), and
@@ -220,48 +279,103 @@ public final class FeathersHud {
         EquipmentSlot slot = part == ArmorWeights.CHEST && !(wearer instanceof Player) ? EquipmentSlot.BODY
                 : part < WEIGHT_SLOTS.length ? WEIGHT_SLOTS[part] : null;
         ItemStack piece = slot != null ? wearer.getItemBySlot(slot) : ItemStack.EMPTY;
-        if (piece.isEmpty()) draw(graphics, x, y, index, half ? ARMOR.half() : ARMOR.full());
+        if (piece.isEmpty()) drawIcons(graphics, x, y, index, index + 1, half, ARMOR.body, ARMOR.border, ARMOR);
         else drawTinted(graphics, x, y, index, half, FeatherColors.of(piece));
     }
 
-    private static void drawTintedFeathers(GuiGraphics graphics, int x, int y, int count, long tint) {
-        if (count <= 0) return;
-        int icons = (count + 1) / 2;
-        for (int i = 0; i < icons; i++) {
-            drawTinted(graphics, x, y, i, i == icons - 1 && (count & 1) == 1, tint);
-        }
-    }
-
-    /**
-     * A grey feather tinted with the pair's body color, outlined in its complementary color.
-     */
+    /** One plain feather in a FeatherColors pair: its body color, outlined in the complementary one. */
     private static void drawTinted(GuiGraphics graphics, int x, int y, int index, boolean half, long tint) {
-        setColor(graphics, FeatherColors.body(tint));
-        draw(graphics, x, y, index, half ? TINT_BODY_HALF : TINT_BODY_FULL);
-        setColor(graphics, FeatherColors.outline(tint));
-        draw(graphics, x, y, index, half ? TINT_EDGE_HALF : TINT_EDGE_FULL);
-        graphics.setColor(1f, 1f, 1f, alpha);
+        drawIcons(graphics, x, y, index, index + 1, half, OPAQUE | FeatherColors.body(tint), OPAQUE | FeatherColors.outline(tint), TINTED);
     }
 
-    private static void setColor(GuiGraphics graphics, int rgb) {
-        graphics.setColor(((rgb >> 16) & 255) / 255f, ((rgb >> 8) & 255) / 255f, (rgb & 255) / 255f, alpha);
+    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, Look look) {
+        drawFeathers(graphics, x, y, count, look.body, look.border, look);
     }
 
     /**
      * {@code count} feathers from the right, two per icon; an odd count ends in a half icon.
      */
-    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, Icons.Set set) {
+    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, int body, int border, Look sprites) {
         if (count <= 0) return;
-        int icons = (count + 1) / 2;
-        for (int i = 0; i < icons; i++) {
-            boolean half = i == icons - 1 && (count & 1) == 1;
-            draw(graphics, x, y, i, half ? set.half() : set.full());
+        drawIcons(graphics, x, y, 0, (count + 1) / 2, (count & 1) == 1, body, border, sprites);
+    }
+
+    /**
+     * Icons {@code from} to {@code to} (exclusive) of {@code sprites}' variant, the last one half when
+     * {@code halfLast}: all bodies in one color, all shines, then all borders in the other, so the color changes three
+     * times per run, not per icon. A border with alpha 0 isn't drawn.
+     */
+    private static void drawIcons(GuiGraphics graphics, int x, int y, int from, int to, boolean halfLast, int body, int border, Look sprites) {
+        ResourceLocation sheet = sprites.sheet;
+        int width = sprites.sheetWidth, height = sprites.sheetHeight;
+        int v = sprites.row * SIZE;
+        int halfIcon = halfLast ? to - 1 : -1;
+        setColor(graphics, pulse > 0 ? brighten(body) : body);
+        for (int i = from; i < to; i++) draw(graphics, sheet, width, height, x, y, i, i == halfIcon ? BODY_HALF_U : BODY_FULL_U, v);
+        graphics.setColor(1f, 1f, 1f, alpha);
+        for (int i = from; i < to; i++) draw(graphics, sheet, width, height, x, y, i, i == halfIcon ? SHINE_HALF_U : SHINE_FULL_U, v);
+        if ((border >>> 24) != 0) {
+            setColor(graphics, border);
+            for (int i = from; i < to; i++) draw(graphics, sheet, width, height, x, y, i, i == halfIcon ? BORDER_HALF_U : BORDER_FULL_U, v);
+            graphics.setColor(1f, 1f, 1f, alpha);
         }
     }
 
-    private static void draw(GuiGraphics graphics, int x, int y, int index, GuiIcon icon) {
-        int wave = energizedWave > index * ROW_HEIGHT && energizedWave < (index + 1) * ROW_HEIGHT ? 2 : 0;
-        graphics.blit(ICONS, x - index * 8, y - wave, icon.x(), icon.y(), icon.width(), icon.height(), 256, 256);
+    /** Empty slots: the fill in the style's body color, the outline (its variant's) in its border color. */
+    private static void drawSlots(GuiGraphics graphics, int x, int y, int icons, Look look) {
+        setColor(graphics, look.body);
+        for (int i = 0; i < icons; i++) draw(graphics, look.slotSheet, look.slotWidth, look.slotHeight, x, y, i, EMPTY_U, 0);
+        if ((look.border >>> 24) != 0) {
+            setColor(graphics, look.border);
+            for (int i = 0; i < icons; i++) draw(graphics, look.sheet, look.sheetWidth, look.sheetHeight, x, y, i, BORDER_FULL_U, look.row * SIZE);
+        }
+        graphics.setColor(1f, 1f, 1f, alpha);
+    }
+
+    /** The style's overlay over {@code icons} slots: primary, then accent. */
+    private static void drawOverlay(GuiGraphics graphics, int x, int y, int icons, Look look) {
+        int v = look.overlayRow * SIZE;
+        setColor(graphics, look.overlayColor);
+        for (int i = 0; i < icons; i++) draw(graphics, look.overlaySheet, look.overlayWidth, look.overlayHeight, x, y, i, OVERLAY_U, v);
+        setColor(graphics, look.overlayAccent);
+        for (int i = 0; i < icons; i++) draw(graphics, look.overlaySheet, look.overlayWidth, look.overlayHeight, x, y, i, OVERLAY_ACCENT_U, v);
+        graphics.setColor(1f, 1f, 1f, alpha);
+    }
+
+    /** An ARGB color, its alpha times the fade. */
+    private static void setColor(GuiGraphics graphics, int argb) {
+        graphics.setColor(((argb >> 16) & 255) / 255f, ((argb >> 8) & 255) / 255f, (argb & 255) / 255f, (argb >>> 24) / 255f * alpha);
+    }
+
+    /** The color moved toward white by the pulse. */
+    private static int brighten(int argb) {
+        int r = (argb >> 16) & 255, g = (argb >> 8) & 255, b = argb & 255;
+        r += (int) ((255 - r) * pulse);
+        g += (int) ((255 - g) * pulse);
+        b += (int) ((255 - b) * pulse);
+        return (argb & 0xFF000000) | r << 16 | g << 8 | b;
+    }
+
+    private static void draw(GuiGraphics graphics, ResourceLocation sheet, int width, int height, int x, int y, int index, int u, int v) {
+        graphics.blit(sheet, x - index * 8, y + offset(index), u, v, SIZE, SIZE, width, height);
+    }
+
+    /**
+     * How far the {@code index}-th icon is moved by the row's animation: up where the wave is, or a random jitter
+     * that changes with the shake's clock (a hash of clock and index: no Random, nothing allocated).
+     */
+    private static int offset(int index) {
+        if (motion == FeatherAnimation.Kind.WAVE) {
+            return wave > index * ROW_HEIGHT && wave < (index + 1) * ROW_HEIGHT ? -motionAmplitude : 0;
+        }
+        if (motion == FeatherAnimation.Kind.SHAKE && motionAmplitude > 0) {
+            int h = ((int) shakeClock * 0x9E3779B9) ^ (index * 0x85EBCA6B);
+            h ^= h >>> 15;
+            h *= 0x2C1B3C6D;
+            h ^= h >>> 12;
+            return (h & 0x7FFFFFFF) % (motionAmplitude + 1);
+        }
+        return 0;
     }
 
     /** "x2", "x3"...: drawn every frame, built once. */
@@ -288,16 +402,29 @@ public final class FeathersHud {
         graphics.drawString(font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, 0xFFFFFF);
     }
 
-    private static Icons.Set iconSet(LocalPlayer player) {
-        if (player.hasEffect(FeathersMobEffects.COLD)) return COLD;
-        if (player.hasEffect(FeathersMobEffects.HOT)) return HOT;
-        if (player.hasEffect(FeathersMobEffects.ENERGIZED)) return ENERGY;
-        if (player.hasEffect(FeathersMobEffects.MOMENTUM)) return MOMENTUM;
-        return switch (FeathersClientConfig.FEATHER_COLOR.get()) {
-            case GREEN -> GREEN;
-            case BLUE -> NORMAL;
-            case WHITE -> null;
-        };
+    /**
+     * The player's style: the first provider's answer, else the configured color. Then the fixed ones, resource
+     * packs' changes included.
+     */
+    private static void refreshStyles(LocalPlayer player) {
+        ResourceLocation chosen = FeatherStyles.select(player, DATA);
+        FeatherStyle style = chosen != null ? FeatherStylePack.resolve(chosen) : null;
+        OWN.set(style != null ? style : style(switch (FeathersClientConfig.FEATHER_COLOR.get()) {
+            case GREEN -> FeatherStyles.GREEN;
+            case BLUE -> FeatherStyles.BLUE;
+            case WHITE -> FeatherStyles.WHITE;
+        }));
+        STRAIN.set(style(FeatherStyles.STRAIN));
+        ENDURANCE.set(style(FeatherStyles.ENDURANCE));
+        ARMOR.set(style(FeatherStyles.ARMOR));
+        EMPTY.set(style(FeatherStyles.EMPTY));
+        EXHAUSTED.set(style(FeatherStyles.EXHAUSTED));
+        TINTED.set(FALLBACK);
+    }
+
+    private static FeatherStyle style(ResourceLocation id) {
+        FeatherStyle style = FeatherStylePack.resolve(id);
+        return style != null ? style : FALLBACK;
     }
 
     private static void drawDebug(GuiGraphics graphics, Font font, LocalPlayer player) {

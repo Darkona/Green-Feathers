@@ -11,17 +11,19 @@ public final class Stamina {
     private Stamina() {}
 
     /**
-     * Stamina in {@code feathers} feathers.
+     * Stamina in {@code feathers} feathers, saturated at {@link Integer#MAX_VALUE} / {@link Integer#MIN_VALUE}.
      */
     public static int ofFeathers(int feathers) {
-        return feathers * PER_FEATHER;
+        return saturate((long) feathers * PER_FEATHER);
     }
 
     /**
-     * Stamina in {@code feathers} feathers, rounded to the nearest unit.
+     * Stamina in {@code feathers} feathers, rounded to the nearest unit and saturated at {@link Integer#MAX_VALUE} /
+     * {@link Integer#MIN_VALUE}; NaN is 0.
      */
     public static int ofFeathers(double feathers) {
-        return (int) Math.round(feathers * PER_FEATHER);
+        // Math.round(double) already saturates to the long range and maps NaN to 0.
+        return saturate(Math.round(feathers * PER_FEATHER));
     }
 
     /**
@@ -35,7 +37,8 @@ public final class Stamina {
      * Whole feathers in {@code stamina}, rounded up: what a HUD shows as partially filled.
      */
     public static int toFeathersCeil(int stamina) {
-        return -Math.floorDiv(-stamina, PER_FEATHER);
+        // In long: -Integer.MIN_VALUE wraps in int.
+        return (int) -Math.floorDiv(-(long) stamina, PER_FEATHER);
     }
 
     /**
@@ -43,5 +46,9 @@ public final class Stamina {
      */
     public static double perTick(double feathersPerSecond) {
         return feathersPerSecond * PER_FEATHER / 20.0;
+    }
+
+    private static int saturate(long stamina) {
+        return (int) Math.clamp(stamina, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 }

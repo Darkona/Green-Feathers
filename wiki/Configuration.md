@@ -257,6 +257,24 @@ Targets can be mounts too.
 	# Range: 0.0 ~ 20.0
 	thirst_per_regenerated_feather = 0.0
 
+#Blue Droplets (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.
+#Ignored for players whose thirst is off.
+[blue_droplets]
+	#Use Blue Droplets when it is installed.
+	enabled = true
+	#Feathers per second lost per missing thirst point (20 points = full).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_reduction_per_thirst_point = 0.02
+	#Feathers per second gained per point of quenched (thirst saturation).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_bonus_per_quench_point = 0.02
+	#Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.
+	# Default: 0.0
+	# Range: 0.0 ~ 20.0
+	thirst_per_regenerated_feather = 0.0
+
 #Tough As Nails: its temperature drives Cold, Heat and Fatigue; its thirst drives regeneration.
 [tough_as_nails]
 	#Use Tough As Nails when it is installed.
@@ -361,6 +379,19 @@ Targets can be mounts too.
 	#Mounts' feathers take their own color, and armor weight its armor's.
 	#Allowed Values: GREEN, BLUE, WHITE
 	feather_color = "GREEN"
+
+[animations]
+	#A wave runs along the feathers while Energized, like hearts under Regeneration.
+	wave_when_energized = true
+	#The feathers shake when few are left, like hearts at low health.
+	shake_when_low = true
+	#How many usable feathers count as few, for shake_when_low.
+	# Default: 2
+	# Range: 0 ~ 20
+	low_feathers = 2
+	#How the feathers move while strained: NONE, SHAKE or PULSE (brighten and dim).
+	#Allowed Values: NONE, SHAKE, PULSE
+	strain_animation = "PULSE"
 
 [feedback]
 	#Play a sound when the Cold effect freezes the feathers.

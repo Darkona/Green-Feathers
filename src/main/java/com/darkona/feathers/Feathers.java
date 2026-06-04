@@ -4,6 +4,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.registry.FeathersDataMaps;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.climate.ClimateEffects;
+import com.darkona.feathers.compatibility.bluedroplets.BlueDropletsCompat;
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatCompat;
 import com.darkona.feathers.compatibility.curios.CuriosCompat;
 import com.darkona.feathers.compatibility.lso.LegendarySurvivalCompat;
@@ -22,6 +23,7 @@ import com.darkona.feathers.item.ModItems;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.registry.ModAttributes;
 import com.darkona.feathers.registry.ModPotions;
+import com.darkona.feathers.style.GreenFeatherStyles;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -62,8 +64,10 @@ public final class Feathers {
         // Built-in extensions go through the same API as other mods' do.
         ClimateEffects.registerBuiltIn();
         HungerRegen.registerBuiltIn();
+        GreenFeatherStyles.register();
         ColdSweatCompat.init();
         ThirstCompat.init();
+        BlueDropletsCompat.init();
         ToughAsNailsCompat.init();
         LegendarySurvivalCompat.init();
         SereneSeasonsCompat.init();

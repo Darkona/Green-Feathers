@@ -36,6 +36,8 @@ public final class FeathersCommands {
     private static final String AMOUNT = "amount";
     private static final String SECONDS = "seconds";
     private static final int DEFAULT_DEBUG_SECONDS = 30;
+    /** Largest feather amount that still fits in stamina units. */
+    private static final double MAX_FEATHERS_ARG = Integer.MAX_VALUE / Stamina.PER_FEATHER;
     private static final SimpleCommandExceptionType NO_FEATHERS =
             new SimpleCommandExceptionType(Component.literal("None of those have feathers"));
 
@@ -49,7 +51,7 @@ public final class FeathersCommands {
                         .then(Commands.argument(TARGETS, EntityArgument.entities()).executes(FeathersCommands::info)))
                 .then(Commands.literal("set")
                         .then(Commands.argument(TARGETS, EntityArgument.entities())
-                                .then(Commands.argument(AMOUNT, DoubleArgumentType.doubleArg(0)).executes(FeathersCommands::set))))
+                                .then(Commands.argument(AMOUNT, DoubleArgumentType.doubleArg(0, MAX_FEATHERS_ARG)).executes(FeathersCommands::set))))
                 .then(Commands.literal("reset")
                         .then(Commands.argument(TARGETS, EntityArgument.entities()).executes(FeathersCommands::reset)))
                 .then(Commands.literal("max")
@@ -64,7 +66,7 @@ public final class FeathersCommands {
                                 .then(Commands.argument(SECONDS, IntegerArgumentType.integer(1, 600)).executes(FeathersCommands::debug))))
                 .then(Commands.literal("spend")
                         .then(Commands.argument(TARGETS, EntityArgument.entities())
-                                .then(Commands.argument(AMOUNT, DoubleArgumentType.doubleArg(0)).executes(FeathersCommands::spend)))));
+                                .then(Commands.argument(AMOUNT, DoubleArgumentType.doubleArg(0, MAX_FEATHERS_ARG)).executes(FeathersCommands::spend)))));
     }
 
     /**

@@ -26,10 +26,6 @@ Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers
   own stamina, and foals take after their parents.
 - **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
-On its own, Green Feathers makes sprinting and jumping cost feathers. Install
-[Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and
-movement mods like ParCool, Paragliders and Better Combat.
-
 ## Plays well with others
 
 It stacks neatly with the other bars on the right: food, air bubbles, thirst.
@@ -45,7 +41,8 @@ Supported out of the box, each switchable in the config:
 | Cold Sweat | Your body temperature decides when you're cold or overheating |
 | Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
 | Legendary Survival Overhaul | The same, from its temperature and hydration |
-| Thirst Was Taken | Being thirsty slows recovery, being well quenched speeds it up |
+| Blue Droplets | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
+| Thirst Was Taken | The same, for worlds still on the original mod (Blue Droplets is its maintained continuation) |
 | Serene Seasons | Winter outdoors is cold, summer sun is hot |
 | Curios | The Feather Ring goes in a ring slot |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |

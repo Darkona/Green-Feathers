@@ -49,7 +49,7 @@ public final class MountExertion {
         LivingEntity mount = event.getEntity();
         if (mount instanceof Player || mount.level().isClientSide() || !mount.isAlive()) return;
         if (FeathersServiceImpl.isMount(mount)) tickMount(mount);
-        else if (mount.tickCount % 100 == 0) clearSlowdown(mount);
+        else if (mount.tickCount % 100 == 0) release(mount);
     }
 
     /**
@@ -155,9 +155,13 @@ public final class MountExertion {
         }
     }
 
-    /** Takes the slowdown off a creature that stopped being a mount (config or tags changed) while exhausted. */
-    private static void clearSlowdown(LivingEntity entity) {
+    /**
+     * Cleans up a creature that stopped being a mount (config, tags or data map changed), possibly while strained or
+     * exhausted: the slowdown, then its feathers' leftovers (see {@link FeathersTicker#releaseExMount}). Public for tests.
+     */
+    public static void release(LivingEntity entity) {
         AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed != null && speed.getModifier(EXHAUSTED_SLOWDOWN_ID) != null) speed.removeModifier(EXHAUSTED_SLOWDOWN_ID);
+        FeathersTicker.releaseExMount(entity);
     }
 }

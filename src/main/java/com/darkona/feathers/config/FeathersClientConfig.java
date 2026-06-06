@@ -21,6 +21,10 @@ public final class FeathersClientConfig {
     public static final IntValue X_OFFSET;
     public static final IntValue Y_OFFSET;
     public static final EnumValue<FeatherColor> FEATHER_COLOR;
+    public static final BooleanValue WAVE_WHEN_ENERGIZED;
+    public static final BooleanValue SHAKE_WHEN_LOW;
+    public static final IntValue LOW_FEATHERS;
+    public static final EnumValue<StrainAnimation> STRAIN_ANIMATION;
 
     /** The color of the player's own feathers. */
     public enum FeatherColor {
@@ -30,6 +34,13 @@ public final class FeathersClientConfig {
         BLUE,
         /** White, like a chicken's. */
         WHITE
+    }
+
+    /** How the row moves while strained. */
+    public enum StrainAnimation {
+        NONE,
+        SHAKE,
+        PULSE
     }
 
     static {
@@ -65,6 +76,22 @@ public final class FeathersClientConfig {
         FEATHER_COLOR = builder.comment("Color of your feathers: GREEN, BLUE (Elenai's original) or WHITE (like a chicken's).",
                         "Mounts' feathers take their own color, and armor weight its armor's.")
                 .defineEnum("feather_color", FeatherColor.GREEN);
+
+        builder.pop();
+
+        builder.push("animations");
+
+        WAVE_WHEN_ENERGIZED = builder.comment("A wave runs along the feathers while Energized, like hearts under Regeneration.")
+                .define("wave_when_energized", true);
+
+        SHAKE_WHEN_LOW = builder.comment("The feathers shake when few are left, like hearts at low health.")
+                .define("shake_when_low", true);
+
+        LOW_FEATHERS = builder.comment("How many usable feathers count as few, for shake_when_low.")
+                .defineInRange("low_feathers", 2, 0, 20);
+
+        STRAIN_ANIMATION = builder.comment("How the feathers move while strained: NONE, SHAKE or PULSE (brighten and dim).")
+                .defineEnum("strain_animation", StrainAnimation.PULSE);
 
         builder.pop();
 

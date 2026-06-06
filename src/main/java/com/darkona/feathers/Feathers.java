@@ -23,6 +23,7 @@ import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.registry.ModAttributes;
 import com.darkona.feathers.registry.ModEnchantments;
 import com.darkona.feathers.registry.ModPotions;
+import com.darkona.feathers.style.GreenFeatherStyles;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
@@ -69,6 +70,7 @@ public final class Feathers {
         // Built-in extensions go through the same API as other mods' do.
         ClimateEffects.registerBuiltIn();
         HungerRegen.registerBuiltIn();
+        GreenFeatherStyles.register();
         ColdSweatCompat.init();
         ThirstCompat.init();
         ToughAsNailsCompat.init();

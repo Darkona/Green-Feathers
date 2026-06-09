@@ -32,6 +32,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.19.2 (through the 1.20.1
 
 - Horses, donkeys and mules have their own feathers, shown instead of yours while you ride, in the animal's colors.
 - Galloping and jumping tire them; an exhausted mount slows down and can't jump.
+- An animal that stops counting as a mount (config or datapack change) drops its strain, exhaustion and slowdown.
 - Each animal is born with its own stamina, and foals take after their parents.
 - Which animals count, and their stats, set by datapack in `data/greenfeathers/data_maps/entity_type/mount_stats.json` and the `greenfeathers:mounts` and `greenfeathers:no_feathers` entity type tags (`data/greenfeathers/tags/entity_types/`).
 
@@ -44,6 +45,10 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.19.2 (through the 1.20.1
 - Feathers above the food bar, colored by state: normal, cold, hot, strained, energized, momentum, endurance. Green, blue or white, your choice.
 - Feathers beyond one row stack in layers of stronger shades.
 - Weight feathers drawn in each source's color.
+- Every feather is drawn from grayscale sprites (body, half body, outline, shine, empty slot) tinted with a body and an outline color, instead of a hand-drawn set per color. Each state keeps its own shape: crystal feathers when cold or with Momentum, a glint when energized, its own stripe for strain.
+- Cold puts frost over the feathers, as in the first Green Feathers. The flames overlay is available to styles and resource packs.
+- The feathers move like hearts: a wave while Energized, a shake when only a few are left, a pulse (or a shake) while strained. Each is set in the client config (`[animations]`), and the low threshold too.
+- Resource packs can recolor any state, change its shape or overlay, or give it sprites of their own, with `assets/greenfeathers/feather_styles.json` (see the Resource Packs wiki page).
 - Armor and horse armor tooltips show the item's weight.
 
 ### Compatibility
@@ -67,6 +72,8 @@ Each one only does something when its mod is installed, and can be turned off in
 ### For mod developers
 
 - A separate API jar, `greenfeathers-api`: spend, drain and read feathers, add regeneration factors, climate providers, stamina modifiers and weight sources, and listen to events.
+- Feather styles (`com.darkona.feathers.api.client`): register a `FeatherStyle` (body and border color, variant, overlay, optional sprites) and a `FeatherStyleProvider` that picks it for the player by condition, by priority. New shapes and overlays with `FeatherVariants`, from Green Feathers' 56x72 sheet layout or a texture of any size in multiples of 8. Green Feathers' own states use the same registry.
+- Feather animations: a `FeatherAnimationProvider` picks a wave, shake or pulse for the row (the player's or their mount's) by condition, by priority. Green Feathers' own triggers use the same path.
 - The old API of Elenai's Feathers (`com.elenai.feathers.api.FeathersHelper`) is gone: use `FeathersAPI` on the server or `ClientFeathers` on the client.
 - The same API as 1.21.1, with the changes Forge 1.19.2 needs (the same as on 1.20.1):
   - Attributes, effects and enchantments are `RegistryObject`s (`FeathersAttributes.MAX_FEATHERS.get()`), not `DeferredHolder`s.

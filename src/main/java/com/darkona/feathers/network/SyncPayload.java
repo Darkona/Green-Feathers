@@ -51,6 +51,11 @@ public record SyncPayload(int entityId, int stamina, int maxStamina, int strain,
         return parts;
     }
 
+    /** An empty bar: what a creature that stopped being a mount shows. */
+    public static SyncPayload none(int entityId) {
+        return new SyncPayload(entityId, 0, 0, 0, 0, 0, 0, 0, false, RestState.NONE, new int[ArmorWeights.PARTS]);
+    }
+
     public static SyncPayload of(int entityId, FeathersData data) {
         return new SyncPayload(entityId, data.stamina(), data.maxStamina(), data.strain(), data.maxStrain(), data.bonusStamina(),
                 data.weight(), data.regenDelay(), data.exhausted(), data.restState(), data.weightSplit().toArray());

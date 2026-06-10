@@ -68,6 +68,13 @@ public final class FeathersNetwork {
         send(player, SyncPayload.of(entity.getId(), data));
     }
 
+    /**
+     * Tells {@code player} that {@code entity} (the creature it rides) has no feathers any more: the HUD drops its row.
+     */
+    public static void sendNoFeathers(ServerPlayer player, LivingEntity entity) {
+        send(player, SyncPayload.none(entity.getId()));
+    }
+
     public static void sendSpendDebug(LivingEntity entity, ResourceLocation source, int cost) {
         if (entity instanceof ServerPlayer player) send(player, new SpendDebugPayload(source, cost));
     }

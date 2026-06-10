@@ -10,6 +10,8 @@ import com.darkona.feathers.config.FeathersClientConfig;
 import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.data.DataMaps;
+import com.darkona.feathers.style.FeatherStylePack;
+import com.darkona.feathers.style.GreenFeatherAnimations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -55,14 +57,19 @@ public final class ClientEvents {
         public static void onClientSetup(FMLClientSetupEvent event) {
             ClientFeathers.setService(ClientFeathersData.INSTANCE);
             FeathersServiceImpl.setClientBridge(ClientFeathersData.INSTANCE);
+            // Its triggers read the client config: registered here, not with the styles in common setup.
+            GreenFeatherAnimations.register();
             // Top of the right-hand stack: after air, where thirst mods such as Thirst Was Taken draw their bar.
             event.enqueueWork(() -> OverlayRegistry.registerOverlayAbove(ForgeIngameGui.AIR_LEVEL_ELEMENT, FeathersHud.OVERLAY_NAME, FeathersHud::render));
         }
 
-        /** Feather colors come from textures: forget them when resource packs change. */
+        /** Feather colors come from textures and resource packs' feather_styles.json: reread them when packs change. */
         @SubscribeEvent
         public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-            event.registerReloadListener((ResourceManagerReloadListener) manager -> FeatherColors.clear());
+            event.registerReloadListener((ResourceManagerReloadListener) manager -> {
+                FeatherColors.clear();
+                FeatherStylePack.load(manager);
+            });
         }
     }
 

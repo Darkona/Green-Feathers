@@ -226,7 +226,7 @@ public final class FeathersTicker {
 
             data.lastDelta = data.stamina - staminaBefore;
             boolean strained = data.strain > 0;
-            // A spend or drain starts Strain and posts its event. This path only recovers existing Strain.
+            // A spend or drain starts strain and posts its event. This path only recovers existing strain.
             if (strainedBefore && !strained) NeoForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
             if (!strainEnabled && data.strain > 0) data.strain = 0;
 
@@ -347,7 +347,7 @@ public final class FeathersTicker {
     }
 
     /**
-     * Regeneration pays Strain back first (faster while resting), then refills stamina. Fractions carry over, so
+     * Regeneration pays strain back first (faster while resting), then refills stamina. Fractions carry over, so
      * any rate works however slow.
      */
     private static void regenerate(LivingEntity entity, FeathersData data) {
@@ -388,7 +388,7 @@ public final class FeathersTicker {
 
         int recovered = 0;
         if (data.strain > 0) {
-            // Resting accelerates Strain recovery. Do not apply the multiplier twice after it boosts regeneration.
+            // Resting accelerates strain recovery. Do not apply the multiplier twice after it boosts regeneration.
             double rest = FeathersServerConfig.REST_BOOSTS_REGEN.get() ? 1.0 : data.restMultiplier;
             int recovery = (int) Math.round(regen * rest);
             recovered = Math.min(data.strain, recovery);
@@ -406,7 +406,7 @@ public final class FeathersTicker {
     }
 
     /**
-     * Ends exhaustion once there is no Strain left and the share of the bar set in the config is back, or at once
+     * Ends exhaustion once there is no strain left and the share of the bar set in the config is back, or at once
      * when exhaustion is turned off.
      */
     static void checkRecovered(LivingEntity entity, FeathersData data) {
@@ -430,7 +430,7 @@ public final class FeathersTicker {
     }
 
     /**
-     * The Strained effect appears during Strain recovery. Changing the effect sends a packet, so this method updates
+     * The strained effect appears during strain recovery. Changing the effect sends a packet, so this method updates
      * it only when the state changes.
      */
     private static void updateIndicators(LivingEntity entity, FeathersData data, boolean strained) {
@@ -444,7 +444,7 @@ public final class FeathersTicker {
 
     /**
      * Undoes what the feathers left on a creature that stopped being a mount (mounts turned off, its type left the
-     * mounts tag or data map): Strain, exhaustion, the slowdown flag, the Strained effect this mod put on it, and the
+     * mounts tag or data map): strain, exhaustion, the slowdown flag, the strained effect this mod put on it, and the
      * rider's HUD row. Its stamina and rolled trait remain available if it becomes a mount again.
      * Only creatures that had feathers are touched, and only once. Public for tests.
      */
@@ -475,7 +475,7 @@ public final class FeathersTicker {
     }
 
     /**
-     * Sends the client a snapshot when something it shows changed: whole feathers, Strain, bonus, weight, maximums,
+     * Sends the client a snapshot when something it shows changed: whole feathers, strain, bonus, weight, maximums,
      * exhaustion, the regeneration pause, rest.
      */
     private static void syncIfChanged(LivingEntity entity, FeathersData data) {

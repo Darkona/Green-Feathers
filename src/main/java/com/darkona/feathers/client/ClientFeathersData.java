@@ -122,7 +122,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
     }
 
     /**
-     * Pays locally the way the server would (bonus, stamina, then Strain) so the HUD reacts at once.
+     * Pays locally the way the server would (bonus, stamina, then strain) so the HUD reacts at once.
      */
     @Override
     public SpendResult predictSpend(int cost, boolean allowStrain) {

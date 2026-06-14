@@ -105,7 +105,7 @@ public class MountTests {
 
     /**
      * A creature that stops being a mount (mounts turned off, a reload that drops its tag or data map entry) while
-     * strained and exhausted gets back to normal: no Strained effect, no slowdown, no leftover exhaustion. Only the
+     * strained and exhausted gets back to normal: no strained effect, no slowdown, no leftover exhaustion. Only the
      * effect this mod put on it goes: one from elsewhere stays.
      */
     @GameTest(template = "empty")

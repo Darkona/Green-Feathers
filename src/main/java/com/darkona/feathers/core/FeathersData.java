@@ -213,14 +213,14 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     /**
-     * Gets the remaining Strain capacity. Returns zero when the spend or server disables Strain.
+     * Gets the remaining strain capacity. Returns zero when the spend or server disables strain.
      */
     int strainRoom(boolean allowStrain, boolean strainEnabled) {
         return allowStrain && strainEnabled ? Math.max(0, maxStrain - strain) : 0;
     }
 
     /**
-     * Whether {@code cost} can be paid, all or nothing: bonus pools, then stamina, then Strain.
+     * Whether {@code cost} can be paid, all or nothing: bonus pools, then stamina, then strain.
      */
     boolean canPay(int cost, boolean allowStrain, boolean strainEnabled) {
         return (long) cost <= (long) bonusStamina() + regularAvailable() + strainRoom(allowStrain, strainEnabled);
@@ -229,7 +229,7 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     /**
      * Pays {@code cost}. Call {@link #canPay} first.
      *
-     * @return the stamina that went into Strain
+     * @return the stamina that went into strain
      */
     int pay(int cost) {
         int left = cost;
@@ -257,14 +257,14 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     /**
-     * Whether nothing is left to spend: no stamina, no bonus, and no Strain room for spends that allow it.
+     * Whether nothing is left to spend: no stamina, no bonus, and no strain room for spends that allow it.
      */
     boolean isSpent(boolean strainEnabled) {
         return availableStamina() <= 0 && strainRoom(true, strainEnabled) <= 0;
     }
 
     /**
-     * Nothing to tick: full, no Strain, bonus, drain, block, delay or exhaustion, and already initialized.
+     * Nothing to tick: full, no strain, bonus, drain, block, delay or exhaustion, and already initialized.
      */
     public boolean isAtRest() {
         return initialized && stamina >= maxStamina && strain == 0 && regenDelay == 0 && !exhausted

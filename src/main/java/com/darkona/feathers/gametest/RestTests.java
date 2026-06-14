@@ -17,7 +17,7 @@ import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.tick;
 
 /**
- * Resting speeds up paying Strain back, and so do API rest bonuses.
+ * Resting speeds up paying strain back, and so do API rest bonuses.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)

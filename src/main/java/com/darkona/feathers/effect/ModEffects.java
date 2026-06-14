@@ -89,7 +89,7 @@ public final class ModEffects {
         // Half the cost at level I, 35% at II, never below 20%: never free.
         }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.momentum"), ADD_MULTIPLIED_TOTAL, amplifier -> Math.max(-0.8, -0.5 - 0.15 * amplifier)));
 
-        // This effect appears during Strain recovery. Its regeneration penalty makes Strain costly.
+        // This effect appears during strain recovery. Its regeneration penalty makes strain costly.
         EFFECTS.register("strain", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0x7E4488) {
             @Override
             public boolean canApply(LivingEntity entity) {

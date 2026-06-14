@@ -39,7 +39,7 @@ import static com.darkona.feathers.client.gui.Icons.*;
 /**
  * Draws the feather row above the food bar and with other right-side bars. Each icon contains two feathers. Beyond a
  * full row, extra feathers use layered overflow colors and a row count. Gray icons show armor weight, red icons show
- * Strain, and golden rows show bonus stamina. While riding a supported mount, the row displays the mount's stamina.
+ * strain, and golden rows show bonus stamina. While riding a supported mount, the row displays the mount's stamina.
  * <p>
  * Each feather uses grayscale sprites tinted with its style's body and border colors. A style can also add a row
  * overlay. Providers or the client setting select the player's style. Fixed ids select the other styles. The HUD

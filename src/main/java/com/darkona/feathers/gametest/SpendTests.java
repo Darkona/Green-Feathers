@@ -22,8 +22,8 @@ import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.saveAndLoad;
 
 /**
- * One-off spends: all or nothing, simulation, Strain, exhaustion, bonus stamina, exemptions, multipliers.
- * Defaults: 20 max feathers, 6 max Strain, Strain and exhaustion on.
+ * One-off spends: all or nothing, simulation, strain, exhaustion, bonus stamina, exemptions, multipliers.
+ * Defaults: 20 max feathers, 6 max strain, strain and exhaustion on.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)

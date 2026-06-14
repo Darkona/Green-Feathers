@@ -172,7 +172,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     /**
-     * Reads the max feathers and max Strain attributes.
+     * Reads the max feathers and max strain attributes.
      *
      * @return whether either changed
      */
@@ -262,7 +262,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     /**
-     * Pays a cost already checked with {@link FeathersData#canPay}, then fires Strain and exhaustion transitions.
+     * Pays a cost already checked with {@link FeathersData#canPay}, then fires strain and exhaustion transitions.
      */
     static void payAndSettle(LivingEntity entity, FeathersData data, int cost, boolean strainEnabled) {
         boolean wasStrained = data.strain > 0;

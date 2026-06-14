@@ -1,6 +1,7 @@
 package com.darkona.feathers.api;
 
 import com.darkona.feathers.api.event.SpendEvent;
+
 /**
  * Outcome of a spend or of a drain tick.
  */
@@ -13,11 +14,13 @@ public enum SpendResult {
     EXHAUSTED,
     /** A {@link SpendEvent.Pre} listener cancelled it. Nothing was spent. */
     CANCELLED,
-    /** The entity doesn't use feathers (creative or spectator players, unsupported entities): allow the action. */
+    /** The entity does not use feathers, so the requested action is allowed. */
     EXEMPT;
 
     /**
-     * Whether the action that asked may go ahead.
+     * Checks whether the action that requested the spend may proceed.
+     *
+     * @return {@code true} for {@link #OK} and {@link #EXEMPT}
      */
     public boolean allowed() {
         return this == OK || this == EXEMPT;

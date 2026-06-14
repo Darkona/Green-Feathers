@@ -31,8 +31,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import net.neoforged.neoforge.common.NeoForge;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The server-side implementation behind the API. Client-side calls go to {@link ClientBridge}.
@@ -42,8 +42,7 @@ public final class FeathersServiceImpl implements FeathersService {
     public static final FeathersServiceImpl INSTANCE = new FeathersServiceImpl();
 
     /**
-     * What client-side calls use: the local player's synced feathers. Installed by the client; on a dedicated
-     * server nothing asks.
+     * Supplies the local player's synchronized state for client-side API calls. The client installs this bridge.
      */
     public interface ClientBridge {
         boolean isLocalPlayer(LivingEntity entity);
@@ -70,7 +69,7 @@ public final class FeathersServiceImpl implements FeathersService {
     /* Access */
 
     /**
-     * Players always; mounts (horses, donkeys, mules, camels...) when enabled in the config.
+     * Supports all players and configured mounts, including horses, donkeys, mules, and camels.
      */
     @Override
     public boolean supports(LivingEntity entity) {
@@ -79,7 +78,7 @@ public final class FeathersServiceImpl implements FeathersService {
 
     /**
      * Horses and anything extending them, plus the entity types in the {@code greenfeathers:mounts} tag or the
-     * {@code greenfeathers:mount_stats} data map: modpacks can give feathers to any creature with data alone.
+     * {@code greenfeathers:mount_stats} data map: modpacks can give feathers to any creature.
      */
     public static boolean isMount(LivingEntity entity) {
         if (entity instanceof Player || !FeathersServerConfig.ENABLE_MOUNTS.get()) return false;
@@ -95,19 +94,21 @@ public final class FeathersServiceImpl implements FeathersService {
         byte verdict = verdicts[id];
         if (verdict == UNKNOWN_TYPE) {
             verdict = computeMount(entity) ? MOUNT_TYPE : NOT_MOUNT_TYPE;
-            // A benign race: both threads of a singleplayer game write the same answer.
             verdicts[id] = verdict;
         }
         return verdict == MOUNT_TYPE;
     }
 
-    private static final byte UNKNOWN_TYPE = 0, MOUNT_TYPE = 1, NOT_MOUNT_TYPE = 2;
+    private static final byte UNKNOWN_TYPE = 0;
+    private static final byte MOUNT_TYPE = 1;
+    private static final byte NOT_MOUNT_TYPE = 2;
     private static volatile byte[] mountTypes = new byte[0];
 
     private static boolean computeMount(LivingEntity entity) {
         if (entity.getType().is(FeathersIds.NO_FEATHERS)) return false;
         boolean mount = entity instanceof AbstractHorse || entity.getType().is(FeathersIds.MOUNTS)
-                || entity.getType().builtInRegistryHolder().getData(FeathersDataMaps.MOUNT_STATS) != null;
+                || BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entity.getType())
+                .getData(FeathersDataMaps.MOUNT_STATS) != null;
         return mount && entity.getAttribute(FeathersAttributes.MAX_FEATHERS) != null;
     }
 
@@ -120,12 +121,13 @@ public final class FeathersServiceImpl implements FeathersService {
      * The creature's mount tuning from the data map, or {@link MountStats#DEFAULT} (the config) without an entry.
      */
     public static MountStats mountStats(LivingEntity entity) {
-        MountStats stats = entity.getType().builtInRegistryHolder().getData(FeathersDataMaps.MOUNT_STATS);
+        MountStats stats = BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entity.getType())
+                .getData(FeathersDataMaps.MOUNT_STATS);
         return stats != null ? stats : MountStats.DEFAULT;
     }
 
     /**
-     * Players in creative or spectator mode don't use feathers.
+     * Checks whether a player bypasses the stamina system in Creative or Spectator mode.
      */
     public static boolean isExempt(LivingEntity entity) {
         return entity instanceof Player player && (player.isCreative() || player.isSpectator());
@@ -154,7 +156,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     /**
-     * Max stamina and weight come from attributes and equipment; the first access after joining or loading reads
+     * Maximum stamina and weight come from attributes and equipment. The first access after joining or loading reads
      * them, and a brand new entity starts full.
      */
     static void ensureInitialized(LivingEntity entity, FeathersData data) {
@@ -312,7 +314,8 @@ public final class FeathersServiceImpl implements FeathersService {
     public void stopDrain(LivingEntity entity, ResourceLocation source) {
         if (!supports(entity) || onClient(entity)) return;
         FeathersData data = data(entity);
-        for (int i = 0, n = data.drains.size(); i < n; i++) {
+        int size = data.drains.size();
+        for (int i = 0; i < size; i++) {
             if (data.drains.get(i).source.equals(source)) {
                 data.drains.remove(i);
                 NeoForge.EVENT_BUS.post(new DrainEvent.Stopped(entity, source, DrainEvent.Stopped.Reason.STOPPED));

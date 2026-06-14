@@ -49,7 +49,7 @@ public class SpendTests {
     }
 
     /**
-     * Huge amounts saturate instead of wrapping into negative (free) spends; the command refuses what doesn't fit.
+     * Huge amounts saturate instead of wrapping into free negative spends. The command rejects values that do not fit.
      */
     @GameTest(template = "empty")
     public static void hugeAmountsSaturate(GameTestHelper helper) {

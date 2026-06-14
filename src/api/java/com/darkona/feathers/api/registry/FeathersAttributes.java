@@ -23,7 +23,7 @@ public final class FeathersAttributes {
     /** Multiplies every cost. 1.0 = normal. */
     public static final DeferredHolder<Attribute, Attribute> USAGE_MULTIPLIER = DeferredHolder.create(Registries.ATTRIBUTE, id("usage_multiplier"));
 
-    /** Multiplies armor weight. 1.0 = normal; an ADD_MULTIPLIED_BASE modifier of -0.5 halves it. */
+    /** Multiplies armor weight. A value of 1.0 is normal. An ADD_MULTIPLIED_BASE modifier of -0.5 halves it. */
     public static final DeferredHolder<Attribute, Attribute> ARMOR_WEIGHT_MULTIPLIER = DeferredHolder.create(Registries.ATTRIBUTE, id("armor_weight_multiplier"));
 
     private FeathersAttributes() {}

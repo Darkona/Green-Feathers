@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.datamaps.DataMapType;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 
+/** Public data map types that mods and data packs can populate. */
 public final class FeathersDataMaps {
 
     /**
@@ -22,7 +23,7 @@ public final class FeathersDataMaps {
             .build();
 
     /**
-     * Per-creature mount tuning; an entry also makes the creature a mount. See {@link MountStats}.
+     * Per-creature mount tuning. An entry also makes the creature a mount. See {@link MountStats}.
      */
     public static final DataMapType<EntityType<?>, MountStats> MOUNT_STATS = DataMapType
             .builder(id("mount_stats"), Registries.ENTITY_TYPE, MountStats.CODEC)

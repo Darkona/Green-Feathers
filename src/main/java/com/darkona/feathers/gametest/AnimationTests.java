@@ -16,12 +16,14 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.Objects;
+
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.player;
 
 /**
- * The feather animation API, and Green Feathers' triggers with explicit settings (the client config isn't loaded
- * here, so the triggers' own provider is only registered on the client).
+ * Tests the feather animation API and built-in triggers with explicit settings. GameTests do not load the client
+ * configuration or register the client-only built-in provider.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -41,22 +43,29 @@ public class AnimationTests {
         ServerPlayer player = player(helper);
         helper.assertTrue(FeatherAnimations.select(player, FeathersAPI.get(player)) == null, "no provider answers");
         player.addTag(MARK);
-        helper.assertValueEqual(FeatherAnimations.select(player, FeathersAPI.get(player)), SLOW_WAVE, "the only provider answering");
+        helper.assertValueEqual(Objects.requireNonNull(FeatherAnimations.select(player, FeathersAPI.get(player))),
+                SLOW_WAVE, "the only provider answering");
         player.addTag(HIGH_MARK);
-        helper.assertValueEqual(FeatherAnimations.select(player, FeathersAPI.get(player)), FeatherAnimation.PULSE, "the higher priority");
+        helper.assertValueEqual(Objects.requireNonNull(FeatherAnimations.select(player, FeathersAPI.get(player))),
+                FeatherAnimation.PULSE, "the higher priority");
         helper.succeed();
     }
 
     @GameTest(template = "empty")
     public static void animationsRefuseNonsense(GameTestHelper helper) {
-        boolean refused = false;
-        try {
-            new FeatherAnimation(FeatherAnimation.Kind.SHAKE, 0f, 1f);
-        } catch (IllegalArgumentException e) {
-            refused = true;
-        }
-        helper.assertTrue(refused, "a speed of 0 is refused");
+        helper.assertTrue(animationRefused(0f, 1f), "a speed of 0 is refused");
+        helper.assertTrue(animationRefused(Float.POSITIVE_INFINITY, 1f), "an infinite speed is refused");
+        helper.assertTrue(animationRefused(1f, Float.NaN), "a NaN amplitude is refused");
         helper.succeed();
+    }
+
+    private static boolean animationRefused(float speed, float amplitude) {
+        try {
+            new FeatherAnimation(FeatherAnimation.Kind.SHAKE, speed, amplitude);
+            return false;
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
     }
 
     @GameTest(template = "empty")
@@ -78,9 +87,11 @@ public class AnimationTests {
         FeathersAPI.spend(player, id("test_strain"), Stamina.ofFeathers(2));
         helper.assertTrue(FeathersAPI.get(player).strained(), "strained");
         helper.assertValueEqual(pick(player, FeathersAPI.get(player)), FeatherAnimation.PULSE, "strain first, as set");
-        helper.assertValueEqual(GreenFeatherAnimations.pick(player, FeathersAPI.get(player), StrainAnimation.SHAKE, true, 2, true), FeatherAnimation.SHAKE,
+        helper.assertValueEqual(Objects.requireNonNull(GreenFeatherAnimations.pick(player, FeathersAPI.get(player),
+                        StrainAnimation.SHAKE, true, 2, true)), FeatherAnimation.SHAKE,
                 "or a shake");
-        helper.assertValueEqual(GreenFeatherAnimations.pick(player, FeathersAPI.get(player), StrainAnimation.NONE, false, 2, true), FeatherAnimation.WAVE,
+        helper.assertValueEqual(Objects.requireNonNull(GreenFeatherAnimations.pick(player, FeathersAPI.get(player),
+                        StrainAnimation.NONE, false, 2, true)), FeatherAnimation.WAVE,
                 "strain and low off: the wave is left");
         helper.succeed();
     }

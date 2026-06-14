@@ -21,6 +21,8 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.Objects;
+
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.tick;
@@ -40,11 +42,15 @@ public class ArmorWeightTests {
     }
 
     private static ItemStack[] iron() {
-        return new ItemStack[]{new ItemStack(Items.IRON_HELMET), new ItemStack(Items.IRON_CHESTPLATE),
-                new ItemStack(Items.IRON_LEGGINGS), new ItemStack(Items.IRON_BOOTS)};
+        return new ItemStack[]{
+                new ItemStack(Items.IRON_HELMET),
+                new ItemStack(Items.IRON_CHESTPLATE),
+                new ItemStack(Items.IRON_LEGGINGS),
+                new ItemStack(Items.IRON_BOOTS)
+        };
     }
 
-    /** Armor weights are off by default; these tests switch them on while they run. */
+    /** Runs a test with armor weight enabled, then restores the previous setting. */
     private static void withWeights(GameTestHelper helper, Runnable test) {
         boolean before = FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.get();
         FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.set(true);
@@ -88,8 +94,14 @@ public class ArmorWeightTests {
         withWeights(helper, () -> {
             Holder<Enchantment> lightweight = helper.getLevel().registryAccess()
                     .lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(FeathersEnchantments.LIGHTWEIGHT);
-            ItemStack[] netherite = {new ItemStack(Items.NETHERITE_HELMET), new ItemStack(Items.NETHERITE_CHESTPLATE),
-                    new ItemStack(Items.NETHERITE_LEGGINGS), new ItemStack(Items.NETHERITE_BOOTS)};
+
+            ItemStack[] netherite = {
+                    new ItemStack(Items.NETHERITE_HELMET),
+                    new ItemStack(Items.NETHERITE_CHESTPLATE),
+                    new ItemStack(Items.NETHERITE_LEGGINGS),
+                    new ItemStack(Items.NETHERITE_BOOTS)
+            };
+
             for (ItemStack piece : netherite) piece.enchant(lightweight, 3);
 
             ServerPlayer player = player(helper);
@@ -110,9 +122,10 @@ public class ArmorWeightTests {
             wear(player, iron());
             tick(player, 1);
 
-            // What the Feather Ring does, in a Curios slot or the off hand.
-            player.getAttribute(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER).addTransientModifier(
-                    new AttributeModifier(id("test_ring"), -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+            Objects.requireNonNull(player.getAttribute(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER))
+                    .addTransientModifier(new AttributeModifier(id("test_ring"), -0.5,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+
             tick(player, 10);
             helper.assertValueEqual(FeathersAPI.get(player).weight(), 4, "weight with the ring");
             helper.assertValueEqual(FeathersServiceImpl.data(player).weightPart(ArmorWeights.CHEST), 1, "the ring halves each piece's share");

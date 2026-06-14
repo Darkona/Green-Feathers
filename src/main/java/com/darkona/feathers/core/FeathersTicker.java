@@ -45,8 +45,8 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 
 /**
- * Runs feathers for every entity that has them: drains, regeneration, Strain, exhaustion, rest, climate, weight,
- * and syncing the owning client. Server side only; the client shows what the server syncs.
+ * Runs feathers for every entity that has them: drains, regeneration, strain, exhaustion, rest, climate, weight,
+ * and client synchronization. This class runs only on the server. The client displays the synchronized state.
  */
 @EventBusSubscriber(modid = FeathersIds.MOD_ID)
 public final class FeathersTicker {
@@ -99,7 +99,7 @@ public final class FeathersTicker {
 
     @SubscribeEvent
     public static void onClone(PlayerEvent.Clone event) {
-        // NeoForge copied the attachment unless this was a death; either way the client must hear about it.
+        // NeoForge copied the attachment unless this was a death. In both cases, synchronize the resulting state.
         FeathersServiceImpl.data(event.getEntity()).forceSync = true;
     }
 
@@ -152,7 +152,7 @@ public final class FeathersTicker {
      */
     static void refreshFromConfig(LivingEntity entity) {
         boolean player = entity instanceof Player;
-        // A mount's max feathers is its own hidden trait, rolled once (see MountTraits); a player's comes from the config.
+        // A mount's maximum is a hidden trait rolled once. A player's maximum comes from the configuration.
         FeathersData data = FeathersServiceImpl.data(entity);
         if (player) configBase(entity, data, FeathersAttributes.MAX_FEATHERS, BASE_MAX, FeathersServerConfig.MAX_FEATHERS.get());
         else MountTraits.ensureRolled(entity);
@@ -213,7 +213,7 @@ public final class FeathersTicker {
 
             if (entity.tickCount % ATTRIBUTE_INTERVAL == 0) tickAttributes(entity, data);
             if (entity.tickCount % REGEN_FACTOR_INTERVAL == 0) applyRegenFactors(entity, data);
-            // Climate is a player thing for now; mounts only tire.
+            // Climate currently affects only players. Mounts use stamina without climate effects.
             if (entity instanceof Player && entity.tickCount % ClimateEffects.INTERVAL == 0) {
                 data.climate = ClimateEffects.evaluate(entity);
                 ClimateEffects.apply(entity, data.climate);
@@ -226,7 +226,7 @@ public final class FeathersTicker {
 
             data.lastDelta = data.stamina - staminaBefore;
             boolean strained = data.strain > 0;
-            // Strain only starts through a spend or drain, which posts Started itself; here it can only be paid back.
+            // A spend or drain starts Strain and posts its event. This path only recovers existing Strain.
             if (strainedBefore && !strained) NeoForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
             if (!strainEnabled && data.strain > 0) data.strain = 0;
 
@@ -275,8 +275,12 @@ public final class FeathersTicker {
     }
 
     private static void updateRest(LivingEntity entity, FeathersData data) {
-        double x = entity.getX(), y = entity.getY(), z = entity.getZ();
-        double dx = x - data.lastX, dy = y - data.lastY, dz = z - data.lastZ;
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+        double dx = x - data.lastX;
+        double dy = y - data.lastY;
+        double dz = z - data.lastZ;
         data.lastX = x;
         data.lastY = y;
         data.lastZ = z;
@@ -303,7 +307,8 @@ public final class FeathersTicker {
             multiplier = 1.0;
         }
 
-        for (int i = 0, n = data.restBonuses.size(); i < n; i++) {
+        int size = data.restBonuses.size();
+        for (int i = 0; i < size; i++) {
             multiplier = Math.max(multiplier, data.restBonuses.get(i).value);
         }
         data.restMultiplier = multiplier;
@@ -383,7 +388,7 @@ public final class FeathersTicker {
 
         int recovered = 0;
         if (data.strain > 0) {
-            // Resting pays Strain back faster; don't apply it twice when it already boosted regeneration.
+            // Resting accelerates Strain recovery. Do not apply the multiplier twice after it boosts regeneration.
             double rest = FeathersServerConfig.REST_BOOSTS_REGEN.get() ? 1.0 : data.restMultiplier;
             int recovery = (int) Math.round(regen * rest);
             recovered = Math.min(data.strain, recovery);
@@ -425,8 +430,8 @@ public final class FeathersTicker {
     }
 
     /**
-     * The Strained effect shows while Strain is being paid back; touched only on a change, since adding an effect
-     * sends it to the client.
+     * The Strained effect appears during Strain recovery. Changing the effect sends a packet, so this method updates
+     * it only when the state changes.
      */
     private static void updateIndicators(LivingEntity entity, FeathersData data, boolean strained) {
         if (strained == entity.hasEffect(FeathersMobEffects.STRAINED)) return;
@@ -440,14 +445,14 @@ public final class FeathersTicker {
     /**
      * Undoes what the feathers left on a creature that stopped being a mount (mounts turned off, its type left the
      * mounts tag or data map): Strain, exhaustion, the slowdown flag, the Strained effect this mod put on it, and the
-     * rider's HUD row. Its stamina and rolled trait stay, for when it becomes a mount again; it is set up anew then.
+     * rider's HUD row. Its stamina and rolled trait remain available if it becomes a mount again.
      * Only creatures that had feathers are touched, and only once. Public for tests.
      */
     public static void releaseExMount(LivingEntity entity) {
         if (!entity.hasData(FeathersAttachments.FEATHERS)) return;
         FeathersData data = FeathersServiceImpl.data(entity);
         MobEffectInstance effect = entity.getEffect(FeathersMobEffects.STRAINED);
-        // Ours is infinite and without particles; one from a command or another mod is left alone.
+        // The built-in instance is infinite and has no particles. Preserve instances from commands or other mods.
         boolean ownEffect = effect != null && effect.isInfiniteDuration() && !effect.isVisible();
         if (!ownEffect && !data.initialized && data.strain == 0 && !data.exhausted && !data.mountSlowed && data.syncedMax <= 0) return;
 
@@ -474,7 +479,7 @@ public final class FeathersTicker {
      * exhaustion, the regeneration pause, rest.
      */
     private static void syncIfChanged(LivingEntity entity, FeathersData data) {
-        // A player's own feathers go to that player; a mount's go to whoever rides it.
+        // A player receives their own state. A mount sends its state to the controlling rider.
         ServerPlayer player = entity instanceof ServerPlayer self ? self
                 : MountExertion.riderOf(entity) instanceof ServerPlayer rider ? rider : null;
         if (player == null) return;

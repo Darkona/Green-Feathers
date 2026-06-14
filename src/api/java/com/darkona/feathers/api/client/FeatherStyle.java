@@ -11,13 +11,13 @@ import java.util.Optional;
 
 /**
  * How a row of feathers looks. The HUD draws every feather from grayscale sprites in the style's {@link #variant}: the
- * body tinted with {@link #body}, the variant's white shine, then the outline tinted with {@link #border}; an
- * {@link #overlay}, if any, goes over the whole row in its two colors. Colors are ARGB ({@code 0xAARRGGBB}); their
+ * body tinted with {@link #body}, the variant's white shine, and the outline tinted with {@link #border}. An
+ * {@link #overlay}, if present, covers the row in its two colors. Colors use ARGB ({@code 0xAARRGGBB}), and their
  * alpha multiplies with the HUD's fade. Rows layered over a full row use deeper shades of the body color, with the same
  * border.
  *
  * @param body          the feather's color, ARGB
- * @param border        the outline's color, ARGB; alpha 0 ({@link #NO_BORDER}) draws no outline
+ * @param border        the outline's ARGB color. An alpha of 0 ({@link #NO_BORDER}) draws no outline
  * @param variant       the feather shape, a {@link FeatherVariants} id
  * @param overlay       a {@link FeatherVariants} overlay id drawn over the row, or null for none
  * @param overlayColor  the overlay's primary color, ARGB
@@ -29,9 +29,11 @@ import java.util.Optional;
 public record FeatherStyle(int body, int border, ResourceLocation variant, @Nullable ResourceLocation overlay, int overlayColor, int overlayAccent,
                            @Nullable ResourceLocation sprites) {
 
-    /** A border that isn't drawn. */
+    /** An alpha value that disables the border. */
     public static final int NO_BORDER = 0;
+    /** Opaque black in ARGB format. */
     public static final int BLACK = 0xFF000000;
+    /** Opaque white in ARGB format. */
     public static final int WHITE = 0xFFFFFFFF;
 
     /** {@code "#RRGGBB"} (opaque) or {@code "#AARRGGBB"}. */
@@ -53,41 +55,94 @@ public record FeatherStyle(int body, int border, ResourceLocation variant, @Null
     ).apply(instance, (body, border, variant, overlay, overlayColor, overlayAccent, sprites) ->
             new FeatherStyle(body, border, variant, overlay.orElse(null), overlayColor, overlayAccent, sprites.orElse(null))));
 
+    /**
+     * Validates required style values when a new record is created.
+     *
+     * @throws NullPointerException if {@code variant} is {@code null}
+     */
     public FeatherStyle {
         Objects.requireNonNull(variant, "variant");
     }
 
-    /** The plain feather in these ARGB colors, without an overlay. */
+    /**
+     * Creates a plain feather with no overlay.
+     *
+     * @param body   the body color in ARGB format
+     * @param border the border color in ARGB format
+     */
     public FeatherStyle(int body, int border) {
         this(body, border, FeatherVariants.FEATHER, null, WHITE, WHITE, null);
     }
 
-    /** Opaque colors from {@code 0xRRGGBB} values: the easy way to get the alpha right. */
+    /**
+     * Creates a plain feather from opaque RGB colors. Use this helper when the source colors have no alpha channel.
+     *
+     * @param bodyRgb   the body color in {@code 0xRRGGBB} format
+     * @param borderRgb the border color in {@code 0xRRGGBB} format
+     * @return the opaque style
+     */
     public static FeatherStyle opaque(int bodyRgb, int borderRgb) {
         return new FeatherStyle(0xFF000000 | bodyRgb, 0xFF000000 | borderRgb);
     }
 
+    /**
+     * Changes the body color.
+     *
+     * @param body the new ARGB color
+     * @return a copy with the new body color
+     */
     public FeatherStyle withBody(int body) {
         return new FeatherStyle(body, border, variant, overlay, overlayColor, overlayAccent, sprites);
     }
 
+    /**
+     * Changes the border color.
+     *
+     * @param border the new ARGB color
+     * @return a copy with the new border color
+     */
     public FeatherStyle withBorder(int border) {
         return new FeatherStyle(body, border, variant, overlay, overlayColor, overlayAccent, sprites);
     }
 
+    /**
+     * Changes the feather shape.
+     *
+     * @param variant the id of a registered variant
+     * @return a copy with the new variant
+     */
     public FeatherStyle withVariant(ResourceLocation variant) {
         return new FeatherStyle(body, border, variant, overlay, overlayColor, overlayAccent, sprites);
     }
 
-    /** An overlay over the row, in two ARGB colors; null for none. */
+    /**
+     * Changes the row overlay and its colors.
+     *
+     * @param overlay the id of a registered overlay, or {@code null} for none
+     * @param color   the primary ARGB color
+     * @param accent  the accent ARGB color
+     * @return a copy with the new overlay settings
+     */
     public FeatherStyle withOverlay(@Nullable ResourceLocation overlay, int color, int accent) {
         return new FeatherStyle(body, border, variant, overlay, color, accent, sprites);
     }
 
+    /**
+     * Changes the optional style-specific sprite sheet.
+     *
+     * @param sprites the sprite sheet texture, or {@code null} to use the variant texture
+     * @return a copy with the new sprite sheet
+     */
     public FeatherStyle withSprites(@Nullable ResourceLocation sprites) {
         return new FeatherStyle(body, border, variant, overlay, overlayColor, overlayAccent, sprites);
     }
 
+    /**
+     * Parses a style color from {@code #RRGGBB} or {@code #AARRGGBB} text.
+     *
+     * @param text the color text
+     * @return a successful ARGB value, or a codec error for invalid text
+     */
     public static DataResult<Integer> parseColor(String text) {
         String hex = text.startsWith("#") ? text.substring(1) : "";
         if (hex.length() != 6 && hex.length() != 8) return DataResult.error(() -> "Not a #RRGGBB or #AARRGGBB color: " + text);
@@ -99,6 +154,12 @@ public record FeatherStyle(int body, int border, ResourceLocation variant, @Null
         }
     }
 
+    /**
+     * Formats an ARGB color for the style codec. Opaque colors use the shorter {@code #RRGGBB} form.
+     *
+     * @param argb the color to format
+     * @return the formatted color text
+     */
     public static String formatColor(int argb) {
         return (argb >>> 24) == 0xFF ? "#%06X".formatted(argb & 0xFFFFFF) : "#%08X".formatted(argb);
     }

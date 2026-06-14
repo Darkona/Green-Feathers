@@ -31,7 +31,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     @WrapOperation(method = "handlePlayerCommand", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/PlayerRideableJumping;handleStartJump(I)V"))
     private void greenfeathers$chargeJump(PlayerRideableJumping mount, int power, Operation<Void> original) {
-        // A jump the mount can't pay for doesn't start.
+        // A jump does not start when the mount cannot pay its cost.
         if (!(mount instanceof LivingEntity living) || MountExertion.chargeJump(living, player, power)) original.call(mount, power);
     }
 }

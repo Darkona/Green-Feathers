@@ -23,9 +23,9 @@ public final class FeathersMobEffects {
     public static final DeferredHolder<MobEffect, MobEffect> FATIGUE = DeferredHolder.create(Registries.MOB_EFFECT, id("fatigued"));
     /** Halves costs. */
     public static final DeferredHolder<MobEffect, MobEffect> MOMENTUM = DeferredHolder.create(Registries.MOB_EFFECT, id("momentum"));
-    /** Shown while Strain is being paid back; slows regeneration. */
+    /** Appears while the entity recovers from Strain and slows regeneration. */
     public static final DeferredHolder<MobEffect, MobEffect> STRAINED = DeferredHolder.create(Registries.MOB_EFFECT, id("strain"));
-    /** Protects from Heat and Fatigue. */
+    /** Protects from the Hot and Fatigue effects. */
     public static final DeferredHolder<MobEffect, MobEffect> COOLING = DeferredHolder.create(Registries.MOB_EFFECT, id("cooling"));
 
     private FeathersMobEffects() {}

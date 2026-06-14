@@ -4,11 +4,16 @@ import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
 /**
- * Base of every Green Feathers event. All are posted on {@code NeoForge.EVENT_BUS}, on the server thread, and only
- * when something changes: never once per tick.
+ * Base class for Green Feathers events. Green Feathers posts them on {@code NeoForge.EVENT_BUS} from the server
+ * thread when the documented state change occurs.
  */
 public abstract class FeathersEvent extends LivingEvent {
 
+    /**
+     * Creates a Green Feathers event for one entity.
+     *
+     * @param entity the affected entity
+     */
     protected FeathersEvent(LivingEntity entity) {
         super(entity);
     }

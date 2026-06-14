@@ -15,7 +15,7 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
 
 /**
  * Green Feathers' own animation triggers, registered like any other mod's: strain first, then few feathers left, then
- * Energized. Endurance and Momentum don't animate: their golden rows and crystal feathers already show them.
+ * Energized. Endurance and Momentum do not animate because their rows already use distinct visual styles.
  */
 public final class GreenFeatherAnimations {
 

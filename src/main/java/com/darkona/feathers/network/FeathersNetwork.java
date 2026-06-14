@@ -48,7 +48,7 @@ public final class FeathersNetwork {
     }
 
     /**
-     * Fake players (machines acting as players) and connections without our channel can't receive payloads.
+     * Fake players and connections without this channel cannot receive payloads.
      */
     private static void send(ServerPlayer player, CustomPacketPayload payload) {
         if (player instanceof FakePlayer || player.connection == null || !player.connection.hasChannel(payload)) return;

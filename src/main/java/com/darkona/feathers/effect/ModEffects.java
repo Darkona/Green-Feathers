@@ -57,7 +57,7 @@ public final class ModEffects {
             public boolean canApply(LivingEntity entity) {
                 if (!super.canApply(entity) || !FeathersServerConfig.ENABLE_COLD.get()) return false;
                 if (!ColdSweatCompat.canApplyCold(entity)) return false;
-                // Cold and Heat never coexist: the climate swaps one for the other, potions can't stack them.
+                // Cold and Hot never coexist. Climate replaces one with the other, and potions cannot stack them.
                 return !entity.hasEffect(FeathersMobEffects.ENERGIZED) && !entity.hasEffect(FeathersMobEffects.HOT);
             }
         }.addAttributeModifier(FEATHERS_PER_SECOND, id("effect.cold"), -0.5, ADD_MULTIPLIED_TOTAL));
@@ -89,7 +89,7 @@ public final class ModEffects {
         // Half the cost at level I, 35% at II, never below 20%: never free.
         }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.momentum"), ADD_MULTIPLIED_TOTAL, amplifier -> Math.max(-0.8, -0.5 - 0.15 * amplifier)));
 
-        // Shown while paying Strain back; the regeneration penalty is what makes Strain costly.
+        // This effect appears during Strain recovery. Its regeneration penalty makes Strain costly.
         EFFECTS.register("strain", () -> new FeathersMobEffect(MobEffectCategory.HARMFUL, 0x7E4488) {
             @Override
             public boolean canApply(LivingEntity entity) {

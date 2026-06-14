@@ -37,15 +37,13 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.client.gui.Icons.*;
 
 /**
- * The feathers row, right above the food bar and stacked with the other right-side bars. Two feathers per icon;
- * past a full row, further feathers are drawn over it in the overflow color (layered), with a row count.
- * Grey icons mark feathers made unusable by armor weight, red ones strain, golden rows bonus feathers. While riding a
- * mount that has feathers, the row shows the mount's instead, in the mount's own colors.
+ * Draws the feather row above the food bar and with other right-side bars. Each icon contains two feathers. Beyond a
+ * full row, extra feathers use layered overflow colors and a row count. Gray icons show armor weight, red icons show
+ * Strain, and golden rows show bonus stamina. While riding a supported mount, the row displays the mount's stamina.
  * <p>
- * Every feather is grayscale sprites tinted with a body and a border color, in its style's variant (see
- * {@link FeatherStyle}), with the style's overlay over the row: the player's by the style providers or the configured
- * color, the rest by their fixed style ids. Styles and the row's animation are resolved once per client tick; drawing
- * changes color once per run of same-colored feathers.
+ * Each feather uses grayscale sprites tinted with its style's body and border colors. A style can also add a row
+ * overlay. Providers or the client setting select the player's style. Fixed ids select the other styles. The HUD
+ * resolves styles and animation once per client tick.
  */
 public final class FeathersHud {
 
@@ -54,7 +52,7 @@ public final class FeathersHud {
     private static final int ICONS_PER_ROW = 10;
     private static final int FEATHERS_PER_ROW = ICONS_PER_ROW * 2;
     private static final int ROW_HEIGHT = 10;
-    /** Off for good if the installed Overflowing Bars doesn't have the renderer this was built against. */
+    /** Disabled after the installed Overflowing Bars version rejects the expected renderer API. */
     private static boolean overflowingBars = ModList.get().isLoaded("overflowingbars");
 
     private static final ClientFeathersData DATA = ClientFeathersData.INSTANCE;
@@ -99,8 +97,9 @@ public final class FeathersHud {
         if (player != null) {
             refreshStyles(player);
             FeathersView mount = DATA.mount();
-            boolean riding = player.getVehicle() instanceof LivingEntity && mount.hasFeathers() && mount.maxStamina() > 0;
-            animate(riding ? FeatherAnimations.select((LivingEntity) player.getVehicle(), mount) : FeatherAnimations.select(player, DATA));
+            LivingEntity mountEntity = player.getVehicle() instanceof LivingEntity living ? living : null;
+            boolean riding = mountEntity != null && mount.hasFeathers() && mount.maxStamina() > 0;
+            animate(riding ? FeatherAnimations.select(mountEntity, mount) : FeatherAnimations.select(player, DATA));
         }
 
         fullTicks = DATA.stamina() >= DATA.maxStamina() && DATA.bonusStamina() == 0 && DATA.strain() == 0 ? fullTicks + 1 : 0;
@@ -151,7 +150,7 @@ public final class FeathersHud {
         boolean riding = vehicle != null && mount.hasFeathers() && mount.maxStamina() > 0;
         FeathersView shown = riding ? mount : DATA;
         int bonusRows = bonusRows(shown);
-        // Reserve the space even while faded out, so the bars above don't jump.
+        // Reserve space while faded out so the bars above remain stable.
         if (stack) gui.rightHeight += ROW_HEIGHT * (1 + bonusRows);
 
         if (alpha > 0) {
@@ -177,7 +176,7 @@ public final class FeathersHud {
 
     /**
      * One row of feathers in {@code look} (its overlay only when {@code overlay}). {@code wearer} colors the armor weight
-     * by piece; null leaves it grey.
+     * by piece. A null wearer leaves the weight gray.
      */
     private static void drawRow(GuiGraphics graphics, FeathersView view, Look look, boolean overlay, LivingEntity wearer, int x, int y) {
         int maxFeathers = view.maxFeathers();
@@ -226,7 +225,7 @@ public final class FeathersHud {
 
     /**
      * Armor weight from the right, head to feet: each piece's share in that piece's colors (leather in its dye), and
-     * weight from other sources in grey.
+     * weight from other sources in gray.
      */
     private static void drawWeight(GuiGraphics graphics, FeathersView view, LivingEntity wearer, int x, int y) {
         int weight = Math.min(FEATHERS_PER_ROW, view.weight());
@@ -259,7 +258,8 @@ public final class FeathersHud {
             end += split.part(part);
             if (feather < end) return part;
         }
-        for (int source = 0, n = split.sourceCount(); source < n; source++) {
+        int sourceCount = split.sourceCount();
+        for (int source = 0; source < sourceCount; source++) {
             end += split.feathers(source);
             if (feather < end) return SOURCE + source;
         }
@@ -303,11 +303,12 @@ public final class FeathersHud {
     /**
      * Icons {@code from} to {@code to} (exclusive) of {@code sprites}' variant, the last one half when
      * {@code halfLast}: all bodies in one color, all shines, then all borders in the other, so the color changes three
-     * times per run, not per icon. A border with alpha 0 isn't drawn.
+     * times per run instead of per icon. A border with alpha 0 is not drawn.
      */
     private static void drawIcons(GuiGraphics graphics, int x, int y, int from, int to, boolean halfLast, int body, int border, Look sprites) {
         ResourceLocation sheet = sprites.sheet;
-        int width = sprites.sheetWidth, height = sprites.sheetHeight;
+        int width = sprites.sheetWidth;
+        int height = sprites.sheetHeight;
         int v = sprites.row * SIZE;
         int halfIcon = halfLast ? to - 1 : -1;
         setColor(graphics, pulse > 0 ? brighten(body) : body);
@@ -349,7 +350,9 @@ public final class FeathersHud {
 
     /** The color moved toward white by the pulse. */
     private static int brighten(int argb) {
-        int r = (argb >> 16) & 255, g = (argb >> 8) & 255, b = argb & 255;
+        int r = (argb >> 16) & 255;
+        int g = (argb >> 8) & 255;
+        int b = argb & 255;
         r += (int) ((255 - r) * pulse);
         g += (int) ((255 - g) * pulse);
         b += (int) ((255 - b) * pulse);

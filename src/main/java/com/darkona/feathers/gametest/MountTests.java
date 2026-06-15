@@ -91,7 +91,7 @@ public class MountTests {
         Horse horse = horse(helper);
         FeathersView feathers = FeathersAPI.get(horse);
         FeathersAPI.spend(horse, id("test"), feathers.maxStamina() + feathers.maxStrain());
-        helper.assertTrue(FeathersAPI.get(horse).exhausted(), "spent everything, Strain included");
+        helper.assertTrue(FeathersAPI.get(horse).exhausted(), "spent everything, strain included");
 
         MountExertion.tickMount(horse);
         helper.assertTrue(MountExertion.isSlowedDown(horse), "an exhausted horse slows down");
@@ -121,7 +121,7 @@ public class MountTests {
         helper.assertFalse(horse.hasEffect(FeathersMobEffects.STRAINED), "the Strained effect goes");
         helper.assertFalse(MountExertion.isSlowedDown(horse), "the slowdown goes");
         feathers = FeathersAPI.get(horse);
-        helper.assertValueEqual(feathers.strain(), 0, "no Strain left");
+        helper.assertValueEqual(feathers.strain(), 0, "no strain left");
         helper.assertFalse(feathers.exhausted(), "no exhaustion left");
 
         horse.addEffect(new MobEffectInstance(FeathersMobEffects.STRAINED, 200));

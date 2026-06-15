@@ -55,18 +55,18 @@ public interface FeathersView {
     }
 
     /**
-     * Stamina overspent into Strain, which regeneration pays back first.
+     * Stamina overspent into strain, which regeneration pays back first.
      *
-     * @return the current Strain in stamina units
+     * @return the current strain in stamina units
      */
     default int strain() {
         return 0;
     }
 
     /**
-     * Gets the current Strain capacity.
+     * Gets the current strain capacity.
      *
-     * @return the maximum Strain in stamina units
+     * @return the maximum strain in stamina units
      */
     default int maxStrain() {
         return 0;
@@ -130,7 +130,7 @@ public interface FeathersView {
     /**
      * Gets the effective rest bonus.
      *
-     * @return the current multiplier for Strain recovery
+     * @return the current multiplier for strain recovery
      */
     default double restMultiplier() {
         return 1.0;
@@ -164,7 +164,7 @@ public interface FeathersView {
     }
 
     /**
-     * Checks whether the entity has accumulated Strain.
+     * Checks whether the entity has accumulated strain.
      *
      * @return {@code true} when {@link #strain()} is greater than zero
      */

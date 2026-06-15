@@ -4,7 +4,7 @@ package com.darkona.feathers.api;
  * How a one-off spend behaves.
  *
  * @param simulate          checks the spend without changing state or firing events
- * @param allowStrain       may overspend into Strain when feathers run out, if the server enables Strain
+ * @param allowStrain       may overspend into strain when feathers run out, if the server enables strain
  * @param ignoreExhaustion  may spend while exhausted
  * @param regenDelayTicks   ticks without regeneration after spending. {@link #SERVER_DEFAULT} uses the config
  */
@@ -13,7 +13,7 @@ public record SpendOptions(boolean simulate, boolean allowStrain, boolean ignore
     /** Selects the delay from the server configuration. */
     public static final int SERVER_DEFAULT = -1;
 
-    /** Standard gameplay options with Strain enabled and the configured regeneration delay. */
+    /** Standard gameplay options with strain enabled and the configured regeneration delay. */
     public static final SpendOptions DEFAULT = new SpendOptions(false, true, false, SERVER_DEFAULT);
 
     /**
@@ -26,9 +26,9 @@ public record SpendOptions(boolean simulate, boolean allowStrain, boolean ignore
     }
 
     /**
-     * Prevents this spend from creating more Strain.
+     * Prevents this spend from creating more strain.
      *
-     * @return a copy with Strain disabled
+     * @return a copy with strain disabled
      */
     public SpendOptions withoutStrain() {
         return new SpendOptions(simulate, false, ignoreExhaustion, regenDelayTicks);

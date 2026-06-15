@@ -8,7 +8,7 @@ import com.darkona.feathers.api.event.SpendEvent;
 public enum SpendResult {
     /** Paid (or, when simulating, would be paid). */
     OK,
-    /** Not enough feathers, even counting bonus feathers and Strain where allowed. Nothing was spent. */
+    /** Not enough feathers, even counting bonus feathers and strain where allowed. Nothing was spent. */
     INSUFFICIENT,
     /** The entity is exhausted and must recover before exerting itself again. Nothing was spent. */
     EXHAUSTED,

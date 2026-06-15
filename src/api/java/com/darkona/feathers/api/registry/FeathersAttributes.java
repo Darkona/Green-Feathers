@@ -14,7 +14,7 @@ public final class FeathersAttributes {
     /** Maximum feathers. */
     public static final DeferredHolder<Attribute, Attribute> MAX_FEATHERS = DeferredHolder.create(Registries.ATTRIBUTE, id("max_feathers"));
 
-    /** Maximum Strain, in feathers. */
+    /** Maximum strain, in feathers. */
     public static final DeferredHolder<Attribute, Attribute> MAX_STRAIN = DeferredHolder.create(Registries.ATTRIBUTE, id("max_strain"));
 
     /** Regeneration, in feathers per second. */

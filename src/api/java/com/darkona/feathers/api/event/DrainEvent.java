@@ -65,7 +65,7 @@ public abstract class DrainEvent extends FeathersEvent {
             STOPPED,
             /** Not refreshed within its timeout. */
             TIMED_OUT,
-            /** Ran out of feathers (and of Strain, where allowed). */
+            /** Ran out of feathers (and of strain, where allowed). */
             INSUFFICIENT,
             /** The entity became exhausted. */
             EXHAUSTED

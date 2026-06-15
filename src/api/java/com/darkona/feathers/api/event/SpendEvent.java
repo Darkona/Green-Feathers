@@ -83,7 +83,8 @@ public abstract class SpendEvent extends FeathersEvent {
     }
 
     /**
-     * Fires after a successful or exempt spend.
+     * Fires on the server after a spend that went through and cost something: never for an exempt entity, a spend that
+     * cost nothing after modifiers, a refused spend or a client-side prediction.
      */
     public static final class Post extends SpendEvent {
         private final int cost;

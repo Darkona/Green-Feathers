@@ -45,7 +45,7 @@ public final class ClientFeathers {
      * with a server-side {@code FeathersAPI.spend}, or use {@link #requestSpend}.
      *
      * @param stamina    the predicted cost in stamina units
-     * @param allowStrain whether the prediction may create more Strain
+     * @param allowStrain whether the prediction may create more strain
      * @return the predicted outcome
      */
     public static SpendResult predictSpend(int stamina, boolean allowStrain) {
@@ -54,7 +54,7 @@ public final class ClientFeathers {
 
     /**
      * Asks the server to spend for the local player, for mods without their own packet. The server applies the
-     * normal rules and honors the Strain and regeneration delay options. It ignores simulation and exhaustion
+     * normal rules and honors the strain and regeneration delay options. It ignores simulation and exhaustion
      * overrides for safety. The request can affect only the player who sent it.
      *
      * @param source  a stable identifier for the action

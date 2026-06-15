@@ -45,6 +45,7 @@ public final class FeathersServiceImpl implements FeathersService {
      * Supplies the local player's synchronized state for client-side API calls. The client installs this bridge.
      */
     public interface ClientBridge {
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         boolean isLocalPlayer(LivingEntity entity);
 
         /**
@@ -176,6 +177,7 @@ public final class FeathersServiceImpl implements FeathersService {
      *
      * @return whether either changed
      */
+    @SuppressWarnings("UnusedReturnValue")
     static boolean refreshMaximums(LivingEntity entity, FeathersData data) {
         AttributeInstance maxFeathers = entity.getAttribute(FeathersAttributes.MAX_FEATHERS);
         AttributeInstance maxStrain = entity.getAttribute(FeathersAttributes.MAX_STRAIN);
@@ -338,7 +340,7 @@ public final class FeathersServiceImpl implements FeathersService {
         ensureInitialized(entity, data);
         GainEvent event = NeoForge.EVENT_BUS.post(new GainEvent(entity, source, stamina));
         if (event.isCanceled()) return 0;
-        int gained = Math.min(event.getAmount(), Math.max(0, data.maxStamina - data.stamina));
+        int gained = Math.clamp(data.maxStamina - data.stamina, 0, event.getAmount());
         data.stamina += gained;
         FeathersTicker.checkRecovered(entity, data);
         return gained;

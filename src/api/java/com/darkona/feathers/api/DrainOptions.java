@@ -3,7 +3,7 @@ package com.darkona.feathers.api;
 /**
  * How a continuous drain behaves.
  *
- * @param allowStrain   may keep draining into Strain when feathers run out, if the server enables Strain
+ * @param allowStrain   may keep draining into strain when feathers run out, if the server enables strain
  * @param blocksRegen   regeneration pauses while the drain is active
  * @param timeoutTicks  the drain stops this many ticks after its last {@code startDrain} call. A value of zero keeps
  *                      it active until {@code stopDrain}. Refreshing it each tick prevents a forgotten stop call from
@@ -15,9 +15,9 @@ public record DrainOptions(boolean allowStrain, boolean blocksRegen, int timeout
     public static final DrainOptions DEFAULT = new DrainOptions(true, true, 5);
 
     /**
-     * Prevents the drain from creating more Strain.
+     * Prevents the drain from creating more strain.
      *
-     * @return a copy with Strain disabled
+     * @return a copy with strain disabled
      */
     public DrainOptions withoutStrain() {
         return new DrainOptions(false, blocksRegen, timeoutTicks);

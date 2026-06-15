@@ -70,7 +70,7 @@ public final class FeathersAPI {
 
     /**
      * Spends stamina once, all or nothing. Use this for discrete actions such as jumps or attacks.
-     * Bonus stamina goes first, then regular stamina, then Strain if the
+     * Bonus stamina goes first, then regular stamina, then strain if the
      * options and the server allow it. The usage multiplier attribute and stamina modifiers apply first.
      *
      * @param entity  the entity that performs the action
@@ -141,7 +141,9 @@ public final class FeathersAPI {
      * @param source         a stable identifier for the activity
      * @param staminaPerTick the base cost per tick in stamina units
      * @param options        rules for the drain
-     * @return the current tick's result. Any result other than OK or EXEMPT stops the drain
+     * @return {@code OK} when the drain runs (started now or refreshed), {@code EXEMPT} when the entity pays nothing, or
+     *         {@code EXHAUSTED}/{@code INSUFFICIENT} when a new drain can't afford its first tick, in which case it isn't
+     *         started. On the client, a prediction for the local player. Each tick's cost is paid later, on the server tick
      */
     public static SpendResult startDrain(LivingEntity entity, ResourceLocation source, double staminaPerTick, DrainOptions options) {
         return service().startDrain(entity, source, staminaPerTick, options);
@@ -229,7 +231,7 @@ public final class FeathersAPI {
     }
 
     /**
-     * Restores full stamina and clears Strain and exhaustion. Use this for administrative or scripted resets.
+     * Restores full stamina and clears strain and exhaustion. Use this for administrative or scripted resets.
      *
      * @param entity the entity to reset
      */
@@ -261,12 +263,12 @@ public final class FeathersAPI {
     }
 
     /**
-     * Adds a rest effect, such as a hot spring, that multiplies Strain recovery. Only the highest applicable
+     * Adds a rest effect, such as a hot spring, that multiplies strain recovery. Only the highest applicable
      * multiplier applies. This transient bonus should be refreshed while its cause remains active.
      *
      * @param entity     the entity receiving the rest bonus
      * @param source     a stable identifier for the bonus
-     * @param multiplier the Strain recovery multiplier
+     * @param multiplier the strain recovery multiplier
      * @param ticks      the duration in ticks, or a negative value until removed
      */
     public static void setRestBonus(LivingEntity entity, ResourceLocation source, double multiplier, int ticks) {

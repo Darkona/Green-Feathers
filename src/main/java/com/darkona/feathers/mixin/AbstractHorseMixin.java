@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * Horses, donkeys and mules: an exhausted mount can't jump. Checked on the client, which simulates the ridden jump;
- * the server side is {@link ServerGamePacketListenerImplMixin}.
+ * Prevents exhausted horses, donkeys, and mules from jumping. The client checks this during ridden jump simulation.
+ * {@link ServerGamePacketListenerImplMixin} performs the server-side check.
  */
 @Mixin(AbstractHorse.class)
 public abstract class AbstractHorseMixin {

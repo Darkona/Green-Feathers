@@ -21,8 +21,8 @@ import static com.darkona.feathers.gametest.TestSupport.assertValueEqual;
 import static com.darkona.feathers.gametest.TestSupport.player;
 
 /**
- * The feather animation API, and Green Feathers' triggers with explicit settings (the client config isn't loaded
- * here, so the triggers' own provider is only registered on the client).
+ * Tests the feather animation API and built-in triggers with explicit settings. GameTests do not load the client
+ * configuration or register the client-only built-in provider.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -50,14 +50,19 @@ public class AnimationTests {
 
     @GameTest(template = "empty")
     public static void animationsRefuseNonsense(GameTestHelper helper) {
-        boolean refused = false;
-        try {
-            new FeatherAnimation(FeatherAnimation.Kind.SHAKE, 0f, 1f);
-        } catch (IllegalArgumentException e) {
-            refused = true;
-        }
-        helper.assertTrue(refused, "a speed of 0 is refused");
+        helper.assertTrue(animationRefused(0f, 1f), "a speed of 0 is refused");
+        helper.assertTrue(animationRefused(Float.POSITIVE_INFINITY, 1f), "an infinite speed is refused");
+        helper.assertTrue(animationRefused(1f, Float.NaN), "a NaN amplitude is refused");
         helper.succeed();
+    }
+
+    private static boolean animationRefused(float speed, float amplitude) {
+        try {
+            new FeatherAnimation(FeatherAnimation.Kind.SHAKE, speed, amplitude);
+            return false;
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
     }
 
     @GameTest(template = "empty")

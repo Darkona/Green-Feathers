@@ -32,7 +32,7 @@ import static com.darkona.feathers.gametest.TestSupport.withCompat;
 
 /**
  * Drives each survival mod into an extreme with its own API and checks the feathers react: cold, scorching heat,
- * thirst. Each test passes trivially when its mod isn't on the runtime ({@code -Pcompat=...}).
+ * thirst. Each test passes without action when its optional mod is absent ({@code -Pcompat=...}).
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -56,7 +56,7 @@ public class SurvivalCompatTests {
         helper.assertTrue(player.hasEffect(FeathersMobEffects.FATIGUE.get()), mod + ": the Fatigue effect");
     }
 
-    /** Thirst factors are applied every 20 ticks; tick past one and read the regeneration. */
+    /** Advances past the 20-tick thirst update interval and reads the resulting regeneration. */
     private static double regenAfterFactors(ServerPlayer player) {
         player.tickCount = 0;
         tick(player, 1);

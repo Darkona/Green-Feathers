@@ -6,12 +6,16 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Implemented by Green Feathers. Use {@link FeathersAPI}; this interface is not meant for other mods to call or
- * implement and may change between versions.
+ * Implemented by Green Feathers. Other mods should use {@link FeathersAPI}. This internal interface can change
+ * between versions.
+ *
+ * @hidden
  */
+@ApiStatus.Internal
 public interface FeathersService {
 
     boolean supports(LivingEntity entity);

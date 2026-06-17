@@ -24,8 +24,8 @@ import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.saveAndLoad;
 
 /**
- * One-off spends: all or nothing, simulation, Strain, exhaustion, bonus stamina, exemptions, multipliers.
- * Defaults: 20 max feathers, 6 max Strain, Strain and exhaustion on.
+ * One-off spends: all or nothing, simulation, strain, exhaustion, bonus stamina, exemptions, multipliers.
+ * Defaults: 20 max feathers, 6 max strain, strain and exhaustion on.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -45,13 +45,13 @@ public class SpendTests {
     public static void spendsAreAllOrNothing(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         SpendResult result = FeathersAPI.spend(player, TEST, Stamina.ofFeathers(25), SpendOptions.DEFAULT.withoutStrain());
-        assertValueEqual(helper, result, SpendResult.INSUFFICIENT, "spend beyond the bar without Strain");
+        assertValueEqual(helper, result, SpendResult.INSUFFICIENT, "spend beyond the bar without strain");
         assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "stamina after a refused spend");
         helper.succeed();
     }
 
     /**
-     * Huge amounts saturate instead of wrapping into negative (free) spends; the command refuses what doesn't fit.
+     * Huge amounts saturate instead of wrapping into free negative spends. The command rejects values that do not fit.
      */
     @GameTest(template = "empty")
     public static void hugeAmountsSaturate(GameTestHelper helper) {
@@ -80,11 +80,11 @@ public class SpendTests {
     @GameTest(template = "empty")
     public static void overspendingGoesIntoStrain(GameTestHelper helper) {
         ServerPlayer player = player(helper);
-        assertValueEqual(helper, FeathersAPI.spend(player, TEST, Stamina.ofFeathers(25)), SpendResult.OK, "spend into Strain");
+        assertValueEqual(helper, FeathersAPI.spend(player, TEST, Stamina.ofFeathers(25)), SpendResult.OK, "spend into strain");
         FeathersView f = FeathersAPI.get(player);
         assertValueEqual(helper, f.stamina(), 0, "stamina");
         assertValueEqual(helper, f.strain(), Stamina.ofFeathers(5), "strain");
-        helper.assertFalse(f.exhausted(), "one feather of Strain room is left");
+        helper.assertFalse(f.exhausted(), "one feather of strain room is left");
         helper.succeed();
     }
 
@@ -92,7 +92,7 @@ public class SpendTests {
     public static void simulatingChangesNothing(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         helper.assertTrue(FeathersAPI.canSpend(player, TEST, Stamina.ofFeathers(10)), "can spend 10");
-        helper.assertFalse(FeathersAPI.canSpend(player, TEST, Stamina.ofFeathers(27)), "can't spend past Strain");
+        helper.assertFalse(FeathersAPI.canSpend(player, TEST, Stamina.ofFeathers(27)), "can't spend past strain");
         assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "stamina after simulating");
         helper.succeed();
     }
@@ -101,7 +101,7 @@ public class SpendTests {
     public static void spendingEverythingExhausts(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         FeathersAPI.spend(player, TEST, Stamina.ofFeathers(26));
-        helper.assertTrue(FeathersAPI.get(player).exhausted(), "exhausted with no feathers and no Strain room");
+        helper.assertTrue(FeathersAPI.get(player).exhausted(), "exhausted with no feathers and no strain room");
         assertValueEqual(helper, FeathersAPI.spend(player, TEST, 1), SpendResult.EXHAUSTED, "spending while exhausted");
         assertValueEqual(helper, FeathersAPI.spend(player, TEST, 0, SpendOptions.DEFAULT.ignoringExhaustion()), SpendResult.OK, "ignoring exhaustion");
 

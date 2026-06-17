@@ -23,9 +23,11 @@ import java.util.Optional;
 public record MountStats(Optional<Integer> minFeathers, Optional<Integer> maxFeathers, Optional<Double> regenPerSecond,
                          Optional<Double> gallopFeathersPerSecond, Optional<Double> gallopSpeed, Optional<Double> jumpFeathers) {
 
+    /** Empty tuning that delegates every value to the server configuration. */
     public static final MountStats DEFAULT = new MountStats(Optional.empty(), Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty());
 
+    /** The codec used by the {@code greenfeathers:mount_stats} entity type data map. */
     public static final Codec<MountStats> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.intRange(1, 1000).optionalFieldOf("min_feathers").forGetter(MountStats::minFeathers),
             Codec.intRange(1, 1000).optionalFieldOf("max_feathers").forGetter(MountStats::maxFeathers),

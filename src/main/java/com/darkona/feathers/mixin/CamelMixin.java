@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * Camels override the horse's jump with their dash: an exhausted camel can't dash either.
+ * Prevents an exhausted camel from using its dash, which replaces the horse jump.
  */
 @Mixin(Camel.class)
 public abstract class CamelMixin {

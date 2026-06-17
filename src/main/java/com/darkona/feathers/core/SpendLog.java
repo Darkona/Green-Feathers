@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * What an entity spent recently, by source, for {@code /feathers debug}. A fixed ring of entries; spends from the
- * same source within a second fold into one entry, so a drain doesn't flood it. Allocated on the first spend.
+ * Stores recent spend activity by source for {@code /feathers debug}. A fixed ring combines spends from the same
+ * source within one second, which prevents drains from flooding the log. The first spend creates the log.
  */
 public final class SpendLog {
 

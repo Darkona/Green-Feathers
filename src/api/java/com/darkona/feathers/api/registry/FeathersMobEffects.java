@@ -23,9 +23,9 @@ public final class FeathersMobEffects {
     public static final RegistryObject<MobEffect> FATIGUE = RegistryObject.create(id("fatigued"), ForgeRegistries.MOB_EFFECTS);
     /** Halves costs. */
     public static final RegistryObject<MobEffect> MOMENTUM = RegistryObject.create(id("momentum"), ForgeRegistries.MOB_EFFECTS);
-    /** Shown while Strain is being paid back; slows regeneration. */
+    /** Appears while the entity recovers from strain and slows regeneration. */
     public static final RegistryObject<MobEffect> STRAINED = RegistryObject.create(id("strain"), ForgeRegistries.MOB_EFFECTS);
-    /** Protects from Heat and Fatigue. */
+    /** Protects from the Hot and Fatigue effects. */
     public static final RegistryObject<MobEffect> COOLING = RegistryObject.create(id("cooling"), ForgeRegistries.MOB_EFFECTS);
 
     private FeathersMobEffects() {}

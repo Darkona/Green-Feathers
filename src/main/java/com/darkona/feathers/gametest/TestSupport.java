@@ -26,14 +26,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Players for feathers tests. Vanilla's mock server player reports itself as creative, which feathers exempt by
- * design, so these are Forge fake players in survival. They aren't ticked by the server: tests tick them.
+ * Creates players for stamina tests. Vanilla's mock server player reports Creative mode, which bypasses stamina.
+ * These tests use Forge fake players in Survival mode and tick them directly.
  */
 final class TestSupport {
 
     private TestSupport() {}
 
-    /** Compat switches, off while ordinary tests run so a thirst or temperature mod on the runtime can't skew them. */
+    /** Compatibility switches that keep optional thirst or temperature mods from changing ordinary tests. */
     private static final List<ForgeConfigSpec.BooleanValue> COMPATS = List.of(FeathersCompatConfig.COLD_SWEAT, FeathersCompatConfig.THIRST,
             FeathersCompatConfig.TAN, FeathersCompatConfig.SEASONS);
 

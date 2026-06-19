@@ -69,7 +69,7 @@ public class RegenTests {
         ServerPlayer player = player(helper);
         FeathersAPI.spend(player, TEST, Stamina.ofFeathers(21), SpendOptions.DEFAULT.withRegenDelay(0));
         tick(player, 25);
-        // 20 on the first tick, then 5 a tick once the Strained effect cuts regeneration by 75%.
+        // 20 on the first tick, then 5 a tick once the strained effect cuts regeneration by 75%.
         assertValueEqual(helper, FeathersAPI.get(player).strain(), 1000 - 20 - 24 * 5, "strain after 25 ticks of payback");
         assertValueEqual(helper, FeathersAPI.get(player).stamina(), 0, "no stamina while strained");
         helper.succeed();

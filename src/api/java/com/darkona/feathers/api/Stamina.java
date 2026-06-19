@@ -6,20 +6,26 @@ package com.darkona.feathers.api;
  */
 public final class Stamina {
 
+    /** The number of stamina units in one feather. */
     public static final int PER_FEATHER = 1000;
 
     private Stamina() {}
 
     /**
-     * Stamina in {@code feathers} feathers, saturated at {@link Integer#MAX_VALUE} / {@link Integer#MIN_VALUE}.
+     * Converts whole feathers to stamina units. Use this overload for fixed, integral costs.
+     *
+     * @param feathers the number of feathers
+     * @return the converted value, saturated to the {@code int} range
      */
     public static int ofFeathers(int feathers) {
         return saturate((long) feathers * PER_FEATHER);
     }
 
     /**
-     * Stamina in {@code feathers} feathers, rounded to the nearest unit and saturated at {@link Integer#MAX_VALUE} /
-     * {@link Integer#MIN_VALUE}; NaN is 0.
+     * Converts fractional feathers to stamina units. The result uses the nearest unit, and NaN produces zero.
+     *
+     * @param feathers the number of feathers
+     * @return the converted value, saturated to the {@code int} range
      */
     public static int ofFeathers(double feathers) {
         // Math.round(double) already saturates to the long range and maps NaN to 0.
@@ -27,14 +33,20 @@ public final class Stamina {
     }
 
     /**
-     * Whole feathers in {@code stamina}, rounded down.
+     * Converts stamina units to whole feathers, rounded down.
+     *
+     * @param stamina the amount in stamina units
+     * @return the number of complete feathers
      */
     public static int toFeathers(int stamina) {
         return Math.floorDiv(stamina, PER_FEATHER);
     }
 
     /**
-     * Whole feathers in {@code stamina}, rounded up: what a HUD shows as partially filled.
+     * Converts stamina units to whole feathers, rounded up. Use this for displays that show a partial feather.
+     *
+     * @param stamina the amount in stamina units
+     * @return the number of visible feathers
      */
     public static int toFeathersCeil(int stamina) {
         // In long: -Integer.MIN_VALUE wraps in int.
@@ -42,7 +54,10 @@ public final class Stamina {
     }
 
     /**
-     * Stamina per tick for a rate in feathers per second.
+     * Converts a rate in feathers per second to stamina units per game tick.
+     *
+     * @param feathersPerSecond the rate in feathers per second
+     * @return the rate in stamina units per tick
      */
     public static double perTick(double feathersPerSecond) {
         return feathersPerSecond * PER_FEATHER / 20.0;

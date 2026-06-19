@@ -17,11 +17,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * An entity's feathers: the state behind {@link FeathersView}. Server-authoritative; {@link FeathersTicker} ticks it
+ * Stores the server-authoritative state behind {@link FeathersView}. {@link FeathersTicker} updates it,
  * and {@link FeathersServiceImpl} changes it. Per-tick paths iterate small lists by index and allocate nothing.
  * <p>
- * Saved: stamina, Strain, the regeneration delay, exhaustion, bonus pools and compat counters. Drains, regeneration
- * blocks and rest bonuses are transient: whoever set them keeps refreshing them.
+ * Saved: stamina, strain, the regeneration delay, exhaustion, bonus pools and compat counters. Drains, regeneration
+ * blocks and rest bonuses are transient. Their callers must refresh them while their causes remain active.
  */
 public final class FeathersData implements FeathersView, INBTSerializable<CompoundTag> {
 
@@ -40,7 +40,7 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
         }
     }
 
-    /** A continuous drain; fractions of a stamina carry over between ticks. */
+    /** A continuous drain that carries fractional stamina between ticks. */
     static final class Drain {
         final ResourceLocation source;
         double perTick;
@@ -100,16 +100,25 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     RestState restState = RestState.NONE;
     double restMultiplier = 1.0;
-    double lastX, lastY, lastZ;
+    double lastX;
+    double lastY;
+    double lastZ;
     int stillTicks;
 
     /* What the client last received, to sync only on visible changes */
-    int syncedStamina = -1, syncedMax = -1, syncedStrain = -1, syncedMaxStrain = -1, syncedBonus = -1, syncedWeight = -1;
-    boolean syncedExhausted, syncedDelayed;
+    int syncedStamina = -1;
+    int syncedMax = -1;
+    int syncedStrain = -1;
+    int syncedMaxStrain = -1;
+    int syncedBonus = -1;
+    int syncedWeight = -1;
+    boolean syncedExhausted;
+    boolean syncedDelayed;
     final WeightSplit syncedWeightSplit = new WeightSplit();
     RestState syncedRest = RestState.NONE;
     boolean forceSync = true;
-    /** Whether the exhausted-mount slowdown is on; not saved, like the transient modifier it mirrors. */
+
+    /** Whether the transient exhausted-mount slowdown is active. This value is not saved. */
     public boolean mountSlowed;
 
     /* FeathersView */
@@ -160,7 +169,8 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     @Override
     public int bonusStamina() {
         int total = 0;
-        for (int i = 0, n = bonuses.size(); i < n; i++) total += bonuses.get(i).amount;
+        int size = bonuses.size();
+        for (int i = 0; i < size; i++) total += bonuses.get(i).amount;
         return total;
     }
 
@@ -201,27 +211,28 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     /**
-     * Room left in Strain, or 0 when the spend or the server doesn't allow it.
+     * Gets the remaining strain capacity. Returns zero when the spend or server disables strain.
      */
     int strainRoom(boolean allowStrain, boolean strainEnabled) {
         return allowStrain && strainEnabled ? Math.max(0, maxStrain - strain) : 0;
     }
 
     /**
-     * Whether {@code cost} can be paid, all or nothing: bonus pools, then stamina, then Strain.
+     * Whether {@code cost} can be paid, all or nothing: bonus pools, then stamina, then strain.
      */
     boolean canPay(int cost, boolean allowStrain, boolean strainEnabled) {
         return (long) cost <= (long) bonusStamina() + regularAvailable() + strainRoom(allowStrain, strainEnabled);
     }
 
     /**
-     * Pays {@code cost}; call {@link #canPay} first.
+     * Pays {@code cost}. Call {@link #canPay} first.
      *
-     * @return the stamina that went into Strain
+     * @return the stamina that went into strain
      */
     int pay(int cost) {
         int left = cost;
-        for (int i = 0, n = bonuses.size(); i < n && left > 0; i++) {
+        int size = bonuses.size();
+        for (int i = 0; i < size && left > 0; i++) {
             Bonus bonus = bonuses.get(i);
             int take = Math.min(bonus.amount, left);
             bonus.amount -= take;
@@ -244,14 +255,14 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     /**
-     * Whether nothing is left to spend: no stamina, no bonus, and no Strain room for spends that allow it.
+     * Whether nothing is left to spend: no stamina, no bonus, and no strain room for spends that allow it.
      */
     boolean isSpent(boolean strainEnabled) {
         return availableStamina() <= 0 && strainRoom(true, strainEnabled) <= 0;
     }
 
     /**
-     * Nothing to tick: full, no Strain, bonus, drain, block, delay or exhaustion, and already initialized.
+     * Nothing to tick: full, no strain, bonus, drain, block, delay or exhaustion, and already initialized.
      */
     public boolean isAtRest() {
         return initialized && stamina >= maxStamina && strain == 0 && regenDelay == 0 && !exhausted
@@ -262,8 +273,10 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     @Nullable
     Bonus bonus(ResourceLocation source) {
-        for (int i = 0, n = bonuses.size(); i < n; i++) {
-            if (bonuses.get(i).source.equals(source)) return bonuses.get(i);
+        int size = bonuses.size();
+        for (int i = 0; i < size; i++) {
+            Bonus bonus = bonuses.get(i);
+            if (bonus.source.equals(source)) return bonus;
         }
         return null;
     }
@@ -278,7 +291,8 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     boolean removeBonus(ResourceLocation source) {
-        for (int i = 0, n = bonuses.size(); i < n; i++) {
+        int size = bonuses.size();
+        for (int i = 0; i < size; i++) {
             if (bonuses.get(i).source.equals(source)) {
                 bonuses.remove(i);
                 return true;
@@ -289,16 +303,20 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     @Nullable
     Drain drain(ResourceLocation source) {
-        for (int i = 0, n = drains.size(); i < n; i++) {
-            if (drains.get(i).source.equals(source)) return drains.get(i);
+        int size = drains.size();
+        for (int i = 0; i < size; i++) {
+            Drain drain = drains.get(i);
+            if (drain.source.equals(source)) return drain;
         }
         return null;
     }
 
     @Nullable
     static Timed timed(ArrayList<Timed> list, ResourceLocation source) {
-        for (int i = 0, n = list.size(); i < n; i++) {
-            if (list.get(i).source.equals(source)) return list.get(i);
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
+            Timed timed = list.get(i);
+            if (timed.source.equals(source)) return timed;
         }
         return null;
     }
@@ -314,7 +332,8 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     static void removeTimed(ArrayList<Timed> list, ResourceLocation source) {
-        for (int i = 0, n = list.size(); i < n; i++) {
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
             if (list.get(i).source.equals(source)) {
                 list.remove(i);
                 return;
@@ -339,8 +358,10 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     boolean isRegenBlocked() {
         if (regenDelay > 0 || !regenBlocks.isEmpty()) return true;
-        for (int i = 0, n = drains.size(); i < n; i++) {
-            if (drains.get(i).blocksRegen) return true;
+        int size = drains.size();
+        for (int i = 0; i < size; i++) {
+            Drain drain = drains.get(i);
+            if (drain.blocksRegen) return true;
         }
         return false;
     }

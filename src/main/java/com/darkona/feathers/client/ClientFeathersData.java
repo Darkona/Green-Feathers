@@ -84,7 +84,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         mount.tick();
         if (lastSpendTicks > 0) lastSpendTicks--;
         // The mount's feathers only mean something while riding it. The server can send them a moment before the
-        // client sees the rider seated: they're only dropped once the player rode it and got off, or rides another.
+        // client sees the rider seated. Clear it after the player dismounts a known mount or rides another entity.
         if (mountId == -1) return;
         LocalPlayer player = Minecraft.getInstance().player;
         Entity vehicle = player != null ? player.getVehicle() : null;
@@ -131,7 +131,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
     }
 
     /**
-     * Pays locally the way the server would (bonus, stamina, then Strain) so the HUD reacts at once.
+     * Pays locally the way the server would (bonus, stamina, then strain) so the HUD reacts at once.
      */
     @Override
     public SpendResult predictSpend(int cost, boolean allowStrain) {

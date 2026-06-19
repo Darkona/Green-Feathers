@@ -20,7 +20,7 @@ import static com.darkona.feathers.gametest.TestSupport.withCompat;
 /**
  * Calls every registered climate provider and regeneration factor on a real player with its compat switched on,
  * so each bridge actually links against the other mod. Meaningful with compat mods on the runtime
- * ({@code -Pcompat=...}); without them only the built-in ones run.
+ * ({@code -Pcompat=...}). Without them, only the built-in integrations run.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)

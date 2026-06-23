@@ -12,13 +12,15 @@ import java.util.List;
 
 public class FeatherRingItem extends Item {
 
+    /** Where the ring goes: a Curios ring slot, or the off hand. Built once, since a tooltip is rebuilt every frame. */
+    private static final String TOOLTIP = "item.greenfeathers.feather_ring.tooltip." + (ModList.get().isLoaded("curios") ? "ring" : "offhand");
+
     public FeatherRingItem(Properties properties) {
         super(properties);
     }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
-        String where = ModList.get().isLoaded("curios") ? "ring" : "offhand";
-        tooltip.add(Component.translatable("item.greenfeathers.feather_ring.tooltip." + where).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
     }
 }

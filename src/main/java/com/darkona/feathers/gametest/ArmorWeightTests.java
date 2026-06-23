@@ -7,20 +7,28 @@ import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
+import com.darkona.feathers.item.ModItems;
 import com.darkona.feathers.weight.ArmorWeights;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
@@ -130,5 +138,16 @@ public class ArmorWeightTests {
             helper.assertValueEqual(FeathersAPI.get(player).weight(), 4, "weight with the ring");
             helper.assertValueEqual(FeathersServiceImpl.data(player).weightPart(ArmorWeights.CHEST), 1, "the ring halves each piece's share");
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void featherRingTooltipNamesItsSlot(GameTestHelper helper) {
+        List<Component> tooltip = new ArrayList<>();
+        ItemStack ring = new ItemStack(ModItems.FEATHER_RING.get());
+        ring.getItem().appendHoverText(ring, Item.TooltipContext.EMPTY, tooltip, TooltipFlag.NORMAL);
+        String where = ModList.get().isLoaded("curios") ? "ring" : "offhand";
+        helper.assertTrue(tooltip.size() == 1 && tooltip.getFirst().getContents() instanceof TranslatableContents contents
+                && contents.getKey().equals("item.greenfeathers.feather_ring.tooltip." + where), "the ring's tooltip names where it goes: " + tooltip);
+        helper.succeed();
     }
 }

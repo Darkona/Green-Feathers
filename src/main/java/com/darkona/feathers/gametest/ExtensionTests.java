@@ -2,9 +2,9 @@ package com.darkona.feathers.gametest;
 
 import com.darkona.feathers.api.Climate;
 import com.darkona.feathers.api.FeathersAPI;
-import com.darkona.feathers.api.StaminaModifier;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.StaminaModifier;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.climate.ClimateEffects;
 import com.darkona.feathers.config.FeathersServerConfig;
@@ -19,6 +19,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.tick;
+
 
 /**
  * The extension points, used the way another mod would. Registrations are global and permanent, so each only

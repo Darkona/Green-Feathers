@@ -3,7 +3,6 @@ package com.darkona.feathers.mount;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.MountStats;
-import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.config.FeathersServerConfig;
@@ -23,6 +22,7 @@ import net.neoforged.neoforge.event.entity.EntityMountEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
+
 
 /**
  * Mounts' feathers: galloping drains them, jumps cost them (see the horse and camel mixins), rest and time bring

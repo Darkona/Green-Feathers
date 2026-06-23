@@ -12,8 +12,8 @@ import com.darkona.feathers.compatibility.sereneseasons.SereneSeasonsCompat;
 import com.darkona.feathers.compatibility.thirst.ThirstCompat;
 import com.darkona.feathers.compatibility.toughasnails.ToughAsNailsCompat;
 import com.darkona.feathers.config.FeathersClientConfig;
-import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.config.FeathersCompatConfig;
+import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersAttachments;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.core.FeathersTicker;
@@ -33,6 +33,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 @Mod(FeathersIds.MOD_ID)
 public final class Feathers {

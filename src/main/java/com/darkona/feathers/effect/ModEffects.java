@@ -1,7 +1,7 @@
 package com.darkona.feathers.effect;
 
-import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.FeathersAPI;
+import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatCompat;
@@ -21,6 +21,7 @@ import static com.darkona.feathers.api.registry.FeathersAttributes.USAGE_MULTIPL
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
 import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE;
+
 
 /**
  * Registers the effects whose holders live in the API's FeathersMobEffects. Most are plain attribute modifiers.

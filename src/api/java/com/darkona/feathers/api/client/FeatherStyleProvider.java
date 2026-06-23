@@ -7,14 +7,17 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Picks the style of the local player's own feathers by condition: a disease, a biome, a status of your own mod.
- * Providers are asked in order of priority, highest first; the first non-null answer wins, and with none the player's
- * configured color is used. Green Feathers' own states (cold, hot, energized, momentum) answer at
- * {@link FeatherStyles#STATUS_PRIORITY}. Asked once per client tick, on the client; keep it cheap.
+ * Providers run from highest to lowest priority, and the first non-null answer wins. Without an answer, the HUD uses
+ * the player's configured color. Built-in states use {@link FeatherStyles#STATUS_PRIORITY}. Green Feathers calls
+ * providers once per client tick, so implementations should avoid expensive work.
  */
 @FunctionalInterface
 public interface FeatherStyleProvider {
 
     /**
+     * Selects a registered style for the local player.
+     *
+     * @param player   the local player
      * @param feathers the player's feathers as the client knows them
      * @return the id of a registered style (see {@link FeatherStyles#registerStyle}), or null to let the next
      * provider decide

@@ -5,8 +5,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
+/** Common Green Feathers identifiers and entity type tags. */
 public final class FeathersIds {
 
+    /** The namespace used by Green Feathers resources and registrations. */
     public static final String MOD_ID = "greenfeathers";
 
     private FeathersIds() {}
@@ -19,10 +21,16 @@ public final class FeathersIds {
     public static final TagKey<EntityType<?>> MOUNTS = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, id("mounts"));
 
     /**
-     * Opt-out: entity types here never get feathers, even horses. For special mounts that shouldn't tire.
+     * Entity types in this opt-out tag never get feathers, including horses. Use it for mounts that should not tire.
      */
     public static final TagKey<EntityType<?>> NO_FEATHERS = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, id("no_feathers"));
 
+    /**
+     * Creates a resource location in the Green Feathers namespace.
+     *
+     * @param path the resource path
+     * @return {@code greenfeathers:path}
+     */
     @SuppressWarnings("removal") // The constructor is the only way on every Forge 43 build.
     public static ResourceLocation id(String path) {
         return new ResourceLocation(MOD_ID, path);

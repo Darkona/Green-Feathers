@@ -31,7 +31,7 @@ public final class VanillaClimate {
 
     /**
      * Rain or snow falling on a cold biome. Not {@code isRainingAt}: it is false where the precipitation is snow,
-     * which is exactly where it's coldest.
+     * which is where the biome is coldest.
      */
     private static boolean isColdWeather(Level level, BlockPos pos) {
         if (!level.isRaining() || !level.canSeeSky(pos)) return false;

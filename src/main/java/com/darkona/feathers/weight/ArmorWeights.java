@@ -206,8 +206,18 @@ public final class ArmorWeights {
         return base * lightness * (1 + heavy);
     }
 
-    /** Weight parts, in the order the HUD draws them: head to feet, then everything else. */
-    public static final int HEAD = 0, CHEST = 1, LEGS = 2, FEET = 3, OTHER = 4, PARTS = 5;
+    /** The head armor share in a {@link WeightSplit}. */
+    public static final int HEAD = 0;
+    /** The chest armor share in a {@link WeightSplit}. */
+    public static final int CHEST = 1;
+    /** The leg armor share in a {@link WeightSplit}. */
+    public static final int LEGS = 2;
+    /** The foot armor share in a {@link WeightSplit}. */
+    public static final int FEET = 3;
+    /** The share without a specific armor piece or colored source. */
+    public static final int OTHER = 4;
+    /** The number of built-in weight shares. */
+    public static final int PARTS = 5;
 
     /**
      * The entity's weight: armor plus weight sources, after the event and the multiplier. 0 when disabled.

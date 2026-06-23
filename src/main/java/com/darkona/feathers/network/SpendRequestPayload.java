@@ -29,7 +29,7 @@ public record SpendRequestPayload(ResourceLocation source, int stamina, boolean 
     static void handle(SpendRequestPayload request, Supplier<NetworkEvent.Context> context) {
         ServerPlayer player = context.get().getSender();
         if (player == null || request.stamina < 0) return;
-        // Clamped: a client can't pause its own regeneration for longer than any spend could.
+        // Clamp the delay so a client cannot pause its regeneration longer than a normal spend permits.
         SpendOptions options = new SpendOptions(false, request.allowStrain, false, Math.max(-1, Math.min(request.regenDelayTicks, 1200)));
         FeathersAPI.spend(player, request.source, request.stamina, options);
         // The client already showed its own prediction: send the server's result back, whatever it charged (a

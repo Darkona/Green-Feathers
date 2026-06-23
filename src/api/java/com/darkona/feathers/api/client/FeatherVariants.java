@@ -14,13 +14,12 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
  * <ul>
  *     <li>a variant: full body, half body, full border, half border, full shine, half shine (columns 0 to 5). Bodies
  *     are grayscale (tinted with the body color), borders white (tinted with the border color), shines white with
- *     their own alpha (drawn as they are, over the body);</li>
+ *     their own alpha and draw over the body.</li>
  *     <li>an overlay: primary and accent (columns 0 and 1), grayscale, tinted with the style's overlay colors and
  *     drawn over every slot of the row.</li>
  * </ul>
- * Green Feathers' own live in {@link #SHEET}; register a texture and row of your own for a new shape. A texture laid out
- * like SHEET is {@link #SHEET_WIDTH}x{@link #SHEET_HEIGHT}; a texture of another size is registered with its size,
- * which must be a multiple of 8 on both sides (pad it with transparent pixels).
+ * Green Feathers stores its built-in sprites in {@link #SHEET}. Register a texture and row to add a shape. A texture
+ * laid out like SHEET is {@link #SHEET_WIDTH}x{@link #SHEET_HEIGHT}. Other sizes must be multiples of 8 on both axes.
  */
 public final class FeatherVariants {
 
@@ -50,10 +49,20 @@ public final class FeatherVariants {
     /**
      * Where a variant's or overlay's cells are: {@code row} counts 9-pixel cells from the top of {@code texture}, which
      * is {@code textureWidth}x{@code textureHeight} pixels.
+     *
+     * @param texture       the sprite sheet texture
+     * @param row           the zero-based cell row
+     * @param textureWidth  the texture width in pixels
+     * @param textureHeight the texture height in pixels
      */
     public record Sprites(ResourceLocation texture, int row, int textureWidth, int textureHeight) {
 
-        /** In a texture laid out like {@link FeatherVariants#SHEET}. */
+        /**
+         * Creates a sprite location for a texture laid out like {@link FeatherVariants#SHEET}.
+         *
+         * @param texture the sprite sheet texture
+         * @param row     the zero-based cell row
+         */
         public Sprites(ResourceLocation texture, int row) {
             this(texture, row, SHEET_WIDTH, SHEET_HEIGHT);
         }
@@ -64,7 +73,13 @@ public final class FeatherVariants {
 
     private FeatherVariants() {}
 
-    /** Adds a feather shape in a texture laid out like {@link #SHEET}, or replaces the one with that id. */
+    /**
+     * Registers a feather shape in a texture laid out like {@link #SHEET}.
+     *
+     * @param id      the variant identifier
+     * @param texture the sprite sheet texture
+     * @param row     the zero-based cell row
+     */
     public static void registerVariant(ResourceLocation id, ResourceLocation texture, int row) {
         registerVariant(id, texture, row, SHEET_WIDTH, SHEET_HEIGHT);
     }
@@ -72,12 +87,24 @@ public final class FeatherVariants {
     /**
      * Adds a feather shape in a {@code width}x{@code height} texture, or replaces the one with that id. Both sizes must
      * be multiples of 8, and the texture wide enough for the variant's six cells.
+     *
+     * @param id      the variant identifier
+     * @param texture the sprite sheet texture
+     * @param row     the zero-based cell row
+     * @param width   the texture width in pixels
+     * @param height  the texture height in pixels
      */
     public static synchronized void registerVariant(ResourceLocation id, ResourceLocation texture, int row, int width, int height) {
         variants = with(variants, id, new Sprites(Objects.requireNonNull(texture), row, width, height), VARIANT_COLUMNS);
     }
 
-    /** Adds an overlay in a texture laid out like {@link #SHEET}, or replaces the one with that id. */
+    /**
+     * Registers an overlay in a texture laid out like {@link #SHEET}.
+     *
+     * @param id      the overlay identifier
+     * @param texture the sprite sheet texture
+     * @param row     the zero-based cell row
+     */
     public static void registerOverlay(ResourceLocation id, ResourceLocation texture, int row) {
         registerOverlay(id, texture, row, SHEET_WIDTH, SHEET_HEIGHT);
     }
@@ -85,15 +112,33 @@ public final class FeatherVariants {
     /**
      * Adds an overlay in a {@code width}x{@code height} texture, or replaces the one with that id. Both sizes must be
      * multiples of 8, and the texture wide enough for the overlay's two cells.
+     *
+     * @param id      the overlay identifier
+     * @param texture the sprite sheet texture
+     * @param row     the zero-based cell row
+     * @param width   the texture width in pixels
+     * @param height  the texture height in pixels
      */
     public static synchronized void registerOverlay(ResourceLocation id, ResourceLocation texture, int row, int width, int height) {
         overlays = with(overlays, id, new Sprites(Objects.requireNonNull(texture), row, width, height), OVERLAY_COLUMNS);
     }
 
+    /**
+     * Gets the sprite location for a registered feather shape.
+     *
+     * @param id the variant identifier
+     * @return the sprite location, or {@code null} for an unknown id
+     */
     public static @Nullable Sprites variant(ResourceLocation id) {
         return variants.get(id);
     }
 
+    /**
+     * Gets the sprite location for a registered row overlay.
+     *
+     * @param id the overlay identifier
+     * @return the sprite location, or {@code null} for an unknown id
+     */
     public static @Nullable Sprites overlay(ResourceLocation id) {
         return overlays.get(id);
     }
@@ -103,7 +148,9 @@ public final class FeatherVariants {
     private static final int OVERLAY_COLUMNS = 2;
 
     private static Object2ObjectOpenHashMap<ResourceLocation, Sprites> with(Object2ObjectOpenHashMap<ResourceLocation, Sprites> map, ResourceLocation id, Sprites sprites, int columns) {
-        int width = sprites.textureWidth(), height = sprites.textureHeight(), row = sprites.row();
+        int width = sprites.textureWidth();
+        int height = sprites.textureHeight();
+        int row = sprites.row();
         if (width <= 0 || height <= 0 || (width & 7) != 0 || (height & 7) != 0)
             throw new IllegalArgumentException("Texture size " + width + "x" + height + " isn't a multiple of 8");
         if (width < columns * CELL) throw new IllegalArgumentException("A " + width + " pixel wide texture has no room for " + columns + " cells");

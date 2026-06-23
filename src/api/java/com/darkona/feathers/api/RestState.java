@@ -1,7 +1,7 @@
 package com.darkona.feathers.api;
 
 /**
- * How an entity is resting, as detected by Green Feathers. Resting speeds up recovering from Strain.
+ * How an entity is resting, as detected by Green Feathers. Resting speeds up recovering from strain.
  */
 public enum RestState {
     /** Moving or otherwise active. */

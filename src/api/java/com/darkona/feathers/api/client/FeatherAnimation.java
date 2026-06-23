@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public record FeatherAnimation(Kind kind, float speed, float amplitude) {
 
+    /** The supported movement patterns for a feather row. */
     public enum Kind {
         /** A bump travelling along the row, like hearts under Regeneration. Default pace: 2 pixels a tick. */
         WAVE,
@@ -21,13 +22,23 @@ public record FeatherAnimation(Kind kind, float speed, float amplitude) {
         PULSE
     }
 
-    /** Green Feathers' defaults. */
+    /** The default wave used by built-in animation providers. */
     public static final FeatherAnimation WAVE = new FeatherAnimation(Kind.WAVE, 1f, 2f);
+    /** The default shake used by built-in animation providers. */
     public static final FeatherAnimation SHAKE = new FeatherAnimation(Kind.SHAKE, 1f, 1f);
+    /** The default pulse used by built-in animation providers. */
     public static final FeatherAnimation PULSE = new FeatherAnimation(Kind.PULSE, 1f, 0.45f);
 
+    /**
+     * Validates animation values when a new record is created.
+     *
+     * @throws NullPointerException     if {@code kind} is {@code null}
+     * @throws IllegalArgumentException if either value is not finite, speed is not positive, or amplitude is negative
+     */
     public FeatherAnimation {
         Objects.requireNonNull(kind, "kind");
-        if (!(speed > 0) || !(amplitude >= 0)) throw new IllegalArgumentException("speed must be positive and amplitude not negative");
+        if (!Float.isFinite(speed) || !Float.isFinite(amplitude) || speed <= 0 || amplitude < 0) {
+            throw new IllegalArgumentException("speed must be finite and positive, and amplitude must be finite and not negative");
+        }
     }
 }

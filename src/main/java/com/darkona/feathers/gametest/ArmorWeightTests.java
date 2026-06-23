@@ -41,11 +41,15 @@ public class ArmorWeightTests {
     }
 
     private static ItemStack[] iron() {
-        return new ItemStack[]{new ItemStack(Items.IRON_HELMET), new ItemStack(Items.IRON_CHESTPLATE),
-                new ItemStack(Items.IRON_LEGGINGS), new ItemStack(Items.IRON_BOOTS)};
+        return new ItemStack[]{
+                new ItemStack(Items.IRON_HELMET),
+                new ItemStack(Items.IRON_CHESTPLATE),
+                new ItemStack(Items.IRON_LEGGINGS),
+                new ItemStack(Items.IRON_BOOTS)
+        };
     }
 
-    /** Armor weights are off by default; these tests switch them on while they run. */
+    /** Runs a test with armor weight enabled, then restores the previous setting. */
     private static void withWeights(GameTestHelper helper, Runnable test) {
         boolean before = FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.get();
         FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.set(true);
@@ -88,8 +92,14 @@ public class ArmorWeightTests {
     public static void lightweightRemovesAQuarterPerLevel(GameTestHelper helper) {
         withWeights(helper, () -> {
             Enchantment lightweight = FeathersEnchantments.LIGHTWEIGHT.get();
-            ItemStack[] netherite = {new ItemStack(Items.NETHERITE_HELMET), new ItemStack(Items.NETHERITE_CHESTPLATE),
-                    new ItemStack(Items.NETHERITE_LEGGINGS), new ItemStack(Items.NETHERITE_BOOTS)};
+
+            ItemStack[] netherite = {
+                    new ItemStack(Items.NETHERITE_HELMET),
+                    new ItemStack(Items.NETHERITE_CHESTPLATE),
+                    new ItemStack(Items.NETHERITE_LEGGINGS),
+                    new ItemStack(Items.NETHERITE_BOOTS)
+            };
+
             for (ItemStack piece : netherite) piece.enchant(lightweight, 3);
 
             ServerPlayer player = player(helper);

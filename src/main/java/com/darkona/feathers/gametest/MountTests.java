@@ -34,7 +34,7 @@ import static com.darkona.feathers.gametest.TestSupport.player;
 
 /**
  * Mounts have feathers: a stamina trait of their own that foals inherit, jumps that cost by power, and an exhausted
- * mount slows down and can't jump.
+ * mount slows down and cannot jump.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -79,7 +79,7 @@ public class MountTests {
     @GameTest(template = "empty")
     public static void jumpsCostByPower(GameTestHelper helper) {
         Horse horse = horse(helper);
-        // The rider is passed in: a fake player can't really mount (it isn't in the level).
+        // Pass the rider directly because a fake player outside the level cannot mount the horse.
         int before = FeathersAPI.get(horse).stamina();
         MountExertion.chargeJump(horse, player(helper), 50);
         int expected = Stamina.ofFeathers(FeathersServerConfig.MOUNT_JUMP_FEATHERS.get() * 0.5);
@@ -92,7 +92,7 @@ public class MountTests {
         Horse horse = horse(helper);
         FeathersView feathers = FeathersAPI.get(horse);
         FeathersAPI.spend(horse, id("test"), feathers.maxStamina() + feathers.maxStrain());
-        assertTrue(helper, FeathersAPI.get(horse).exhausted(), "spent everything, Strain included");
+        assertTrue(helper, FeathersAPI.get(horse).exhausted(), "spent everything, strain included");
 
         MountExertion.tickMount(horse);
         assertTrue(helper, MountExertion.isSlowedDown(horse), "an exhausted horse slows down");
@@ -106,7 +106,7 @@ public class MountTests {
 
     /**
      * A creature that stops being a mount (mounts turned off, a reload that drops its tag or data map entry) while
-     * strained and exhausted gets back to normal: no Strained effect, no slowdown, no leftover exhaustion. Only the
+     * strained and exhausted gets back to normal: no strained effect, no slowdown, no leftover exhaustion. Only the
      * effect this mod put on it goes: one from elsewhere stays.
      */
     @GameTest(template = "empty")
@@ -122,7 +122,7 @@ public class MountTests {
         assertFalse(helper, horse.hasEffect(FeathersMobEffects.STRAINED.get()), "the Strained effect goes");
         assertFalse(helper, MountExertion.isSlowedDown(horse), "the slowdown goes");
         feathers = FeathersAPI.get(horse);
-        assertValueEqual(helper, feathers.strain(), 0, "no Strain left");
+        assertValueEqual(helper, feathers.strain(), 0, "no strain left");
         assertFalse(helper, feathers.exhausted(), "no exhaustion left");
 
         horse.addEffect(new MobEffectInstance(FeathersMobEffects.STRAINED.get(), 200));
@@ -161,8 +161,8 @@ public class MountTests {
     }
 
     /**
-     * Other mods' mounts have feathers when they're installed: Naturalist's zebra, a horse of its own
-     * ({@code -Pcompat=naturalist}); passes trivially without it.
+     * Other mods' mounts have stamina when those mods are installed: Naturalist's zebra, a horse of its own
+     * ({@code -Pcompat=naturalist}). The test passes without that optional mod.
      */
     @GameTest(template = "empty")
     public static void otherModsMountsHaveFeathers(GameTestHelper helper) {

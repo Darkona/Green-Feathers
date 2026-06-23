@@ -20,13 +20,12 @@ import net.minecraft.world.item.ItemStack;
 import java.io.InputStream;
 
 /**
- * Feather colors taken from what they belong to: a mount's texture, an armor piece's icon. Each is the texture's
- * dominant color made readable on any background (lightness kept in a middle band), paired with its complementary
- * color for the outline so the feathers always stand out. Computed once per texture or item and cached; client only.
+ * Derives feather colors from a mount texture or armor icon. It adjusts the dominant color to remain readable and
+ * pairs it with a complementary outline. The client calculates and caches each texture or item once.
  */
 public final class FeatherColors {
 
-    /** Fallback when a texture can't be read: neutral leather. */
+    /** Neutral leather used when the client cannot read a texture. */
     public static final int LEATHER = 0x9A6A3F;
 
     private static final long UNKNOWN = Long.MIN_VALUE;
@@ -157,16 +156,20 @@ public final class FeatherColors {
 
     /**
      * The most common color, quantized to 4 bits per channel, averaged over the pixels that fall in it. Transparent
-     * and pure black pixels (outlines) don't vote: a black horse is still mostly very dark grey.
+     * and pure black pixels do not contribute. This keeps a black horse very dark gray instead of pure black.
      */
     static int dominant(NativeImage image) {
         int[] counts = new int[4096];
-        long[] red = new long[4096], green = new long[4096], blue = new long[4096];
+        long[] red = new long[4096];
+        long[] green = new long[4096];
+        long[] blue = new long[4096];
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int abgr = image.getPixelRGBA(x, y);
                 if ((abgr >>> 24) < 200) continue;
-                int r = abgr & 0xFF, g = (abgr >> 8) & 0xFF, b = (abgr >> 16) & 0xFF;
+                int r = abgr & 0xFF;
+                int g = (abgr >> 8) & 0xFF;
+                int b = (abgr >> 16) & 0xFF;
                 if (r + g + b < 24) continue;
                 int bucket = (r >> 4) << 8 | (g >> 4) << 4 | b >> 4;
                 counts[bucket]++;
@@ -190,7 +193,7 @@ public final class FeatherColors {
     static long pair(int rgb) {
         float[] hsl = hsl(rgb);
         float lightness = Mth.clamp(hsl[2], 0.42f, 0.74f);
-        // Only clearly colored textures get a saturation floor: near-greys (a black or white horse) stay grey.
+        // Apply a saturation floor only to clear colors. Near-grays from black or white horses remain gray.
         float saturation = hsl[1] > 0.2f ? Math.max(hsl[1], 0.28f) : hsl[1];
         int body = rgb(hsl[0], saturation, lightness);
         // Opposite hue, and the opposite side of the lightness band, so the edge contrasts in both.
@@ -199,9 +202,14 @@ public final class FeatherColors {
     }
 
     private static float[] hsl(int rgb) {
-        float r = ((rgb >> 16) & 255) / 255f, g = ((rgb >> 8) & 255) / 255f, b = (rgb & 255) / 255f;
-        float max = Math.max(r, Math.max(g, b)), min = Math.min(r, Math.min(g, b));
-        float l = (max + min) / 2, h = 0, s = 0;
+        float r = ((rgb >> 16) & 255) / 255f;
+        float g = ((rgb >> 8) & 255) / 255f;
+        float b = (rgb & 255) / 255f;
+        float max = Math.max(r, Math.max(g, b));
+        float min = Math.min(r, Math.min(g, b));
+        float l = (max + min) / 2;
+        float h = 0;
+        float s = 0;
         if (max != min) {
             float d = max - min;
             s = l > 0.5f ? d / (2 - max - min) : d / (max + min);
@@ -218,7 +226,8 @@ public final class FeatherColors {
             int v = Math.round(l * 255);
             return v << 16 | v << 8 | v;
         }
-        float q = l < 0.5f ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+        float q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+        float p = 2 * l - q;
         return Math.round(hue(p, q, h + 1f / 3) * 255) << 16 | Math.round(hue(p, q, h) * 255) << 8 | Math.round(hue(p, q, h - 1f / 3) * 255);
     }
 

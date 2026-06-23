@@ -18,19 +18,24 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
  * packs can recolor any registered style with {@code assets/greenfeathers/feather_styles.json}, which wins over what
  * code registers.
  * <p>
- * Safe to call from any side and at any time (registration is meant for mod setup); nothing here touches client
- * classes, so providers can be registered from common code.
+ * Registration is safe from either logical side because this class does not load client-only classes. Mods should
+ * register styles and providers during setup.
  */
 public final class FeatherStyles {
 
     /** The player's feathers, by the client config's feather color. */
     public static final ResourceLocation GREEN = id("green");
+    /** The built-in blue player style. */
     public static final ResourceLocation BLUE = id("blue");
+    /** The built-in white player style. */
     public static final ResourceLocation WHITE = id("white");
     /** The player's feathers under Green Feathers' effects. */
     public static final ResourceLocation COLD = id("cold");
+    /** The built-in style for the Hot effect. */
     public static final ResourceLocation HOT = id("hot");
+    /** The built-in style for the Energized effect. */
     public static final ResourceLocation ENERGIZED = id("energized");
+    /** The built-in style for the Momentum effect. */
     public static final ResourceLocation MOMENTUM = id("momentum");
     /** Strain feathers, over the empty slots. */
     public static final ResourceLocation STRAIN = id("strain");
@@ -40,11 +45,19 @@ public final class FeatherStyles {
     public static final ResourceLocation ARMOR = id("armor");
     /** The empty slots behind the feathers, and the same while exhausted. The body color fills the slot. */
     public static final ResourceLocation EMPTY = id("empty");
+    /** The built-in style for empty slots while exhausted. */
     public static final ResourceLocation EXHAUSTED = id("exhausted");
 
     /** The priority Green Feathers' own states answer at: above it wins over them, below only applies without them. */
     public static final int STATUS_PRIORITY = 0;
 
+    /**
+     * A registered provider and its selection metadata.
+     *
+     * @param id       the provider identifier
+     * @param priority the selection priority
+     * @param provider the registered provider
+     */
     public record ProviderEntry(ResourceLocation id, int priority, FeatherStyleProvider provider) {}
 
     private static volatile Object2ObjectOpenHashMap<ResourceLocation, FeatherStyle> styles = new Object2ObjectOpenHashMap<>();
@@ -55,6 +68,9 @@ public final class FeatherStyles {
 
     /**
      * Adds a style, or replaces the one with that id.
+     *
+     * @param id    the style identifier
+     * @param style the style to register
      */
     public static synchronized void registerStyle(ResourceLocation id, FeatherStyle style) {
         Object2ObjectOpenHashMap<ResourceLocation, FeatherStyle> next = new Object2ObjectOpenHashMap<>(styles);
@@ -64,8 +80,12 @@ public final class FeatherStyles {
     }
 
     /**
-     * Adds a provider, or replaces the one with that id. Higher priorities are asked first; equal ones in the order
-     * they were registered.
+     * Adds a provider, or replaces the provider with the same id. Higher priorities run first. Equal priorities keep
+     * their registration order.
+     *
+     * @param id       a stable identifier for the provider
+     * @param priority its selection priority
+     * @param provider the provider to register
      */
     public static synchronized void registerStyleProvider(ResourceLocation id, int priority, FeatherStyleProvider provider) {
         ProviderEntry entry = new ProviderEntry(Objects.requireNonNull(id), priority, Objects.requireNonNull(provider));
@@ -91,13 +111,20 @@ public final class FeatherStyles {
     /**
      * The style registered with this id, as code registered it (resource packs may still recolor it on screen), or
      * null.
+     *
+     * @param id the style identifier
+     * @return the registered style, or {@code null}
      */
     public static @Nullable FeatherStyle get(ResourceLocation id) {
         return styles.get(id);
     }
 
     /**
-     * The style id the providers pick for this player, or null when none answers (the configured color then).
+     * Selects the first style supplied by the registered providers.
+     *
+     * @param player   the local player
+     * @param feathers the player's current client-side stamina view
+     * @return the selected style id, or {@code null} to use the configured color
      */
     public static @Nullable ResourceLocation select(Player player, FeathersView feathers) {
         for (ProviderEntry entry : providers) {
@@ -107,12 +134,20 @@ public final class FeatherStyles {
         return null;
     }
 
-    /** The registered providers, highest priority first. */
+    /**
+     * Gets a snapshot of the current provider order.
+     *
+     * @return a new array ordered from highest to lowest priority
+     */
     public static ProviderEntry[] providers() {
         return providers.clone();
     }
 
-    /** Changes with every registration: for caches built from the registered styles. */
+    /**
+     * Gets the registration version for caches built from styles or providers.
+     *
+     * @return a value that changes after each registration
+     */
     public static int version() {
         return version;
     }

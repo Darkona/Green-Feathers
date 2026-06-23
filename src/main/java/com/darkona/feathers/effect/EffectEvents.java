@@ -15,8 +15,7 @@ public final class EffectEvents {
     private EffectEvents() {}
 
     /**
-     * Makes {@link FeathersMobEffect#canApply} binding: an effect the entity can't take is refused, whether it comes
-     * from the climate, a potion or another mod.
+     * Enforces {@link FeathersMobEffect#canApply} for effects from climate, potions, and other mods.
      */
     @SubscribeEvent
     public static void onApplicable(PotionEvent.PotionApplicableEvent event) {
@@ -27,9 +26,10 @@ public final class EffectEvents {
 
     @SubscribeEvent
     public static void onAdded(PotionEvent.PotionAddedEvent event) {
-        MobEffectInstance added = event.getPotionEffect(), old = event.getOldPotionEffect();
-        // Fired before the merge: the entity keeps its current instance unless the new one is stronger, or as strong and
-        // longer (MobEffectInstance.update), so a weaker potion mustn't replace what the stronger one gave.
+        MobEffectInstance added = event.getPotionEffect();
+        MobEffectInstance old = event.getOldPotionEffect();
+        // This event fires before the merge. Minecraft keeps the current instance unless the new one is stronger,
+        // or has the same strength and a longer duration. A weaker potion must not replace the stronger bonus.
         if (old != null && (added.getAmplifier() < old.getAmplifier()
                 || added.getAmplifier() == old.getAmplifier() && added.getDuration() <= old.getDuration())) return;
         if (added.getEffect() instanceof FeathersMobEffect effect && !event.getEntityLiving().level.isClientSide()) {

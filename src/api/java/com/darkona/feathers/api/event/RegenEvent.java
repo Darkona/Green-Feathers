@@ -4,12 +4,17 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.Cancelable;
 
 /**
- * Regeneration is about to resume after a pause (a spend's delay, a block, a drain). Cancel to keep it paused for
- * this tick; the event fires again on the next one while it stays cancelled.
+ * Fires before regeneration resumes after a spend delay, block, or drain. Cancellation pauses regeneration for the
+ * current tick. Green Feathers fires the event again on the next eligible tick.
  */
 @Cancelable
 public final class RegenEvent extends FeathersEvent {
 
+    /**
+     * Creates a regeneration-resume event.
+     *
+     * @param entity the entity whose regeneration is about to resume
+     */
     public RegenEvent(LivingEntity entity) {
         super(entity);
     }

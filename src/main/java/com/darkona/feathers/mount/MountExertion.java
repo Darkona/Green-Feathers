@@ -6,6 +6,7 @@ import com.darkona.feathers.api.MountStats;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.config.FeathersServerConfig;
+import com.darkona.feathers.core.FeathersAttachments;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.core.FeathersTicker;
@@ -155,6 +156,8 @@ public final class MountExertion {
      * exhausted: the slowdown, then its feathers' leftovers (see {@link FeathersTicker#releaseExMount}). Public for tests.
      */
     public static void release(LivingEntity entity) {
+        // Every creature that isn't a mount comes here: one that never had feathers never got the slowdown either.
+        if (!entity.hasData(FeathersAttachments.FEATHERS)) return;
         AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed != null && speed.hasModifier(EXHAUSTED_SLOWDOWN)) speed.removeModifier(EXHAUSTED_SLOWDOWN);
         FeathersTicker.releaseExMount(entity);

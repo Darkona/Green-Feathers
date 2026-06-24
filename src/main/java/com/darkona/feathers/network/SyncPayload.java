@@ -5,6 +5,7 @@ import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.weight.ArmorWeights;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
+import net.minecraft.network.VarInt;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -25,39 +26,40 @@ public record SyncPayload(int entityId, int stamina, int maxStamina, int strain,
     private static final StreamCodec<ByteBuf, RestState> REST_CODEC =
             ByteBufCodecs.idMapper(i -> REST_STATES[i], RestState::ordinal);
 
+    /** Written field by field with VarInt: ByteBufCodecs.VAR_INT would box every int on both ends. */
     public static final StreamCodec<ByteBuf, SyncPayload> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public @NotNull SyncPayload decode(@NotNull ByteBuf buf) {
-            return new SyncPayload(ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
-                    ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
-                    ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.BOOL.decode(buf), REST_CODEC.decode(buf), readParts(buf));
+            return new SyncPayload(VarInt.read(buf), VarInt.read(buf), VarInt.read(buf), VarInt.read(buf),
+                    VarInt.read(buf), VarInt.read(buf), VarInt.read(buf),
+                    VarInt.read(buf), ByteBufCodecs.BOOL.decode(buf), REST_CODEC.decode(buf), readParts(buf));
         }
 
         @Override
         public void encode(@NotNull ByteBuf buf, @NotNull SyncPayload p) {
-            ByteBufCodecs.VAR_INT.encode(buf, p.entityId);
-            ByteBufCodecs.VAR_INT.encode(buf, p.stamina);
-            ByteBufCodecs.VAR_INT.encode(buf, p.maxStamina);
-            ByteBufCodecs.VAR_INT.encode(buf, p.strain);
-            ByteBufCodecs.VAR_INT.encode(buf, p.maxStrain);
-            ByteBufCodecs.VAR_INT.encode(buf, p.bonus);
-            ByteBufCodecs.VAR_INT.encode(buf, p.weight);
-            ByteBufCodecs.VAR_INT.encode(buf, p.regenDelay);
+            VarInt.write(buf, p.entityId);
+            VarInt.write(buf, p.stamina);
+            VarInt.write(buf, p.maxStamina);
+            VarInt.write(buf, p.strain);
+            VarInt.write(buf, p.maxStrain);
+            VarInt.write(buf, p.bonus);
+            VarInt.write(buf, p.weight);
+            VarInt.write(buf, p.regenDelay);
             ByteBufCodecs.BOOL.encode(buf, p.exhausted);
             REST_CODEC.encode(buf, p.rest);
-            ByteBufCodecs.VAR_INT.encode(buf, p.weightSplit.length);
-            for (int value : p.weightSplit) ByteBufCodecs.VAR_INT.encode(buf, value);
+            VarInt.write(buf, p.weightSplit.length);
+            for (int value : p.weightSplit) VarInt.write(buf, value);
         }
     };
 
     /** The weight split, flattened (see WeightSplit#toArray): the parts, then a pair per colored source. */
     private static int[] readParts(ByteBuf buf) {
-        int length = ByteBufCodecs.VAR_INT.decode(buf);
+        int length = VarInt.read(buf);
         if (length < ArmorWeights.PARTS || length > ArmorWeights.PARTS + 2 * MAX_SOURCES || (length - ArmorWeights.PARTS) % 2 != 0) {
             throw new DecoderException("Bad weight split length " + length);
         }
         int[] parts = new int[length];
-        for (int i = 0; i < length; i++) parts[i] = ByteBufCodecs.VAR_INT.decode(buf);
+        for (int i = 0; i < length; i++) parts[i] = VarInt.read(buf);
         return parts;
     }
 

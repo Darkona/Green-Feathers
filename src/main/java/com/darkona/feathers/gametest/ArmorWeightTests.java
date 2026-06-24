@@ -8,7 +8,10 @@ import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.item.ModItems;
+import com.darkona.feathers.network.SyncPayload;
 import com.darkona.feathers.weight.ArmorWeights;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
@@ -28,6 +31,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -149,5 +153,27 @@ public class ArmorWeightTests {
         helper.assertTrue(tooltip.size() == 1 && tooltip.getFirst().getContents() instanceof TranslatableContents contents
                 && contents.getKey().equals("item.greenfeathers.feather_ring.tooltip." + where), "the ring's tooltip names where it goes: " + tooltip);
         helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void syncPayloadRoundTrips(GameTestHelper helper) {
+        withWeights(helper, () -> {
+            ServerPlayer player = player(helper);
+            wear(player, iron());
+            FeathersAPI.addBonusStamina(player, id("test"), 5000, -1);
+            FeathersAPI.spend(player, id("test"), 2000);
+            tick(player, 1);
+
+            SyncPayload sent = SyncPayload.of(123456, FeathersServiceImpl.data(player));
+            ByteBuf buf = Unpooled.buffer();
+            SyncPayload.STREAM_CODEC.encode(buf, sent);
+            SyncPayload read = SyncPayload.STREAM_CODEC.decode(buf);
+            helper.assertValueEqual(buf.readableBytes(), 0, "bytes left after reading the sync");
+            helper.assertTrue(read.entityId() == sent.entityId() && read.stamina() == sent.stamina() && read.maxStamina() == sent.maxStamina()
+                    && read.strain() == sent.strain() && read.maxStrain() == sent.maxStrain() && read.bonus() == sent.bonus()
+                    && read.weight() == sent.weight() && read.regenDelay() == sent.regenDelay() && read.exhausted() == sent.exhausted()
+                    && read.rest() == sent.rest() && Arrays.equals(read.weightSplit(), sent.weightSplit()), "the sync reads back as sent: " + sent + " / " + read);
+            helper.assertTrue(sent.weight() > 0 && sent.bonus() > 0 && sent.regenDelay() > 0, "the sync carries weight, bonus and a delay: " + sent);
+        });
     }
 }

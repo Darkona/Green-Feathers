@@ -47,7 +47,8 @@ public final class BasicExertion {
 
     @SubscribeEvent
     public static void onJump(LivingEvent.LivingJumpEvent event) {
-        if (event.getEntity().level().isClientSide() || !isActive() || !(event.getEntity() instanceof Player player)) return;
+        // Every living entity's jump comes here: the player check goes first.
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide() || !isActive()) return;
         double feathers = FeathersServerConfig.JUMP_FEATHERS.get();
         if (feathers > 0) FeathersAPI.spend(player, JUMP, Stamina.ofFeathers(feathers));
     }

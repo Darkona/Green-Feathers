@@ -34,6 +34,7 @@ public class SyncedFeathers implements FeathersView {
     /**
      * Feathers of weight from one part: head, chest, legs, feet, then other sources (see ArmorWeights).
      */
+    @SuppressWarnings("unused")
     public int weightPart(int part) {
         return weightSplit.part(part);
     }

@@ -194,6 +194,7 @@ public final class ArmorWeights {
     /**
      * The entity's weight: armor plus weight sources, after the event and the multiplier. 0 when disabled.
      */
+    @SuppressWarnings("unused")
     public static int totalWeight(LivingEntity entity) {
         return totalWeight(entity, null);
     }

@@ -203,7 +203,7 @@ public final class FeathersServiceImpl implements FeathersService {
         if (onClient(entity)) {
             ClientBridge bridge = clientBridge;
             if (bridge == null || !bridge.isLocalPlayer(entity)) return SpendResult.EXEMPT;
-            if (options.simulate()) return simulateAgainst(bridge.localView(), stamina, options);
+            if (options.simulate()) return simulateAgainst(bridge.localView(), stamina, options.allowStrain(), options.ignoreExhaustion());
             return bridge.predictSpend(stamina, options.allowStrain());
         }
 
@@ -248,9 +248,13 @@ public final class FeathersServiceImpl implements FeathersService {
         data.regenDelay = Math.min(data.regenDelay + delay, FeathersServerConfig.MAX_COOLDOWN.get() * 20);
     }
 
-    private static SpendResult simulateAgainst(FeathersView view, int cost, SpendOptions options) {
-        if (view.exhausted() && !options.ignoreExhaustion()) return SpendResult.EXHAUSTED;
-        int room = options.allowStrain() && FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, view.maxStrain() - view.strain()) : 0;
+    /**
+     * Checks {@code cost} against a view without the usage multiplier or the modifiers: exhaustion, then stamina and
+     * bonus plus the strain room the spend may use. For views that are not the server's, such as the client's copy.
+     */
+    public static SpendResult simulateAgainst(FeathersView view, int cost, boolean allowStrain, boolean ignoreExhaustion) {
+        if (view.exhausted() && !ignoreExhaustion) return SpendResult.EXHAUSTED;
+        int room = allowStrain && FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, view.maxStrain() - view.strain()) : 0;
         return cost <= view.availableStamina() + room ? SpendResult.OK : SpendResult.INSUFFICIENT;
     }
 
@@ -279,7 +283,7 @@ public final class FeathersServiceImpl implements FeathersService {
         if (onClient(entity)) {
             ClientBridge bridge = clientBridge;
             return bridge == null || !bridge.isLocalPlayer(entity) ? SpendResult.EXEMPT
-                    : simulateAgainst(bridge.localView(), (int) Math.ceil(staminaPerTick), options.allowStrain() ? SpendOptions.DEFAULT : SpendOptions.DEFAULT.withoutStrain());
+                    : simulateAgainst(bridge.localView(), (int) Math.ceil(staminaPerTick), options.allowStrain(), false);
         }
 
         FeathersData data = data(entity);

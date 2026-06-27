@@ -323,14 +323,10 @@ public final class FeathersServiceImpl implements FeathersService {
     public void stopDrain(LivingEntity entity, ResourceLocation source) {
         if (!supports(entity) || onClient(entity)) return;
         FeathersData data = data(entity);
-        int size = data.drains.size();
-        for (int i = 0; i < size; i++) {
-            if (data.drains.get(i).source.equals(source)) {
-                data.drains.remove(i);
-                NeoForge.EVENT_BUS.post(new DrainEvent.Stopped(entity, source, DrainEvent.Stopped.Reason.STOPPED));
-                return;
-            }
-        }
+        int i = FeathersData.indexOf(data.drains, source);
+        if (i < 0) return;
+        data.drains.remove(i);
+        NeoForge.EVENT_BUS.post(new DrainEvent.Stopped(entity, source, DrainEvent.Stopped.Reason.STOPPED));
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -168,10 +169,10 @@ public final class FeatherColors {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int abgr = image.getPixelRGBA(x, y);
-                if ((abgr >>> 24) < 200) continue;
-                int r = abgr & 0xFF;
-                int g = (abgr >> 8) & 0xFF;
-                int b = (abgr >> 16) & 0xFF;
+                if (FastColor.ABGR32.alpha(abgr) < 200) continue;
+                int r = FastColor.ABGR32.red(abgr);
+                int g = FastColor.ABGR32.green(abgr);
+                int b = FastColor.ABGR32.blue(abgr);
                 if (r + g + b < 24) continue;
                 int bucket = (r >> 4) << 8 | (g >> 4) << 4 | b >> 4;
                 counts[bucket]++;
@@ -204,9 +205,9 @@ public final class FeatherColors {
     }
 
     private static float[] hsl(int rgb) {
-        float r = ((rgb >> 16) & 255) / 255f;
-        float g = ((rgb >> 8) & 255) / 255f;
-        float b = (rgb & 255) / 255f;
+        float r = FastColor.ARGB32.red(rgb) / 255f;
+        float g = FastColor.ARGB32.green(rgb) / 255f;
+        float b = FastColor.ARGB32.blue(rgb) / 255f;
         float max = Math.max(r, Math.max(g, b));
         float min = Math.min(r, Math.min(g, b));
         float l = (max + min) / 2;

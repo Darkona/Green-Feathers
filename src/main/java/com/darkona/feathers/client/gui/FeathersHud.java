@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -349,18 +350,19 @@ public final class FeathersHud {
 
     /** An ARGB color, its alpha times the fade. */
     private static void setColor(GuiGraphics graphics, int argb) {
-        graphics.setColor(((argb >> 16) & 255) / 255f, ((argb >> 8) & 255) / 255f, (argb & 255) / 255f, (argb >>> 24) / 255f * alpha);
+        graphics.setColor(FastColor.ARGB32.red(argb) / 255f, FastColor.ARGB32.green(argb) / 255f, FastColor.ARGB32.blue(argb) / 255f,
+                FastColor.ARGB32.alpha(argb) / 255f * alpha);
     }
 
     /** The color moved toward white by the pulse. */
     private static int brighten(int argb) {
-        int r = (argb >> 16) & 255;
-        int g = (argb >> 8) & 255;
-        int b = argb & 255;
+        int r = FastColor.ARGB32.red(argb);
+        int g = FastColor.ARGB32.green(argb);
+        int b = FastColor.ARGB32.blue(argb);
         r += (int) ((255 - r) * pulse);
         g += (int) ((255 - g) * pulse);
         b += (int) ((255 - b) * pulse);
-        return (argb & 0xFF000000) | r << 16 | g << 8 | b;
+        return FastColor.ARGB32.color(FastColor.ARGB32.alpha(argb), r, g, b);
     }
 
     private static void draw(GuiGraphics graphics, ResourceLocation sheet, int width, int height, int x, int y, int index, int u, int v) {

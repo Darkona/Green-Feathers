@@ -97,9 +97,8 @@ public final class FeathersHud {
         if (player != null) {
             refreshStyles(player);
             FeathersView mount = DATA.mount();
-            LivingEntity mountEntity = player.getVehicle() instanceof LivingEntity living ? living : null;
-            boolean riding = mountEntity != null && mount.hasFeathers() && mount.maxStamina() > 0;
-            animate(riding ? FeatherAnimations.select(mountEntity, mount) : FeatherAnimations.select(player, DATA));
+            LivingEntity mountEntity = shownMount(player, mount);
+            animate(mountEntity != null ? FeatherAnimations.select(mountEntity, mount) : FeatherAnimations.select(player, DATA));
         }
 
         fullTicks = DATA.stamina() >= DATA.maxStamina() && DATA.bonusStamina() == 0 && DATA.strain() == 0 ? fullTicks + 1 : 0;
@@ -146,8 +145,8 @@ public final class FeathersHud {
 
         // Riding a mount that has feathers, only the mount's matter: they replace the rider's, in the mount's colors.
         FeathersView mount = DATA.mount();
-        LivingEntity vehicle = player.getVehicle() instanceof LivingEntity living ? living : null;
-        boolean riding = vehicle != null && mount.hasFeathers() && mount.maxStamina() > 0;
+        LivingEntity vehicle = shownMount(player, mount);
+        boolean riding = vehicle != null;
         FeathersView shown = riding ? mount : DATA;
         int bonusRows = bonusRows(shown);
         // Reserve space while faded out so the bars above remain stable.
@@ -168,6 +167,11 @@ public final class FeathersHud {
         }
 
         if (FeathersServerConfig.DEBUG_MODE.get()) drawDebug(graphics, mc.font, player);
+    }
+
+    /** The creature the player rides, when its feathers are known and replace the player's row; else null. */
+    private static LivingEntity shownMount(LocalPlayer player, FeathersView mount) {
+        return player.getVehicle() instanceof LivingEntity living && mount.hasFeathers() && mount.maxStamina() > 0 ? living : null;
     }
 
     private static int bonusRows(FeathersView view) {

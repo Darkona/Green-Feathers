@@ -22,6 +22,9 @@ public final class ModItems {
 
     public static final double FEATHER_RING_WEIGHT_MULTIPLIER = -0.5;
 
+    /** With Curios the Feather Ring is worn in a ring slot, without it held in the off hand. */
+    public static final boolean CURIOS = ModList.get().isLoaded("curios");
+
     /**
      * Halves armor weight. Worn in a Curios ring slot when Curios is installed, otherwise held in the off hand. It
      * does nothing special in code: an attribute modifier on armor_weight_multiplier, what any mod's item can do.
@@ -30,7 +33,7 @@ public final class ModItems {
 
     private static Item.Properties featherRingProperties() {
         Item.Properties properties = new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON);
-        if (!ModList.get().isLoaded("curios")) {
+        if (!CURIOS) {
             properties.attributes(ItemAttributeModifiers.builder()
                     .add(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER,
                             new AttributeModifier(id("feather_ring"), FEATHER_RING_WEIGHT_MULTIPLIER, AttributeModifier.Operation.ADD_MULTIPLIED_BASE),

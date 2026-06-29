@@ -26,7 +26,6 @@ import com.darkona.feathers.registry.ModPotions;
 import com.darkona.feathers.style.GreenFeatherStyles;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -75,6 +74,6 @@ public final class Feathers {
     }
 
     private static void commonSetup(FMLCommonSetupEvent event) {
-        if (ModList.get().isLoaded("curios")) event.enqueueWork(CuriosCompat::init);
+        if (ModItems.CURIOS) event.enqueueWork(CuriosCompat::init);
     }
 }

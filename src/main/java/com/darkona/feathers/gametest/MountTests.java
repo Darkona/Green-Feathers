@@ -7,6 +7,7 @@ import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.config.FeathersServerConfig;
+import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.mount.MountExertion;
 import com.darkona.feathers.mount.MountTraits;
 import net.minecraft.core.BlockPos;
@@ -18,6 +19,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraftforge.common.MinecraftForge;
@@ -132,6 +134,11 @@ public class MountTests {
         FeathersAPI.spend(horse, id("test"), FeathersAPI.get(horse).availableStamina() + FeathersAPI.get(horse).maxStrain());
         MountExertion.tickMount(horse);
         helper.assertTrue(MountExertion.isSlowedDown(horse), "an exhausted mount slows down again");
+
+        // A creature without feathers is left alone.
+        Cow cow = helper.spawn(EntityType.COW, new BlockPos(1, 2, 1));
+        MountExertion.release(cow);
+        helper.assertTrue(FeathersServiceImpl.dataOrNull(cow) == null, "a cow gets no feathers from the release");
         helper.succeed();
     }
 

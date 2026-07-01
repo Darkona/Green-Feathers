@@ -160,6 +160,8 @@ public final class MountExertion {
      * exhausted: the slowdown, then its feathers' leftovers (see {@link FeathersTicker#releaseExMount}). Public for tests.
      */
     public static void release(LivingEntity entity) {
+        // Every creature that isn't a mount comes here: one without feathers never got the slowdown either.
+        if (FeathersServiceImpl.dataOrNull(entity) == null) return;
         AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed != null && speed.getModifier(EXHAUSTED_SLOWDOWN_ID) != null) speed.removeModifier(EXHAUSTED_SLOWDOWN_ID);
         FeathersTicker.releaseExMount(entity);

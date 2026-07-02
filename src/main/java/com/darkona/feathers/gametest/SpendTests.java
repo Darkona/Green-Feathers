@@ -142,6 +142,16 @@ public class SpendTests {
     }
 
     @GameTest(template = "empty")
+    public static void costsFollowUsageChanges(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(1));
+        player.addEffect(new MobEffectInstance(FeathersMobEffects.HOT.get(), 200));
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(3));
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(13), "a cost doubled by heat that came after the first spend");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void fractionalCostsWork(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         FeathersAPI.spend(player, TEST, 250);

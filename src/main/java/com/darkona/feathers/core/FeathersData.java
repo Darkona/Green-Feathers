@@ -4,6 +4,7 @@ import com.darkona.feathers.api.Climate;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.weight.WeightSplit;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -11,6 +12,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,6 +100,11 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     Climate climate = Climate.NEUTRAL;
 
     SpendLog spendLog;
+
+    /* Attribute instances read every tick. An entity keeps its instances for life, and vanilla's lookup allocates a
+       lambda on every call. */
+    @Nullable AttributeInstance regenAttribute;
+    @Nullable AttributeInstance usageAttribute;
 
     RestState restState = RestState.NONE;
     double restMultiplier = 1.0;
@@ -376,6 +384,18 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
      */
     public @Nullable SpendLog spendLog() {
         return spendLog;
+    }
+
+    /* Attributes */
+
+    @Nullable AttributeInstance regenAttribute(LivingEntity entity) {
+        if (regenAttribute == null) regenAttribute = entity.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+        return regenAttribute;
+    }
+
+    @Nullable AttributeInstance usageAttribute(LivingEntity entity) {
+        if (usageAttribute == null) usageAttribute = entity.getAttribute(FeathersAttributes.USAGE_MULTIPLIER.get());
+        return usageAttribute;
     }
 
     /* Compat counters */

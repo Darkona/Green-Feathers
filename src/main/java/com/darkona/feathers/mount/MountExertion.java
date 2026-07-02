@@ -3,6 +3,7 @@ package com.darkona.feathers.mount;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.MountStats;
+import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
@@ -61,7 +62,7 @@ public final class MountExertion {
         // Unridden mounts with nothing to recover skip the feathers tick: most horses in a world are idle and full.
         // The slowdown still gets checked: a reset or a night's sleep ends exhaustion outside the tick.
         if (rider != null || !data.isAtRest()) {
-            if (rider != null && !rider.isCreative() && !rider.isSpectator()) gallop(mount);
+            if (rider != null && !FeathersServiceImpl.isExempt(rider)) gallop(mount);
             FeathersTicker.tick(mount);
         }
         updateSlowdown(mount, data);
@@ -114,7 +115,7 @@ public final class MountExertion {
      * The jump's cost, for {@code rider}'s jump. Creative and spectator riders jump for free.
      */
     public static boolean chargeJump(LivingEntity mount, Player rider, int power) {
-        if (!FeathersServiceImpl.isMount(mount) || rider.isCreative() || rider.isSpectator()) return true;
+        if (!FeathersServiceImpl.isMount(mount) || FeathersServiceImpl.isExempt(rider)) return true;
         double feathers = fullJumpFeathers(mount) * Mth.clamp(power, 0, 100) / 100.0;
         return feathers <= 0 || FeathersAPI.spend(mount, JUMP, Stamina.ofFeathers(feathers)).allowed();
     }
@@ -129,11 +130,7 @@ public final class MountExertion {
         // A client that hasn't heard the mount's feathers yet (the sync can land before the rider is seated) lets the
         // server decide, instead of grounding the mount.
         if (!view.hasFeathers()) return true;
-        if (view.exhausted()) return false;
-        // Strain room only counts where the jump's spend could use it.
-        int strainRoom = FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, view.maxStrain() - view.strain()) : 0;
-        int room = view.availableStamina() + strainRoom;
-        return room >= Stamina.ofFeathers(fullJumpFeathers(mount));
+        return FeathersServiceImpl.simulateAgainst(view, Stamina.ofFeathers(fullJumpFeathers(mount)), true, false) == SpendResult.OK;
     }
 
     private static double fullJumpFeathers(LivingEntity mount) {

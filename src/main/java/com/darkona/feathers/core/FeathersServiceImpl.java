@@ -59,7 +59,11 @@ public final class FeathersServiceImpl implements FeathersService {
 
         FeathersView localView();
 
-        SpendResult predictSpend(int stamina, boolean allowStrain);
+        /**
+         * Checks a spend on the local view like {@link #simulateAgainst} and pays it the way the server would, so the
+         * HUD reacts before the server's sync. EXEMPT until the first sync.
+         */
+        SpendResult predictSpend(int stamina, SpendOptions options);
     }
 
     private static volatile ClientBridge clientBridge;
@@ -235,7 +239,7 @@ public final class FeathersServiceImpl implements FeathersService {
             ClientBridge bridge = clientBridge;
             if (bridge == null || !bridge.isLocalPlayer(entity)) return SpendResult.EXEMPT;
             if (options.simulate()) return simulateAgainst(bridge.localView(), stamina, options.allowStrain(), options.ignoreExhaustion());
-            return bridge.predictSpend(stamina, options.allowStrain());
+            return bridge.predictSpend(stamina, options);
         }
 
         FeathersData data = data(entity);

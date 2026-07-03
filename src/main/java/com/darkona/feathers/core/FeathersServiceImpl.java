@@ -275,8 +275,16 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     private static void applyRegenDelay(FeathersData data, SpendOptions options) {
+        data.regenDelay = regenDelayAfter(data.regenDelay, options);
+    }
+
+    /**
+     * A regeneration delay after a spend with {@code options}: the spend's delay (or the config's) added to
+     * {@code current}, up to max_cooldown. Added in long: a huge delay from the API would wrap negative.
+     */
+    public static int regenDelayAfter(int current, SpendOptions options) {
         int delay = options.regenDelayTicks() < 0 ? FeathersServerConfig.DEFAULT_USAGE_COOLDOWN.get() : options.regenDelayTicks();
-        data.regenDelay = Math.min(data.regenDelay + delay, FeathersServerConfig.MAX_COOLDOWN.get() * 20);
+        return (int) Math.min((long) current + delay, FeathersServerConfig.MAX_COOLDOWN.get() * 20L);
     }
 
     /**

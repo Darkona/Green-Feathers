@@ -123,6 +123,28 @@ public class RegenTests {
     }
 
     @GameTest(template = "empty")
+    public static void entriesAreRemovedPerSource(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.startDrain(player, TEST, 10, DrainOptions.DEFAULT.withTimeout(0));
+        FeathersAPI.startDrain(player, OTHER, 10, DrainOptions.DEFAULT.withTimeout(0));
+        FeathersAPI.stopDrain(player, TEST);
+        helper.assertFalse(FeathersAPI.isDraining(player, TEST), "the stopped drain is gone");
+        helper.assertTrue(FeathersAPI.isDraining(player, OTHER), "the other drain goes on");
+
+        FeathersAPI.addBonusStamina(player, TEST, 1000, -1);
+        FeathersAPI.addBonusStamina(player, OTHER, 2000, -1);
+        FeathersAPI.removeBonusStamina(player, TEST);
+        assertValueEqual(helper, FeathersAPI.get(player).bonusStamina(), 2000, "only the other bonus is left");
+
+        FeathersAPI.setRestBonus(player, TEST, 4.0, -1);
+        FeathersAPI.setRestBonus(player, OTHER, 3.0, -1);
+        FeathersAPI.removeRestBonus(player, TEST);
+        tick(player, 1);
+        assertValueEqual(helper, FeathersAPI.get(player).restMultiplier(), 3.0, "only the other rest bonus is left");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void fractionalDrainsCarryOver(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         FeathersAPI.startDrain(player, TEST, 12.5, DrainOptions.DEFAULT.withTimeout(0));

@@ -1,6 +1,7 @@
 package com.darkona.feathers.api.client;
 
 import com.darkona.feathers.api.FeathersView;
+import com.darkona.feathers.api.spi.Registrations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
@@ -40,19 +41,7 @@ public final class FeatherAnimations {
      */
     public static synchronized void registerProvider(ResourceLocation id, int priority, FeatherAnimationProvider provider) {
         ProviderEntry entry = new ProviderEntry(Objects.requireNonNull(id), priority, Objects.requireNonNull(provider));
-        ProviderEntry[] current = providers;
-        ProviderEntry[] next = null;
-        for (int i = 0; i < current.length; i++) {
-            if (current[i].id().equals(id)) {
-                next = current.clone();
-                next[i] = entry;
-                break;
-            }
-        }
-        if (next == null) {
-            next = Arrays.copyOf(current, current.length + 1);
-            next[current.length] = entry;
-        }
+        ProviderEntry[] next = Registrations.withEntry(providers, entry, ProviderEntry::id);
         Arrays.sort(next, Comparator.comparingInt(ProviderEntry::priority).reversed());
         providers = next;
     }

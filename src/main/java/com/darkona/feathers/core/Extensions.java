@@ -4,11 +4,11 @@ import com.darkona.feathers.api.ClimateProvider;
 import com.darkona.feathers.api.RegenFactor;
 import com.darkona.feathers.api.StaminaModifier;
 import com.darkona.feathers.api.WeightSource;
+import com.darkona.feathers.api.spi.Registrations;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.function.Function;
 
 /**
  * What other mods (and Green Feathers' own compats) plug in. Registration is rare and happens at startup; reads
@@ -49,39 +49,22 @@ public final class Extensions {
     }
 
     public static synchronized void addClimate(ResourceLocation id, int priority, ClimateProvider provider) {
-        ClimateEntry[] next = withEntry(climates, new ClimateEntry(id, priority, provider), ClimateEntry::id);
+        ClimateEntry[] next = Registrations.withEntry(climates, new ClimateEntry(id, priority, provider), ClimateEntry::id);
         Arrays.sort(next, Comparator.comparingInt(ClimateEntry::priority).reversed());
         climates = next;
     }
 
     public static synchronized void addRegenFactor(ResourceLocation id, RegenFactor factor) {
-        regenFactors = withEntry(regenFactors, new RegenEntry(id, factor), RegenEntry::id);
+        regenFactors = Registrations.withEntry(regenFactors, new RegenEntry(id, factor), RegenEntry::id);
     }
 
     public static synchronized void addWeightSource(ResourceLocation id, WeightSource source) {
-        weightSources = withEntry(weightSources, new WeightEntry(id, source), WeightEntry::id);
+        weightSources = Registrations.withEntry(weightSources, new WeightEntry(id, source), WeightEntry::id);
     }
 
     public static synchronized void addModifier(ResourceLocation id, int ordinal, StaminaModifier modifier) {
-        ModifierEntry[] next = withEntry(modifiers, new ModifierEntry(id, ordinal, modifier), ModifierEntry::id);
+        ModifierEntry[] next = Registrations.withEntry(modifiers, new ModifierEntry(id, ordinal, modifier), ModifierEntry::id);
         Arrays.sort(next, Comparator.comparingInt(ModifierEntry::ordinal));
         modifiers = next;
-    }
-
-    /**
-     * A copy of {@code array} with {@code entry} added, replacing any entry with the same id.
-     */
-    private static <T> T[] withEntry(T[] array, T entry, Function<T, ResourceLocation> id) {
-        ResourceLocation key = id.apply(entry);
-        for (int i = 0; i < array.length; i++) {
-            if (id.apply(array[i]).equals(key)) {
-                T[] copy = array.clone();
-                copy[i] = entry;
-                return copy;
-            }
-        }
-        T[] copy = Arrays.copyOf(array, array.length + 1);
-        copy[array.length] = entry;
-        return copy;
     }
 }

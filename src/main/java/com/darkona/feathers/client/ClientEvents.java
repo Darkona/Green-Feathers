@@ -40,6 +40,8 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
 public final class ClientEvents {
 
     private static final ResourceLocation FEATHER_FONT = id("feather_font");
+    /** The weight tooltip's icons, in the feather font: built once, since a tooltip is rebuilt every frame. */
+    private static final Style FEATHER_ICONS = Style.EMPTY.withFont(FEATHER_FONT);
 
     private static boolean wasCold;
 
@@ -136,7 +138,7 @@ public final class ClientEvents {
         if (FeathersClientConfig.VISUAL_WEIGHTS.get()) {
             // The feather font maps 'a' to a full feather icon and 'b' to a half one; a weight point is half an icon.
             int halves = Math.max(1, (int) Math.round(weight));
-            event.getToolTip().add(Component.literal(weightIcons(halves)).withStyle(Style.EMPTY.withFont(FEATHER_FONT)));
+            event.getToolTip().add(Component.literal(weightIcons(halves)).withStyle(FEATHER_ICONS));
         } else {
             String shown = weight == Math.rint(weight) ? Integer.toString((int) weight) : "%.1f".formatted(weight);
             event.getToolTip().add(Component.translatable("text.greenfeathers.tooltip", shown).withStyle(ChatFormatting.BLUE));

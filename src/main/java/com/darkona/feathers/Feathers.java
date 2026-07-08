@@ -18,6 +18,7 @@ import com.darkona.feathers.core.FeathersTicker;
 import com.darkona.feathers.core.HungerRegen;
 import com.darkona.feathers.data.DataMaps;
 import com.darkona.feathers.effect.ModEffects;
+import com.darkona.feathers.item.FeatherRingItem;
 import com.darkona.feathers.item.ModItems;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.registry.ModAttributes;
@@ -28,7 +29,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -82,7 +82,7 @@ public final class Feathers {
         event.enqueueWork(() -> {
             ModEffects.bindAttributeModifiers();
             ModPotions.registerBrewingRecipes();
-            if (ModList.get().isLoaded("curios")) CuriosCompat.init();
+            if (FeatherRingItem.CURIOS) CuriosCompat.init();
         });
     }
 }

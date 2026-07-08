@@ -24,6 +24,8 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
 public class FeatherRingItem extends Item {
 
     private static final boolean CURIOS = ModList.get().isLoaded("curios");
+    /** Where the ring goes: a Curios ring slot, or the off hand. Built once, since a tooltip is rebuilt every frame. */
+    private static final String TOOLTIP = "item.greenfeathers.feather_ring.tooltip." + (CURIOS ? "ring" : "offhand");
 
     /** Built on first use: the attribute registers after the items. */
     private Multimap<Attribute, AttributeModifier> offhandModifiers;
@@ -48,6 +50,6 @@ public class FeatherRingItem extends Item {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.greenfeathers.feather_ring.tooltip." + (CURIOS ? "ring" : "offhand")).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
     }
 }

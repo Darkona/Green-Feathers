@@ -265,7 +265,7 @@ public final class FeathersTicker {
      */
     private static void applyRegenFactors(LivingEntity entity, FeathersData data) {
         Extensions.RegenEntry[] factors = Extensions.regenFactors();
-        AttributeInstance regen = entity.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+        AttributeInstance regen = data.regenAttribute(entity);
         if (regen == null) return;
 
         double sum = 0;
@@ -361,7 +361,7 @@ public final class FeathersTicker {
         boolean blocked = data.isRegenBlocked();
         if (data.regenDelay > 0) data.regenDelay--;
 
-        AttributeInstance attribute = entity.getAttribute(FeathersAttributes.FEATHERS_PER_SECOND.get());
+        AttributeInstance attribute = data.regenAttribute(entity);
         double perTick = attribute != null ? Stamina.perTick(attribute.getValue()) : 0.0;
 
         if (perTick > 0) {

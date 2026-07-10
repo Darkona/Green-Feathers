@@ -218,7 +218,7 @@ public final class FeathersServiceImpl implements FeathersService {
      * A base cost after the usage multiplier and the stamina modifiers.
      */
     static int effectiveCost(LivingEntity entity, FeathersData data, ResourceLocation source, double baseCost) {
-        AttributeInstance usage = entity.getAttribute(FeathersAttributes.USAGE_MULTIPLIER.get());
+        AttributeInstance usage = data.usageAttribute(entity);
         // Clamped before narrowing: an "everything" cost times a multiplier would wrap negative and cost nothing.
         int cost = (int) Math.min(Integer.MAX_VALUE, Math.round(baseCost * (usage != null ? usage.getValue() : 1.0)));
         for (Extensions.ModifierEntry modifier : Extensions.modifiers()) {

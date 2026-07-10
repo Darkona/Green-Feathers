@@ -44,6 +44,16 @@ public class RegenTests {
     }
 
     @GameTest(template = "empty")
+    public static void regenerationFollowsRateChanges(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        tick(player, 50);
+        FeathersAPI.setBaseRegenPerSecond(player, 1.0);
+        tick(player, 20);
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), 2000, "one feather at 0.4 f/s, then one more at 1 f/s");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void verySlowRegenerationStillAddsUp(GameTestHelper helper) {
         ServerPlayer player = emptyPlayer(helper);
         FeathersAPI.setBaseRegenPerSecond(player, 0.01);

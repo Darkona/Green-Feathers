@@ -7,6 +7,8 @@ import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
+import com.darkona.feathers.config.FeathersServerConfig;
+import com.darkona.feathers.core.FeathersServiceImpl;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -150,6 +152,37 @@ public class SpendTests {
         player.addEffect(new MobEffectInstance(FeathersMobEffects.HOT.get(), 200));
         FeathersAPI.spend(player, TEST, Stamina.ofFeathers(3));
         assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(13), "a cost doubled by heat that came after the first spend");
+        helper.succeed();
+    }
+
+    /** A view as the client or a mount's rider sees it: 3 feathers, 2 of strain room out of 4, exhausted or not. */
+    private static FeathersView view(boolean exhausted) {
+        return new FeathersView() {
+            public boolean hasFeathers() { return true; }
+            public int stamina() { return Stamina.ofFeathers(3); }
+            public int maxStamina() { return Stamina.ofFeathers(20); }
+            public int availableStamina() { return Stamina.ofFeathers(3); }
+            public int strain() { return Stamina.ofFeathers(2); }
+            public int maxStrain() { return Stamina.ofFeathers(4); }
+            public boolean exhausted() { return exhausted; }
+        };
+    }
+
+    @GameTest(template = "empty")
+    public static void viewChecksFollowTheOptions(GameTestHelper helper) {
+        boolean strain = FeathersServerConfig.ENABLE_STRAIN.get();
+        try {
+            FeathersServerConfig.ENABLE_STRAIN.set(true);
+            assertValueEqual(helper, FeathersServiceImpl.simulateAgainst(view(false), Stamina.ofFeathers(5), true, false), SpendResult.OK, "stamina plus strain room");
+            assertValueEqual(helper, FeathersServiceImpl.simulateAgainst(view(false), Stamina.ofFeathers(6), true, false), SpendResult.INSUFFICIENT, "past the strain room");
+            assertValueEqual(helper, FeathersServiceImpl.simulateAgainst(view(false), Stamina.ofFeathers(4), false, false), SpendResult.INSUFFICIENT, "no strain for this spend");
+            assertValueEqual(helper, FeathersServiceImpl.simulateAgainst(view(true), Stamina.ofFeathers(1), true, false), SpendResult.EXHAUSTED, "exhausted");
+            assertValueEqual(helper, FeathersServiceImpl.simulateAgainst(view(true), Stamina.ofFeathers(1), true, true), SpendResult.OK, "exhaustion ignored");
+            FeathersServerConfig.ENABLE_STRAIN.set(false);
+            assertValueEqual(helper, FeathersServiceImpl.simulateAgainst(view(false), Stamina.ofFeathers(4), true, false), SpendResult.INSUFFICIENT, "strain off on the server");
+        } finally {
+            FeathersServerConfig.ENABLE_STRAIN.set(strain);
+        }
         helper.succeed();
     }
 

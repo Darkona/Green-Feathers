@@ -5,6 +5,7 @@ import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
+import com.darkona.feathers.config.FeathersServerConfig;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -50,6 +51,16 @@ public class RegenTests {
         FeathersAPI.setBaseRegenPerSecond(player, 1.0);
         tick(player, 20);
         assertValueEqual(helper, FeathersAPI.get(player).stamina(), 2000, "one feather at 0.4 f/s, then one more at 1 f/s");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void hugeRegenDelaysStopAtTheCap(GameTestHelper helper) {
+        ServerPlayer player = emptyPlayer(helper);
+        FeathersAPI.setStamina(player, 5000);
+        FeathersAPI.spend(player, TEST, 1000);
+        FeathersAPI.spend(player, TEST, 1000, SpendOptions.DEFAULT.withRegenDelay(Integer.MAX_VALUE));
+        assertValueEqual(helper, FeathersAPI.get(player).regenDelay(), FeathersServerConfig.MAX_COOLDOWN.get() * 20, "the delay stops at max_cooldown");
         helper.succeed();
     }
 

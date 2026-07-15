@@ -7,21 +7,29 @@ import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
+import com.darkona.feathers.item.ModItems;
 import com.darkona.feathers.weight.ArmorWeights;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
+import static com.darkona.feathers.gametest.TestSupport.assertTrue;
 import static com.darkona.feathers.gametest.TestSupport.assertValueEqual;
 import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.tick;
@@ -127,5 +135,16 @@ public class ArmorWeightTests {
             assertValueEqual(helper, FeathersAPI.get(player).weight(), 4, "weight with the ring");
             assertValueEqual(helper, FeathersServiceImpl.data(player).weightPart(ArmorWeights.CHEST), 1, "the ring halves each piece's share");
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void featherRingTooltipNamesItsSlot(GameTestHelper helper) {
+        List<Component> tooltip = new ArrayList<>();
+        ItemStack ring = new ItemStack(ModItems.FEATHER_RING.get());
+        ring.getItem().appendHoverText(ring, null, tooltip, TooltipFlag.Default.NORMAL);
+        String where = ModList.get().isLoaded("curios") ? "ring" : "offhand";
+        assertTrue(helper, tooltip.size() == 1 && tooltip.get(0) instanceof TranslatableComponent contents
+                && contents.getKey().equals("item.greenfeathers.feather_ring.tooltip." + where), "the ring's tooltip names where it goes: " + tooltip);
+        helper.succeed();
     }
 }

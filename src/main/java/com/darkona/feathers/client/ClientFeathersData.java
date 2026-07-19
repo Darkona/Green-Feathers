@@ -5,7 +5,6 @@ import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.client.ClientFeathersService;
-import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import com.darkona.feathers.data.DataMaps;
 import com.darkona.feathers.network.DataMapsPayload;
@@ -130,15 +129,21 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         return entity == Minecraft.getInstance().player;
     }
 
+    private static final SpendOptions NO_STRAIN = SpendOptions.DEFAULT.withoutStrain();
+
+    @Override
+    public SpendResult predictSpend(int cost, boolean allowStrain) {
+        return predictSpend(cost, allowStrain ? SpendOptions.DEFAULT : NO_STRAIN);
+    }
+
     /**
      * Pays locally the way the server would (bonus, stamina, then strain) so the HUD reacts at once.
      */
     @Override
-    public SpendResult predictSpend(int cost, boolean allowStrain) {
+    public SpendResult predictSpend(int cost, SpendOptions options) {
         if (!synced) return SpendResult.EXEMPT;
-        if (exhausted) return SpendResult.EXHAUSTED;
-        int strainRoom = allowStrain && FeathersServerConfig.ENABLE_STRAIN.get() ? Math.max(0, maxStrain - strain) : 0;
-        if (cost > availableStamina() + strainRoom) return SpendResult.INSUFFICIENT;
+        SpendResult check = FeathersServiceImpl.simulateAgainst(this, cost, options.allowStrain(), options.ignoreExhaustion());
+        if (check != SpendResult.OK) return check;
 
         int fromBonus = Math.min(bonus, cost);
         bonus -= fromBonus;
@@ -146,7 +151,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         int fromStamina = Math.min(Math.max(0, stamina - Stamina.ofFeathers(weight)), left);
         stamina -= fromStamina;
         strain += left - fromStamina;
-        regenDelay = Math.max(regenDelay, FeathersServerConfig.DEFAULT_USAGE_COOLDOWN.get());
+        regenDelay = FeathersServiceImpl.regenDelayAfter(regenDelay, options);
         return SpendResult.OK;
     }
 

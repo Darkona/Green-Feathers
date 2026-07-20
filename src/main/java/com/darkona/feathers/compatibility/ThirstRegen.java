@@ -32,9 +32,7 @@ public final class ThirstRegen {
      */
     public static int owedSinceLastCall(Player player, FeathersView feathers, Keys key, double costPerFeather) {
         FeathersData data = FeathersServiceImpl.data(player);
-        double regenerated = feathers.totalRegenerated();
-        double since = regenerated - data.getCounter(key.lastRegenerated());
-        data.setCounter(key.lastRegenerated(), regenerated);
+        double since = regeneratedSinceLastCall(data, feathers, key);
         if (costPerFeather <= 0 || since <= 0) return 0;
 
         double owed = data.getCounter(key.owed()) + since / Stamina.PER_FEATHER * costPerFeather;
@@ -47,12 +45,17 @@ public final class ThirstRegen {
      * Like {@link #owedSinceLastCall}, for mods that charge fractional exhaustion instead of whole points.
      */
     public static float exhaustionSinceLastCall(Player player, FeathersView feathers, Keys key, double exhaustionPerFeather) {
-        FeathersData data = FeathersServiceImpl.data(player);
+        double since = regeneratedSinceLastCall(FeathersServiceImpl.data(player), feathers, key);
+        if (exhaustionPerFeather <= 0 || since <= 0) return 0f;
+        return (float) (since / Stamina.PER_FEATHER * exhaustionPerFeather);
+    }
+
+    /** Stamina regenerated since the last call for {@code key}, which this call marks. */
+    private static double regeneratedSinceLastCall(FeathersData data, FeathersView feathers, Keys key) {
         double regenerated = feathers.totalRegenerated();
         double since = regenerated - data.getCounter(key.lastRegenerated());
         data.setCounter(key.lastRegenerated(), regenerated);
-        if (exhaustionPerFeather <= 0 || since <= 0) return 0f;
-        return (float) (since / Stamina.PER_FEATHER * exhaustionPerFeather);
+        return since;
     }
 
     /** A compat's counter names, built once: these calls run every 20 ticks per player. */

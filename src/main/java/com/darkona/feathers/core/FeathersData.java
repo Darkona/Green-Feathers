@@ -30,22 +30,29 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     public static final long FOREVER = Long.MAX_VALUE;
 
-    /** A pool of bonus stamina, spent before regular stamina. */
-    static final class Bonus {
+    /** An entry kept once per source: a bonus pool, a drain, a regeneration block or a rest bonus. */
+    abstract static class Sourced {
         final ResourceLocation source;
+
+        Sourced(ResourceLocation source) {
+            this.source = source;
+        }
+    }
+
+    /** A pool of bonus stamina, spent before regular stamina. */
+    static final class Bonus extends Sourced {
         int amount;
         long expiresAt;
 
         Bonus(ResourceLocation source, int amount, long expiresAt) {
-            this.source = source;
+            super(source);
             this.amount = amount;
             this.expiresAt = expiresAt;
         }
     }
 
     /** A continuous drain that carries fractional stamina between ticks. */
-    static final class Drain {
-        final ResourceLocation source;
+    static final class Drain extends Sourced {
         double perTick;
         boolean allowStrain;
         boolean blocksRegen;
@@ -54,18 +61,17 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
         double carry;
 
         Drain(ResourceLocation source) {
-            this.source = source;
+            super(source);
         }
     }
 
     /** A regeneration block or a rest bonus: a value that holds until a game time. */
-    static final class Timed {
-        final ResourceLocation source;
+    static final class Timed extends Sourced {
         double value;
         long until;
 
         Timed(ResourceLocation source) {
-            this.source = source;
+            super(source);
         }
     }
 
@@ -279,14 +285,19 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     /* Bonuses, drains, blocks */
 
+    /** Where {@code source}'s entry is in {@code list}, or -1. */
+    static int indexOf(ArrayList<? extends Sourced> list, ResourceLocation source) {
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
+            if (list.get(i).source.equals(source)) return i;
+        }
+        return -1;
+    }
+
     @Nullable
     Bonus bonus(ResourceLocation source) {
-        int size = bonuses.size();
-        for (int i = 0; i < size; i++) {
-            Bonus bonus = bonuses.get(i);
-            if (bonus.source.equals(source)) return bonus;
-        }
-        return null;
+        int i = indexOf(bonuses, source);
+        return i < 0 ? null : bonuses.get(i);
     }
 
     void setBonus(ResourceLocation source, int amount, long expiresAt) {
@@ -299,34 +310,21 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     boolean removeBonus(ResourceLocation source) {
-        int size = bonuses.size();
-        for (int i = 0; i < size; i++) {
-            if (bonuses.get(i).source.equals(source)) {
-                bonuses.remove(i);
-                return true;
-            }
-        }
-        return false;
+        int i = indexOf(bonuses, source);
+        if (i >= 0) bonuses.remove(i);
+        return i >= 0;
     }
 
     @Nullable
     Drain drain(ResourceLocation source) {
-        int size = drains.size();
-        for (int i = 0; i < size; i++) {
-            Drain drain = drains.get(i);
-            if (drain.source.equals(source)) return drain;
-        }
-        return null;
+        int i = indexOf(drains, source);
+        return i < 0 ? null : drains.get(i);
     }
 
     @Nullable
     static Timed timed(ArrayList<Timed> list, ResourceLocation source) {
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            Timed timed = list.get(i);
-            if (timed.source.equals(source)) return timed;
-        }
-        return null;
+        int i = indexOf(list, source);
+        return i < 0 ? null : list.get(i);
     }
 
     static void setTimed(ArrayList<Timed> list, ResourceLocation source, double value, long until) {
@@ -340,13 +338,8 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     }
 
     static void removeTimed(ArrayList<Timed> list, ResourceLocation source) {
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            if (list.get(i).source.equals(source)) {
-                list.remove(i);
-                return;
-            }
-        }
+        int i = indexOf(list, source);
+        if (i >= 0) list.remove(i);
     }
 
     /**

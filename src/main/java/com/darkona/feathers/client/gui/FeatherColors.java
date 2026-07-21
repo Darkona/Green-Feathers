@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -202,9 +203,9 @@ public final class FeatherColors {
     }
 
     private static float[] hsl(int rgb) {
-        float r = ((rgb >> 16) & 255) / 255f;
-        float g = ((rgb >> 8) & 255) / 255f;
-        float b = (rgb & 255) / 255f;
+        float r = FastColor.ARGB32.red(rgb) / 255f;
+        float g = FastColor.ARGB32.green(rgb) / 255f;
+        float b = FastColor.ARGB32.blue(rgb) / 255f;
         float max = Math.max(r, Math.max(g, b));
         float min = Math.min(r, Math.min(g, b));
         float l = (max + min) / 2;

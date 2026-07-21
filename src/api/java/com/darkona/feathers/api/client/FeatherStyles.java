@@ -1,6 +1,7 @@
 package com.darkona.feathers.api.client;
 
 import com.darkona.feathers.api.FeathersView;
+import com.darkona.feathers.api.spi.Registrations;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -89,19 +90,7 @@ public final class FeatherStyles {
      */
     public static synchronized void registerStyleProvider(ResourceLocation id, int priority, FeatherStyleProvider provider) {
         ProviderEntry entry = new ProviderEntry(Objects.requireNonNull(id), priority, Objects.requireNonNull(provider));
-        ProviderEntry[] current = providers;
-        ProviderEntry[] next = null;
-        for (int i = 0; i < current.length; i++) {
-            if (current[i].id().equals(id)) {
-                next = current.clone();
-                next[i] = entry;
-                break;
-            }
-        }
-        if (next == null) {
-            next = Arrays.copyOf(current, current.length + 1);
-            next[current.length] = entry;
-        }
+        ProviderEntry[] next = Registrations.withEntry(providers, entry, ProviderEntry::id);
         // Stable: equal priorities keep their registration order.
         Arrays.sort(next, Comparator.comparingInt(ProviderEntry::priority).reversed());
         providers = next;

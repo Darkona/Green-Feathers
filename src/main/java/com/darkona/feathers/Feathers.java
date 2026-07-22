@@ -17,6 +17,7 @@ import com.darkona.feathers.core.FeathersTicker;
 import com.darkona.feathers.core.HungerRegen;
 import com.darkona.feathers.data.DataMaps;
 import com.darkona.feathers.effect.ModEffects;
+import com.darkona.feathers.item.FeatherRingItem;
 import com.darkona.feathers.item.ModItems;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.registry.ModAttributes;
@@ -27,7 +28,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -61,7 +61,7 @@ public final class Feathers {
         modEventBus.addListener(FeathersTicker::onConfigChanged);
         modEventBus.addListener(Feathers::commonSetup);
         FeathersNetwork.register();
-        if (ModList.get().isLoaded("curios")) CuriosCompat.init(modEventBus);
+        if (FeatherRingItem.CURIOS) CuriosCompat.init(modEventBus);
 
         // The data maps: loaded with the server data, sent to each client when it joins and after every reload.
         MinecraftForge.EVENT_BUS.addListener((AddReloadListenerEvent event) -> event.addListener(new DataMaps.Loader(event.getConditionContext())));

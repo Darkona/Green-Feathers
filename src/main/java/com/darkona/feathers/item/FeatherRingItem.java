@@ -24,7 +24,8 @@ import static com.darkona.feathers.api.registry.FeathersIds.id;
 
 public class FeatherRingItem extends Item {
 
-    private static final boolean CURIOS = ModList.get().isLoaded("curios");
+    /** With Curios the ring is worn in a ring slot, without it held in the off hand. */
+    public static final boolean CURIOS = ModList.get().isLoaded("curios");
     /** Where the ring goes: a Curios ring slot, or the off hand. Built once, since a tooltip is rebuilt every frame. */
     private static final String TOOLTIP = "item.greenfeathers.feather_ring.tooltip." + (CURIOS ? "ring" : "offhand");
 

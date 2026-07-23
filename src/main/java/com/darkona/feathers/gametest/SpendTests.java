@@ -5,6 +5,7 @@ import com.darkona.feathers.api.FeathersView;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.event.StrainEvent;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.config.FeathersServerConfig;
@@ -16,12 +17,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.GameType;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+
+import java.util.function.Consumer;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.saveAndLoad;
+import static com.darkona.feathers.gametest.TestSupport.tick;
 
 /**
  * One-off spends: all or nothing, simulation, strain, exhaustion, bonus stamina, exemptions, multipliers.
@@ -85,6 +90,31 @@ public class SpendTests {
         helper.assertValueEqual(f.stamina(), 0, "stamina");
         helper.assertValueEqual(f.strain(), Stamina.ofFeathers(5), "strain");
         helper.assertFalse(f.exhausted(), "one feather of strain room is left");
+        helper.succeed();
+    }
+
+    /**
+     * Strain turned off in the config while a player is strained: the strain goes on the next tick, with its event,
+     * and the strained effect is not put on the player on the way out.
+     */
+    @GameTest(template = "empty")
+    public static void strainTurnedOffClearsStrainWithItsEvent(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(24));
+        boolean[] cleared = {false};
+        Consumer<StrainEvent.Cleared> listener = event -> cleared[0] |= event.getEntity() == player;
+        NeoForge.EVENT_BUS.addListener(StrainEvent.Cleared.class, listener);
+        boolean strain = FeathersServerConfig.ENABLE_STRAIN.get();
+        try {
+            FeathersServerConfig.ENABLE_STRAIN.set(false);
+            tick(player, 1);
+            helper.assertValueEqual(FeathersAPI.get(player).strain(), 0, "strain with strain turned off");
+            helper.assertTrue(cleared[0], "dropping the strain posts its event");
+            helper.assertFalse(player.hasEffect(FeathersMobEffects.STRAINED), "no strained effect without strain");
+        } finally {
+            FeathersServerConfig.ENABLE_STRAIN.set(strain);
+            NeoForge.EVENT_BUS.unregister(listener);
+        }
         helper.succeed();
     }
 

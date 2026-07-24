@@ -343,10 +343,15 @@ public final class FeathersServiceImpl implements FeathersService {
         ensureInitialized(entity, data);
         GainEvent event = NeoForge.EVENT_BUS.post(new GainEvent(entity, source, stamina));
         if (event.isCanceled()) return 0;
-        int gained = Math.clamp(data.maxStamina - data.stamina, 0, event.getAmount());
+        // Strain is stamina owed: paid back first, like regeneration does. Otherwise a gift while strained would leave
+        // stamina and strain side by side, which nothing else produces and the HUD can't draw.
+        int recovered = Math.min(data.strain, event.getAmount());
+        data.strain -= recovered;
+        int gained = Math.clamp(data.maxStamina - data.stamina, 0, event.getAmount() - recovered);
         data.stamina += gained;
+        if (recovered > 0 && data.strain == 0) NeoForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
         FeathersTicker.checkRecovered(entity, data);
-        return gained;
+        return recovered + gained;
     }
 
     @Override

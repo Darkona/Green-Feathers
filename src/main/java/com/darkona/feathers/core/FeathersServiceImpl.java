@@ -48,10 +48,11 @@ public final class FeathersServiceImpl implements FeathersService {
         FeathersView localView();
 
         /**
-         * Checks a spend on the local view like {@link #simulateAgainst} and pays it the way the server would, so the
-         * HUD reacts before the server's sync. EXEMPT until the first sync.
+         * Checks {@code cost}, already through the usage multiplier and the modifiers, on the local view like
+         * {@link #simulateAgainst} and pays it the way the server would, so the HUD reacts before the server's sync.
+         * EXEMPT until the first sync.
          */
-        SpendResult predictSpend(int stamina, SpendOptions options);
+        SpendResult payPredicted(int cost, SpendOptions options);
     }
 
     private static volatile ClientBridge clientBridge;
@@ -191,13 +192,27 @@ public final class FeathersServiceImpl implements FeathersService {
      * A base cost after the usage multiplier and the stamina modifiers.
      */
     static int effectiveCost(LivingEntity entity, FeathersData data, ResourceLocation source, double baseCost) {
-        AttributeInstance usage = data.usageAttribute(entity);
+        return effectiveCost(entity, data, data.usageAttribute(entity), source, baseCost);
+    }
+
+    /**
+     * A base cost after the usage multiplier and the stamina modifiers, against any view of the entity's feathers.
+     * The client prices its predictions with it: the usage multiplier is a synced attribute, and modifiers are
+     * registered on both sides.
+     */
+    public static int effectiveCost(LivingEntity entity, FeathersView feathers, @Nullable AttributeInstance usage,
+                                    ResourceLocation source, double baseCost) {
         // Clamped before narrowing: an "everything" cost times a multiplier would wrap negative and cost nothing.
         int cost = (int) Math.min(Integer.MAX_VALUE, Math.round(baseCost * (usage != null ? usage.getValue() : 1.0)));
         for (Extensions.ModifierEntry modifier : Extensions.modifiers()) {
-            cost = modifier.modifier().modifyCost(entity, data, source, cost);
+            cost = modifier.modifier().modifyCost(entity, feathers, source, cost);
         }
         return Math.max(0, cost);
+    }
+
+    /** A cost priced on the client against its view of the local player's feathers. */
+    private static int clientCost(LivingEntity entity, FeathersView feathers, ResourceLocation source, double baseCost) {
+        return effectiveCost(entity, feathers, entity.getAttribute(FeathersAttributes.USAGE_MULTIPLIER), source, baseCost);
     }
 
     @Override
@@ -207,8 +222,10 @@ public final class FeathersServiceImpl implements FeathersService {
         if (onClient(entity)) {
             ClientBridge bridge = clientBridge;
             if (bridge == null || !bridge.isLocalPlayer(entity)) return SpendResult.EXEMPT;
-            if (options.simulate()) return simulateAgainst(bridge.localView(), stamina, options.allowStrain(), options.ignoreExhaustion());
-            return bridge.predictSpend(stamina, options);
+            FeathersView local = bridge.localView();
+            int cost = stamina > 0 ? clientCost(entity, local, source, stamina) : 0;
+            if (options.simulate()) return simulateAgainst(local, cost, options.allowStrain(), options.ignoreExhaustion());
+            return bridge.payPredicted(cost, options);
         }
 
         FeathersData data = data(entity);
@@ -261,8 +278,8 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     /**
-     * Checks {@code cost} against a view without the usage multiplier or the modifiers: exhaustion, then stamina and
-     * bonus plus the strain room the spend may use. For views that are not the server's, such as the client's copy.
+     * Checks {@code cost}, already priced, against a view: exhaustion, then stamina and bonus plus the strain room the
+     * spend may use. For views that are not the server's, such as the client's copy.
      */
     public static SpendResult simulateAgainst(FeathersView view, int cost, boolean allowStrain, boolean ignoreExhaustion) {
         if (view.exhausted() && !ignoreExhaustion) return SpendResult.EXHAUSTED;
@@ -294,8 +311,9 @@ public final class FeathersServiceImpl implements FeathersService {
         if (!supports(entity) || isExempt(entity)) return SpendResult.EXEMPT;
         if (onClient(entity)) {
             ClientBridge bridge = clientBridge;
-            return bridge == null || !bridge.isLocalPlayer(entity) ? SpendResult.EXEMPT
-                    : simulateAgainst(bridge.localView(), (int) Math.ceil(staminaPerTick), options.allowStrain(), false);
+            if (bridge == null || !bridge.isLocalPlayer(entity)) return SpendResult.EXEMPT;
+            FeathersView local = bridge.localView();
+            return simulateAgainst(local, clientCost(entity, local, source, Math.ceil(staminaPerTick)), options.allowStrain(), false);
         }
 
         FeathersData data = data(entity);

@@ -220,8 +220,9 @@ public final class FeathersAPI {
     }
 
     /**
-     * Sets stamina directly and clamps it to the maximum. Use this for commands and scripted events. Normal gameplay
-     * should use {@link #spend} or {@link #gain}.
+     * Sets stamina directly and clamps it to the maximum. Any stamina above zero clears the strain (and posts
+     * {@code StrainEvent.Cleared}): stamina and strain never sit side by side. Use this for commands and scripted
+     * events. Normal gameplay should use {@link #spend} or {@link #gain}.
      *
      * @param entity  the entity to update
      * @param stamina the new amount in stamina units

@@ -4,12 +4,16 @@ import com.darkona.feathers.api.DrainOptions;
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
+import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.config.FeathersServerConfig;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -31,6 +35,28 @@ public class RegenTests {
         ServerPlayer player = player(helper);
         FeathersAPI.setStamina(player, 0);
         return player;
+    }
+
+    /**
+     * The game keeps attribute bases when a player dies and respawns, and so do the maximum and regeneration set by
+     * {@code /feathers max} and {@code /feathers regen}: the respawned player does not get the config's back.
+     */
+    @GameTest(template = "empty")
+    public static void commandBasesSurviveDeath(GameTestHelper helper) {
+        ServerPlayer dead = player(helper);
+        NeoForge.EVENT_BUS.post(new EntityJoinLevelEvent(dead, helper.getLevel()));
+        FeathersAPI.setMaxFeathers(dead, 30);
+        FeathersAPI.setBaseRegenPerSecond(dead, 1.5);
+
+        // PlayerList.respawn: restoreFrom copies the bases, posts the clone event, then the new player joins the level.
+        ServerPlayer respawned = player(helper);
+        respawned.getAttributes().assignBaseValues(dead.getAttributes());
+        NeoForge.EVENT_BUS.post(new PlayerEvent.Clone(respawned, dead, true));
+        NeoForge.EVENT_BUS.post(new EntityJoinLevelEvent(respawned, helper.getLevel()));
+
+        helper.assertValueEqual(respawned.getAttributeBaseValue(FeathersAttributes.MAX_FEATHERS), 30.0, "max feathers after respawning");
+        helper.assertValueEqual(respawned.getAttributeBaseValue(FeathersAttributes.FEATHERS_PER_SECOND), 1.5, "regeneration after respawning");
+        helper.succeed();
     }
 
     @GameTest(template = "empty")

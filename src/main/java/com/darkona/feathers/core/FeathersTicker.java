@@ -99,8 +99,20 @@ public final class FeathersTicker {
 
     @SubscribeEvent
     public static void onClone(PlayerEvent.Clone event) {
-        // NeoForge copied the attachment unless this was a death. In both cases, synchronize the resulting state.
-        FeathersServiceImpl.data(event.getEntity()).forceSync = true;
+        FeathersData data = FeathersServiceImpl.data(event.getEntity());
+        // NeoForge copies the attachment unless this is a death. The game keeps every attribute base on death too, so
+        // the config values they were set from go along: a base set by /feathers max or regen survives respawning.
+        if (event.isWasDeath() && event.getOriginal().hasData(FeathersAttachments.FEATHERS)) {
+            FeathersData original = FeathersServiceImpl.data(event.getOriginal());
+            copyCounter(original, data, BASE_MAX);
+            copyCounter(original, data, BASE_STRAIN);
+            copyCounter(original, data, BASE_REGEN);
+        }
+        data.forceSync = true;
+    }
+
+    private static void copyCounter(FeathersData from, FeathersData to, String key) {
+        if (from.counters.containsKey(key)) to.setCounter(key, from.getCounter(key));
     }
 
     @SubscribeEvent

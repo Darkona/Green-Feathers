@@ -21,3 +21,19 @@ Supported out of the box, each with its own switch in `Feathers-Compat.toml`:
 | Curios | The Feather Ring goes in a ring slot |
 | Jade | Shows a mount's stamina when you look at it |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
+
+## Versions
+
+Green Feathers calls into these mods directly, so it accepts the versions it was tested with, up to the next major version. With a version outside that range, the game stops at load and names the mod and the range, instead of crashing later in the middle of play.
+
+| Mod | Accepted versions (1.21.1) |
+|---|---|
+| Cold Sweat | 2.4.3.1 up to 3 |
+| Tough As Nails | 10.1.0.13 up to 11 |
+| Legendary Survival Overhaul | 2.4.7.2 up to 3 |
+| Blue Droplets | 1.21.1-3.0.0 up to 1.21.1-4 |
+| Thirst Was Taken | 1.21.1-2.1.5 up to 1.21.1-3 |
+| Serene Seasons | 10.1.0.9 up to 11 |
+| Curios | 9.5.1 up to 10 |
+| Jade | 15.10.6 up to 16 |
+| Overflowing Bars | 21.1.1 up to 22 |

@@ -58,6 +58,7 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 - Serene Seasons: winter outdoors is cold, summer sun is hot.
 - Curios: the Feather Ring goes in a ring slot.
 - AppleSkin, Overflowing Bars, Jade: sit nicely alongside the feathers.
+- Each supported mod declares the versions it accepts; a version outside them stops the game at load with a message instead of a crash in play.
 
 ### Configuration
 

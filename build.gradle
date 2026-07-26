@@ -169,6 +169,15 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             mod_version            : mod_version,
             mod_authors            : mod_authors,
             mod_description        : mod_description,
+            cold_sweat_range       : cold_sweat_range,
+            thirst_range           : thirst_range,
+            blue_droplets_range    : blue_droplets_range,
+            tough_as_nails_range   : tough_as_nails_range,
+            serene_seasons_range   : serene_seasons_range,
+            lso_range              : lso_range,
+            overflowing_bars_range : overflowing_bars_range,
+            curios_range           : curios_range,
+            jade_range             : jade_range,
     ]
     inputs.properties replaceProperties
     expand replaceProperties

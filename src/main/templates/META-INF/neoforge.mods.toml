@@ -25,5 +25,68 @@ versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
+[[dependencies.${mod_id}]]
+modId = "cold_sweat"
+type = "optional"
+versionRange = "${cold_sweat_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "thirst"
+type = "optional"
+versionRange = "${thirst_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "bluedroplets"
+type = "optional"
+versionRange = "${blue_droplets_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "toughasnails"
+type = "optional"
+versionRange = "${tough_as_nails_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "sereneseasons"
+type = "optional"
+versionRange = "${serene_seasons_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "legendarysurvivaloverhaul"
+type = "optional"
+versionRange = "${lso_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "overflowingbars"
+type = "optional"
+versionRange = "${overflowing_bars_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "curios"
+type = "optional"
+versionRange = "${curios_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "jade"
+type = "optional"
+versionRange = "${jade_range}"
+ordering = "NONE"
+side = "BOTH"
+
 [[mixins]]
 config = "greenfeathers.mixins.json"

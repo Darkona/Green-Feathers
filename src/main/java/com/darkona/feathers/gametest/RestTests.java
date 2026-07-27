@@ -90,7 +90,6 @@ public class RestTests {
     @GameTest(template = "empty")
     public static void onlyANightSleptThroughRestoresFeathers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        long dayTime = level.getDayTime();
         try {
             level.setDayTime(18000);
             level.updateSkyBrightness();
@@ -108,8 +107,7 @@ public class RestTests {
             wakeUp(player, false, true);
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after the day broke over the bed");
         } finally {
-            level.setDayTime(dayTime);
-            level.updateSkyBrightness();
+            TestSupport.clearNoon(level);
         }
         helper.succeed();
     }

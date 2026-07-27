@@ -58,8 +58,9 @@ public final class FeathersHud {
 
     private static final ClientFeathersData DATA = ClientFeathersData.INSTANCE;
 
-    /* Animation state, advanced once per client tick by tickAnimations. */
-    private static int previousFeathers;
+    /* Animation state, advanced once per client tick by tickAnimations and cleared by reset. */
+    private static final int UNKNOWN_FEATHERS = -1;
+    private static int previousFeathers = UNKNOWN_FEATHERS;
     private static int regenFlashTicks;
     private static int fullTicks;
     private static float alpha = 1.0f;
@@ -88,10 +89,27 @@ public final class FeathersHud {
 
     private FeathersHud() {}
 
+    /**
+     * Back to a bar never drawn, on leaving a world: the next one starts without a regeneration flash or a fade.
+     */
+    public static void reset() {
+        previousFeathers = UNKNOWN_FEATHERS;
+        regenFlashTicks = 0;
+        fullTicks = 0;
+        alpha = 1.0f;
+        motion = null;
+        wave = 0;
+        shakeClock = 0;
+        pulsePhase = 0;
+        pulse = 0;
+    }
+
     public static void tickAnimations() {
         int feathers = DATA.feathers();
-        if (feathers > previousFeathers && FeathersClientConfig.REGEN_EFFECT.get() && regenFlashTicks <= 0) regenFlashTicks = 18;
-        previousFeathers = feathers;
+        // The first sync is no regeneration: the flash waits for a count the client already had.
+        if (previousFeathers != UNKNOWN_FEATHERS && feathers > previousFeathers && FeathersClientConfig.REGEN_EFFECT.get()
+                && regenFlashTicks <= 0) regenFlashTicks = 18;
+        previousFeathers = DATA.hasFeathers() ? feathers : UNKNOWN_FEATHERS;
         if (regenFlashTicks > 0) regenFlashTicks--;
 
         LocalPlayer player = Minecraft.getInstance().player;

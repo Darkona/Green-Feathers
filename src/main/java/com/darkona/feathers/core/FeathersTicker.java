@@ -260,7 +260,7 @@ public final class FeathersTicker {
         FeathersServiceImpl.refreshMaximums(entity, data);
 
         // The multiplier changes through other mods' items (e.g. a Curios ring) with no event of its own.
-        AttributeInstance multiplier = entity.getAttribute(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER);
+        AttributeInstance multiplier = data.weightMultiplierAttribute(entity);
         double value = multiplier != null ? multiplier.getValue() : 1.0;
         if (value != data.lastWeightMultiplier) {
             data.lastWeightMultiplier = value;

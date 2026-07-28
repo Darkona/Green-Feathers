@@ -26,6 +26,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
 
@@ -172,10 +173,34 @@ public final class ArmorWeights {
     public static double pieceWeight(ItemStack stack) {
         int base = baseWeight(stack);
         if (base == 0) return 0;
-        int lightweight = enchantmentLevel(FeathersEnchantments.LIGHTWEIGHT, stack);
-        int heavy = enchantmentLevel(FeathersEnchantments.HEAVY, stack);
-        double lightness = Math.max(0.0, 1.0 - lightweight * FeathersServerConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
-        return base * lightness * (1 + heavy);
+        EnchantmentLevels levels = enchantmentLevels(stack.getTagEnchantments());
+        double lightness = Math.max(0.0, 1.0 - levels.lightweight() * FeathersServerConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
+        return base * lightness * (1 + levels.heavy());
+    }
+
+    /** A stack's Lightweight and Heavy levels, read from its enchantments component. */
+    private record EnchantmentLevels(ItemEnchantments enchantments, int lightweight, int heavy) {}
+
+    private static final EnchantmentLevels NO_LEVELS = new EnchantmentLevels(ItemEnchantments.EMPTY, 0, 0);
+    /** The last component read: a tooltip asks for the same stack every frame, and the component is immutable. */
+    private static volatile EnchantmentLevels lastLevels = NO_LEVELS;
+
+    /**
+     * Reads the levels straight from the component, so no registry access is needed.
+     */
+    private static EnchantmentLevels enchantmentLevels(ItemEnchantments enchantments) {
+        if (enchantments.isEmpty()) return NO_LEVELS;
+        EnchantmentLevels levels = lastLevels;
+        if (levels.enchantments() == enchantments) return levels;
+        int lightweight = 0;
+        int heavy = 0;
+        for (Object2IntMap.Entry<Holder<Enchantment>> e : enchantments.entrySet()) {
+            if (e.getKey().is(FeathersEnchantments.LIGHTWEIGHT)) lightweight = e.getIntValue();
+            else if (e.getKey().is(FeathersEnchantments.HEAVY)) heavy = e.getIntValue();
+        }
+        levels = new EnchantmentLevels(enchantments, lightweight, heavy);
+        lastLevels = levels;
+        return levels;
     }
 
     /** The head armor share in a {@link WeightSplit}. */
@@ -305,16 +330,5 @@ public final class ArmorWeights {
     private static void setFeathers(WeightSplit split, int i, int feathers) {
         if (i < PARTS) split.parts[i] = feathers;
         else split.sources.set(2 * (i - PARTS) + 1, feathers);
-    }
-
-    /**
-     * Reads the level straight from the stack's enchantments, so no registry access is needed.
-     */
-    public static int enchantmentLevel(ResourceKey<Enchantment> enchantment, ItemStack stack) {
-        if (stack.isEmpty() || !stack.isEnchanted()) return 0;
-        for (Object2IntMap.Entry<Holder<Enchantment>> e : stack.getTagEnchantments().entrySet()) {
-            if (e.getKey().is(enchantment)) return e.getIntValue();
-        }
-        return 0;
     }
 }

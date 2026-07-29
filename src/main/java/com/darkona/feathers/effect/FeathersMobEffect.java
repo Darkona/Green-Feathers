@@ -7,6 +7,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base of the feathers effects. {@link #canApply} is binding: {@link EffectEvents} refuses the effect otherwise.
@@ -26,8 +27,10 @@ public class FeathersMobEffect extends MobEffect {
 
     /**
      * The effect was added to an entity that {@link #canApply} accepted.
+     *
+     * @param previous the instance it replaces (a refresh or a stronger level), or null for a new effect
      */
-    public void onApplied(LivingEntity entity, MobEffectInstance instance) {}
+    public void onApplied(LivingEntity entity, MobEffectInstance instance, @Nullable MobEffectInstance previous) {}
 
     /**
      * The effect was removed or expired.

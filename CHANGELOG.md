@@ -37,7 +37,7 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 
 ### Potions
 
-- Endurance (golden bonus feathers), Energy (faster regeneration), Momentum (cheaper actions), Cooling.
+- Endurance (golden bonus feathers; another potion extends what is left, a stronger one adds its extra feathers), Energy (faster regeneration), Momentum (cheaper actions), Cooling.
 
 ### HUD
 

@@ -314,6 +314,12 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
         }
     }
 
+    /** The stamina left in {@code source}'s bonus pool, 0 without one. */
+    public int bonusStamina(ResourceLocation source) {
+        Bonus bonus = bonus(source);
+        return bonus != null ? bonus.amount : 0;
+    }
+
     boolean removeBonus(ResourceLocation source) {
         int i = indexOf(bonuses, source);
         if (i >= 0) bonuses.remove(i);

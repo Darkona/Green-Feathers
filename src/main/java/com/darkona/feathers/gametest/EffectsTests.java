@@ -12,8 +12,12 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+
+import java.util.function.Consumer;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.player;
@@ -33,6 +37,29 @@ public class EffectsTests {
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200));
         helper.assertFalse(player.addEffect(new MobEffectInstance(FeathersMobEffects.HOT, 200)), "Heat applied despite Fire Resistance");
         helper.assertFalse(player.addEffect(new MobEffectInstance(FeathersMobEffects.FATIGUE, 200)), "Fatigue applied despite Fire Resistance");
+        helper.succeed();
+    }
+
+    /**
+     * Heat that Fire Resistance refuses is not offered to the player again at every climate check.
+     */
+    @GameTest(template = "empty")
+    public static void refusedHeatIsNotOfferedAgain(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 600));
+        int[] offered = {0};
+        Consumer<MobEffectEvent.Applicable> listener = event -> {
+            if (event.getEntity() == player && event.getEffectInstance().is(FeathersMobEffects.HOT)) offered[0]++;
+        };
+        NeoForge.EVENT_BUS.addListener(MobEffectEvent.Applicable.class, listener);
+        try {
+            ClimateEffects.apply(player, Climate.HOT);
+            ClimateEffects.apply(player, Climate.HOT);
+        } finally {
+            NeoForge.EVENT_BUS.unregister(listener);
+        }
+        helper.assertFalse(player.hasEffect(FeathersMobEffects.HOT), "Heat under Fire Resistance");
+        helper.assertValueEqual(offered[0], 0, "Heat offered under Fire Resistance");
         helper.succeed();
     }
 

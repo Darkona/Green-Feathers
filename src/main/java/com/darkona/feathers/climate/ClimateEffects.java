@@ -66,7 +66,8 @@ public final class ClimateEffects {
         boolean permanent = current != null && current.isInfiniteDuration();
 
         if (active) {
-            if (!permanent) {
+            // A refused effect (Heat under Fire Resistance) is not offered again every interval.
+            if (!permanent && canApply(entity, effect)) {
                 entity.addEffect(new MobEffectInstance(effect, MobEffectInstance.INFINITE_DURATION, 0, false, true));
             }
         } else if (permanent) {
@@ -77,8 +78,10 @@ public final class ClimateEffects {
     }
 
     private static void removeIfRefused(LivingEntity entity, Holder<MobEffect> effect) {
-        if (entity.hasEffect(effect) && effect.value() instanceof FeathersMobEffect fe && !fe.canApply(entity)) {
-            entity.removeEffect(effect);
-        }
+        if (entity.hasEffect(effect) && !canApply(entity, effect)) entity.removeEffect(effect);
+    }
+
+    private static boolean canApply(LivingEntity entity, Holder<MobEffect> effect) {
+        return !(effect.value() instanceof FeathersMobEffect feathersEffect) || feathersEffect.canApply(entity);
     }
 }

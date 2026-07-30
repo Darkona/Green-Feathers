@@ -1,9 +1,7 @@
 package com.darkona.feathers.mount;
 
-import com.darkona.feathers.api.MountStats;
 import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
-import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.core.FeathersData;
 import com.darkona.feathers.core.FeathersServiceImpl;
 import net.minecraft.util.Mth;
@@ -66,12 +64,10 @@ public final class MountTraits {
 
     /** The creature's range: its mount stats data map entry, else the config. */
     private static double min(LivingEntity mount) {
-        MountStats stats = FeathersServiceImpl.mountStats(mount);
-        return Math.min(stats.minFeathers().orElseGet(FeathersServerConfig.MOUNT_MIN_FEATHERS), stats.maxFeathers().orElseGet(FeathersServerConfig.MOUNT_MAX_FEATHERS));
+        return FeathersServiceImpl.mountTuning(mount).minFeathers();
     }
 
     private static double max(LivingEntity mount) {
-        MountStats stats = FeathersServiceImpl.mountStats(mount);
-        return Math.max(stats.minFeathers().orElseGet(FeathersServerConfig.MOUNT_MIN_FEATHERS), stats.maxFeathers().orElseGet(FeathersServerConfig.MOUNT_MAX_FEATHERS));
+        return FeathersServiceImpl.mountTuning(mount).maxFeathers();
     }
 }

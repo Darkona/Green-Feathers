@@ -189,7 +189,7 @@ public final class FeathersTicker {
 
     /**
      * Sets an attribute base from the config, unless something else (a command, the API) changed it since the config
-     * last set it: that value is kept across rejoins, dimension changes and config reloads.
+     * last set it: that value is kept across rejoins, deaths, dimension changes and config reloads.
      */
     private static void configBase(LivingEntity entity, FeathersData data, Holder<Attribute> attribute, String key, double value) {
         AttributeInstance instance = entity.getAttribute(attribute);

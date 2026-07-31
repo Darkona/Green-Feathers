@@ -98,9 +98,6 @@ public final class ClientEvents {
         FeathersHud.reset();
     }
 
-    /**
-     * Shows how much an armor piece weighs, counting its enchantments.
-     */
     /** Icon strings by weight in half icons: a tooltip is rebuilt every frame while hovered. */
     private static final String[] WEIGHT_ICONS = new String[41];
 
@@ -115,6 +112,9 @@ public final class ClientEvents {
         return built;
     }
 
+    /**
+     * Shows how much an armor piece weighs, counting its enchantments.
+     */
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();

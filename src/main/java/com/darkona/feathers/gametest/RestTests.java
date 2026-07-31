@@ -85,7 +85,8 @@ public class RestTests {
 
     /**
      * Only a night slept through restores the feathers: "Leave Bed" at night, after the five seconds the level counts
-     * as sleeping, does not (in multiplayer the other players may be up, and the night goes on).
+     * as sleeping, does not (in multiplayer the other players may be up, and the night goes on). A sleep mod that skips
+     * the night itself and wakes the players with {@code stopSleeping()} does restore them, by day.
      */
     @GameTest(template = "empty")
     public static void onlyANightSleptThroughRestoresFeathers(GameTestHelper helper) {
@@ -97,15 +98,25 @@ public class RestTests {
             wakeUp(player, false, true);
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after leaving the bed at night");
             wakeUp(player, true, false);
-            helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after the bed broke");
+            helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after disconnecting at night");
             wakeUp(player, false, false);
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after the level skipped the night");
+
+            player = sleeper(helper);
+            player.stopSleeping();
+            helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after being woken at once at night");
 
             level.setDayTime(6000);
             level.updateSkyBrightness();
             player = sleeper(helper);
             wakeUp(player, false, true);
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after the day broke over the bed");
+            player = sleeper(helper);
+            player.stopSleeping();
+            helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after a sleep mod woke the player by day");
+            player = sleeper(helper);
+            wakeUp(player, true, false);
+            helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after disconnecting by day");
         } finally {
             TestSupport.clearNoon(level);
         }

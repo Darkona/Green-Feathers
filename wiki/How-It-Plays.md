@@ -34,8 +34,7 @@ you've regained part of your bar (30% by default) with no strain left.
 
 ## Resting
 
-Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back
-faster. Sleeping through the night restores everything.
+Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back faster. Sleeping through the night restores everything, also when a sleep mod skips the night for you. Leaving the bed before morning restores nothing.
 
 ## Food (optional)
 

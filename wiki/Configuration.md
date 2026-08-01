@@ -8,9 +8,7 @@ Green Feathers has three config files in `config/feathers/`:
 | `Feathers-Compat.toml` | Server | One section per supported mod, each with its own switch |
 | `Feathers-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
 
-Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same
-rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each
-player's own.
+Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each player's own.
 
 Changes to the server configs apply while the game runs.
 

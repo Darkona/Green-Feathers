@@ -193,21 +193,17 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     /**
-     * Reads the max feathers and max strain attributes.
-     *
-     * @return whether either changed
+     * Reads the max feathers and max strain attributes, and clamps the stamina to the new maximum.
      */
-    @SuppressWarnings("UnusedReturnValue")
-    static boolean refreshMaximums(LivingEntity entity, FeathersData data) {
+    static void refreshMaximums(LivingEntity entity, FeathersData data) {
         AttributeInstance maxFeathers = data.maxFeathersAttribute(entity);
         AttributeInstance maxStrain = data.maxStrainAttribute(entity);
         int max = maxFeathers != null ? Stamina.ofFeathers(maxFeathers.getValue()) : 0;
         int strainMax = maxStrain != null ? Stamina.ofFeathers(maxStrain.getValue()) : 0;
-        if (max == data.maxStamina && strainMax == data.maxStrain) return false;
+        if (max == data.maxStamina && strainMax == data.maxStrain) return;
         data.maxStamina = max;
         data.maxStrain = strainMax;
         if (data.stamina > max) data.stamina = max;
-        return true;
     }
 
     /* Costs */

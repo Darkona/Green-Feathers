@@ -5,12 +5,20 @@ import com.darkona.feathers.api.RestState;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.registry.FeathersIds;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+import java.util.UUID;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.assertValueEqual;
@@ -18,7 +26,7 @@ import static com.darkona.feathers.gametest.TestSupport.player;
 import static com.darkona.feathers.gametest.TestSupport.tick;
 
 /**
- * Resting speeds up paying strain back, and so do API rest bonuses.
+ * Resting speeds up paying strain back, and so do API rest bonuses. A night slept through restores everything.
  */
 @GameTestHolder(FeathersIds.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -44,6 +52,66 @@ public class RestTests {
         int activeStrain = FeathersAPI.get(active).strain();
         int restingStrain = FeathersAPI.get(resting).strain();
         helper.assertTrue(restingStrain < activeStrain, "crouching still should recover faster: " + restingStrain + " vs " + activeStrain);
+        helper.succeed();
+    }
+
+    /**
+     * A player that slept long enough (the level wakes sleepers only then) and lies in bed: sleeping is what the
+     * wake-up event checks, not the bed.
+     */
+    private static Player sleeper(GameTestHelper helper) {
+        Player player = new Player(helper.getLevel(), BlockPos.ZERO, 0f, new GameProfile(UUID.randomUUID(), "feathers-sleeper")) {
+            @Override
+            public boolean isSpectator() {
+                return false;
+            }
+
+            @Override
+            public boolean isCreative() {
+                return false;
+            }
+
+            @Override
+            public boolean isSleepingLongEnough() {
+                return true;
+            }
+        };
+        FeathersAPI.spend(player, id("test"), Stamina.ofFeathers(10));
+        return player;
+    }
+
+    private static void wakeUp(Player player, boolean wakeImmediately, boolean updateLevel) {
+        MinecraftForge.EVENT_BUS.post(new PlayerWakeUpEvent(player, wakeImmediately, updateLevel));
+    }
+
+    /**
+     * Only a night slept through restores the feathers: "Leave Bed" at night, after the five seconds the level counts
+     * as sleeping, does not (in multiplayer the other players may be up, and the night goes on).
+     */
+    @GameTest(template = "empty")
+    public static void onlyANightSleptThroughRestoresFeathers(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        long dayTime = level.getDayTime();
+        try {
+            level.setDayTime(18000);
+            level.updateSkyBrightness();
+            Player player = sleeper(helper);
+            wakeUp(player, false, true);
+            assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after leaving the bed at night");
+            wakeUp(player, true, false);
+            assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after the bed broke");
+            wakeUp(player, false, false);
+            assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after the level skipped the night");
+
+            level.setDayTime(6000);
+            level.updateSkyBrightness();
+            player = sleeper(helper);
+            wakeUp(player, false, true);
+            assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after the day broke over the bed");
+        } finally {
+            level.setDayTime(dayTime);
+            level.updateSkyBrightness();
+        }
         helper.succeed();
     }
 

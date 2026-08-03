@@ -234,10 +234,12 @@ public final class FeathersTicker {
             regenerate(entity, data);
 
             data.lastDelta = data.stamina - staminaBefore;
+            // Strain turned off in the config while strained: dropped here, before the check below, so its clearing
+            // posts the event and the strained effect goes with it.
+            if (!strainEnabled && data.strain > 0) data.strain = 0;
             boolean strained = data.strain > 0;
             // A spend or drain starts strain and posts its event. This path only recovers existing strain.
             if (strainedBefore && !strained) MinecraftForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
-            if (!strainEnabled && data.strain > 0) data.strain = 0;
 
             FeathersServiceImpl.checkExhausted(entity, data, strainEnabled);
             checkRecovered(entity, data);

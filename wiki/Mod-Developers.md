@@ -23,10 +23,7 @@ if (FeathersAPI.spend(player, MY_DASH, Stamina.ofFeathers(3)).allowed()) dash(pl
 if (!FeathersAPI.startDrain(player, MY_GLIDE, Stamina.perTick(1.5)).allowed()) stopGliding(player);
 ```
 
-The source (`MY_DASH`) is your own `ResourceLocation`: it shows in `/feathers debug` and in the spend events.
-`SpendOptions` asks for a spend that never strains, a simulated one, or its own regeneration pause. `canSpend`
-checks without spending. On the client, a spend predicts the result against the synced feathers; the server's
-decision is what counts.
+The source (`MY_DASH`) is your own `ResourceLocation`: it shows in `/feathers debug` and in the spend events. `SpendOptions` asks for a spend that never strains, a simulated one, or its own regeneration pause. `canSpend` checks without spending. On the client, a spend predicts the result against the synced feathers, priced like on the server (usage multiplier and stamina modifiers, with the same source); the server's decision is what counts. `ClientFeathers.predictSpend` does the same for actions decided on the client.
 
 ## Reading
 

@@ -6,6 +6,7 @@ import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.Stamina;
 import com.darkona.feathers.api.event.StrainEvent;
+import com.darkona.feathers.api.registry.FeathersAttributes;
 import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.config.FeathersServerConfig;
@@ -209,6 +210,21 @@ public class SpendTests {
         player.addEffect(new MobEffectInstance(FeathersMobEffects.HOT.get(), 200));
         FeathersAPI.spend(player, TEST, Stamina.ofFeathers(3));
         assertValueEqual(helper, FeathersAPI.get(player).stamina(), Stamina.ofFeathers(13), "a cost doubled by heat that came after the first spend");
+        helper.succeed();
+    }
+
+    /**
+     * The client prices a predicted spend like the server: the usage multiplier (Heat doubles it) and the stamina
+     * modifiers, against the view it has.
+     */
+    @GameTest(template = "empty")
+    public static void clientPricingMatchesTheServer(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        player.addEffect(new MobEffectInstance(FeathersMobEffects.HOT.get(), 200));
+        int priced = FeathersServiceImpl.effectiveCost(player, view(false), player.getAttribute(FeathersAttributes.USAGE_MULTIPLIER.get()), TEST, Stamina.ofFeathers(3));
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(3));
+        assertValueEqual(helper, priced, Stamina.ofFeathers(20) - FeathersAPI.get(player).stamina(), "the client's price against the server's");
+        assertValueEqual(helper, priced, Stamina.ofFeathers(6), "a cost doubled by heat");
         helper.succeed();
     }
 

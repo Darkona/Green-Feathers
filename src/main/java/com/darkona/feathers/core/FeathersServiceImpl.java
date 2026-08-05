@@ -409,6 +409,11 @@ public final class FeathersServiceImpl implements FeathersService {
         FeathersData data = data(entity);
         ensureInitialized(entity, data);
         data.stamina = Mth.clamp(stamina, 0, data.maxStamina);
+        // Strain is owed from an empty bar: a bar set above zero owes nothing.
+        if (data.stamina > 0 && data.strain > 0) {
+            data.strain = 0;
+            MinecraftForge.EVENT_BUS.post(new StrainEvent.Cleared(entity));
+        }
         FeathersTicker.checkRecovered(entity, data);
     }
 

@@ -126,6 +126,34 @@ public class SpendTests {
     }
 
     /**
+     * Setting the feathers of a strained player (the API, {@code /feathers set}) clears the strain, with its event:
+     * stamina and strain never sit side by side. Setting them to zero keeps it.
+     */
+    @GameTest(template = "empty")
+    public static void settingFeathersClearsStrain(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(24));
+        boolean[] cleared = {false};
+        Consumer<StrainEvent.Cleared> listener = event -> cleared[0] |= event.getEntity() == player;
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, StrainEvent.Cleared.class, listener);
+        try {
+            FeathersAPI.setStamina(player, 0);
+            assertValueEqual(helper, FeathersAPI.get(player).strain(), Stamina.ofFeathers(4), "strain after setting no feathers");
+            helper.assertFalse(cleared[0], "strain not cleared yet");
+
+            var server = helper.getLevel().getServer();
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withEntity(player).withSuppressedOutput(), "feathers set @s 10");
+            FeathersView f = FeathersAPI.get(player);
+            assertValueEqual(helper, f.stamina(), Stamina.ofFeathers(10), "stamina set by the command");
+            assertValueEqual(helper, f.strain(), 0, "strain after setting feathers");
+            helper.assertTrue(cleared[0], "clearing the strain posts its event");
+        } finally {
+            MinecraftForge.EVENT_BUS.unregister(listener);
+        }
+        helper.succeed();
+    }
+
+    /**
      * Strain turned off in the config while a player is strained: the strain goes on the next tick, with its event,
      * and the strained effect is not put on the player on the way out.
      */

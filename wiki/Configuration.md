@@ -21,7 +21,7 @@ Operators (permission level 2) can inspect and adjust feathers:
 | Command | What it does |
 |---|---|
 | `/feathers info <targets>` | Shows their feathers, strain, weight and state |
-| `/feathers set <targets> <amount>` | Sets their feathers |
+| `/feathers set <targets> <amount>` | Sets their feathers; above zero it also clears their strain |
 | `/feathers reset <targets>` | Full feathers, no strain, not exhausted |
 | `/feathers max <targets> <amount>` | Sets their base maximum feathers (kept across rejoins) |
 | `/feathers regen <targets> <amount>` | Sets their base regeneration, in feathers per second (kept across rejoins) |

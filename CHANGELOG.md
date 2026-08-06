@@ -53,7 +53,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.20.1 with the same featu
 
 ### Compatibility
 
-Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.20.1 Forge builds:
+Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.20.1 Forge builds, and each accepts versions up to its next major one: another version stops the game at load with a message instead of a crash in play.
 
 - Cold Sweat 2.4.3.2: body temperature decides cold and heat.
 - Tough As Nails 9.2.0.171: its temperature decides cold and heat; its thirst affects regeneration.

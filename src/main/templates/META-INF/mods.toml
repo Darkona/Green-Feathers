@@ -24,3 +24,59 @@ mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "cold_sweat"
+mandatory = false
+versionRange = "${cold_sweat_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "thirst"
+mandatory = false
+versionRange = "${thirst_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "toughasnails"
+mandatory = false
+versionRange = "${tough_as_nails_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "sereneseasons"
+mandatory = false
+versionRange = "${serene_seasons_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "legendarysurvivaloverhaul"
+mandatory = false
+versionRange = "${lso_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "overflowingbars"
+mandatory = false
+versionRange = "${overflowing_bars_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "curios"
+mandatory = false
+versionRange = "${curios_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "jade"
+mandatory = false
+versionRange = "${jade_range}"
+ordering = "NONE"
+side = "BOTH"

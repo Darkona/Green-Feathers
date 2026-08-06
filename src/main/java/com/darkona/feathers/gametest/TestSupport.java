@@ -12,6 +12,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -70,10 +71,23 @@ final class TestSupport {
     }
 
     static ServerPlayer player(GameTestHelper helper) {
+        clearNoon(helper.getLevel());
         ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "feathers-test"));
         player.moveTo(helper.absoluteVec(Vec3.ZERO));
         FeathersAPI.get(player);
         return player;
+    }
+
+    /**
+     * Noon under a clear sky, whenever the batch happens to run: the vanilla climate and Serene Seasons read the sun,
+     * and rain on a cold biome chills.
+     */
+    static void clearNoon(ServerLevel level) {
+        level.setDayTime(6000);
+        level.setWeatherParameters(24000, 0, false, false);
+        level.setRainLevel(0);
+        level.setThunderLevel(0);
+        level.updateSkyBrightness();
     }
 
     static void tick(ServerPlayer player, int ticks) {

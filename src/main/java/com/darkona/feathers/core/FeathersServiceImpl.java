@@ -206,8 +206,8 @@ public final class FeathersServiceImpl implements FeathersService {
      */
     @SuppressWarnings("UnusedReturnValue")
     static boolean refreshMaximums(LivingEntity entity, FeathersData data) {
-        AttributeInstance maxFeathers = entity.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
-        AttributeInstance maxStrain = entity.getAttribute(FeathersAttributes.MAX_STRAIN.get());
+        AttributeInstance maxFeathers = data.maxFeathersAttribute(entity);
+        AttributeInstance maxStrain = data.maxStrainAttribute(entity);
         int max = maxFeathers != null ? Stamina.ofFeathers(maxFeathers.getValue()) : 0;
         int strainMax = maxStrain != null ? Stamina.ofFeathers(maxStrain.getValue()) : 0;
         if (max == data.maxStamina && strainMax == data.maxStrain) return false;

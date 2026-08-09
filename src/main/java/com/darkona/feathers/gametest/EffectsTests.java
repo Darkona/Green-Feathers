@@ -12,8 +12,13 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+import java.util.function.Consumer;
 
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 import static com.darkona.feathers.gametest.TestSupport.assertValueEqual;
@@ -34,6 +39,29 @@ public class EffectsTests {
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200));
         helper.assertFalse(player.addEffect(new MobEffectInstance(FeathersMobEffects.HOT.get(), 200)), "Heat applied despite Fire Resistance");
         helper.assertFalse(player.addEffect(new MobEffectInstance(FeathersMobEffects.FATIGUE.get(), 200)), "Fatigue applied despite Fire Resistance");
+        helper.succeed();
+    }
+
+    /**
+     * Heat that Fire Resistance refuses is not offered to the player again at every climate check.
+     */
+    @GameTest(template = "empty")
+    public static void refusedHeatIsNotOfferedAgain(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 600));
+        int[] offered = {0};
+        Consumer<MobEffectEvent.Applicable> listener = event -> {
+            if (event.getEntity() == player && event.getEffectInstance().getEffect() == FeathersMobEffects.HOT.get()) offered[0]++;
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, MobEffectEvent.Applicable.class, listener);
+        try {
+            ClimateEffects.apply(player, Climate.HOT);
+            ClimateEffects.apply(player, Climate.HOT);
+        } finally {
+            MinecraftForge.EVENT_BUS.unregister(listener);
+        }
+        helper.assertFalse(player.hasEffect(FeathersMobEffects.HOT.get()), "Heat under Fire Resistance");
+        assertValueEqual(helper, offered[0], 0, "Heat offered under Fire Resistance");
         helper.succeed();
     }
 

@@ -93,7 +93,7 @@ Modpacks can give feathers to other creatures (see [Modpack Makers](Modpack-Make
 
 | Potion | Effect |
 |---|---|
-| Endurance | A row of golden bonus feathers on top of your own |
+| Endurance | A row of golden bonus feathers on top of your own; drinking it again extends what is left instead of refilling it |
 | Energy | Faster recovery |
 | Momentum | Cheaper actions |
 | Cooling | Protects from heat |

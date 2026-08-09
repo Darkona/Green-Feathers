@@ -89,4 +89,24 @@ public class EffectsTests {
         helper.assertFalse(player.hasEffect(FeathersMobEffects.ENDURANCE.get()), "Endurance ends when its feathers are spent");
         helper.succeed();
     }
+
+    /**
+     * Drinking Endurance again extends what is left of the golden feathers instead of refilling them; a stronger
+     * level adds only its extra feathers.
+     */
+    @GameTest(template = "empty")
+    public static void refreshedEnduranceKeepsWhatIsLeft(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        player.addEffect(new MobEffectInstance(FeathersMobEffects.ENDURANCE.get(), 600));
+        FeathersAPI.spend(player, id("test"), Stamina.ofFeathers(3));
+        FeathersView f = FeathersAPI.get(player);
+
+        player.addEffect(new MobEffectInstance(FeathersMobEffects.ENDURANCE.get(), 1200));
+        assertValueEqual(helper, f.bonusStamina(), Stamina.ofFeathers(5), "golden feathers after a longer Endurance I");
+        assertValueEqual(helper, player.getEffect(FeathersMobEffects.ENDURANCE.get()).getDuration(), 1200, "the longer duration");
+
+        player.addEffect(new MobEffectInstance(FeathersMobEffects.ENDURANCE.get(), 1200, 1));
+        assertValueEqual(helper, f.bonusStamina(), Stamina.ofFeathers(13), "Endurance II adds its eight extra feathers");
+        helper.succeed();
+    }
 }

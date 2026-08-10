@@ -167,7 +167,7 @@ public final class FeathersTicker {
         else MountTraits.ensureRolled(entity);
         configBase(entity, data, FeathersAttributes.MAX_STRAIN, BASE_STRAIN, FeathersServerConfig.MAX_STRAIN.get());
         configBase(entity, data, FeathersAttributes.FEATHERS_PER_SECOND, BASE_REGEN, player ? FeathersServerConfig.REGEN_FEATHERS_PER_SECOND.get()
-                : FeathersServiceImpl.mountStats(entity).regenPerSecond().orElseGet(FeathersServerConfig.MOUNT_REGEN));
+                : FeathersServiceImpl.mountTuning(entity).regenPerSecond());
         FeathersServiceImpl.ensureInitialized(entity, data);
         FeathersServiceImpl.refreshMaximums(entity, data);
         data.weight = ArmorWeights.totalWeight(entity, data.weightSplit);

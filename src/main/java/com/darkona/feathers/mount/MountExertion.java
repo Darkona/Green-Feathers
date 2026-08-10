@@ -2,7 +2,6 @@ package com.darkona.feathers.mount;
 
 import com.darkona.feathers.api.FeathersAPI;
 import com.darkona.feathers.api.FeathersView;
-import com.darkona.feathers.api.MountStats;
 import com.darkona.feathers.api.SpendResult;
 import com.darkona.feathers.api.SpendOptions;
 import com.darkona.feathers.api.Stamina;
@@ -94,11 +93,11 @@ public final class MountExertion {
     }
 
     private static void gallop(LivingEntity mount) {
-        MountStats stats = FeathersServiceImpl.mountStats(mount);
-        double perSecond = stats.gallopFeathersPerSecond().orElseGet(FeathersServerConfig.MOUNT_GALLOP_FEATHERS_PER_SECOND);
+        MountTuning tuning = FeathersServiceImpl.mountTuning(mount);
+        double perSecond = tuning.gallopFeathersPerSecond();
         if (perSecond <= 0) return;
         Vec3 motion = mount.getDeltaMovement();
-        double speed = stats.gallopSpeed().orElseGet(FeathersServerConfig.MOUNT_GALLOP_SPEED);
+        double speed = tuning.gallopSpeed();
         if (motion.x * motion.x + motion.z * motion.z < speed * speed) return;
         FeathersAPI.startDrain(mount, GALLOP, Stamina.perTick(perSecond));
     }
@@ -134,7 +133,7 @@ public final class MountExertion {
     }
 
     private static double fullJumpFeathers(LivingEntity mount) {
-        return FeathersServiceImpl.mountStats(mount).jumpFeathers().orElseGet(FeathersServerConfig.MOUNT_JUMP_FEATHERS);
+        return FeathersServiceImpl.mountTuning(mount).jumpFeathers();
     }
 
     private static void updateSlowdown(LivingEntity mount, FeathersData data) {

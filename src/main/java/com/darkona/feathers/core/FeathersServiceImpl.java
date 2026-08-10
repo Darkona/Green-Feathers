@@ -22,6 +22,7 @@ import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.spi.FeathersService;
 import com.darkona.feathers.config.FeathersServerConfig;
 import com.darkona.feathers.data.DataMaps;
+import com.darkona.feathers.mount.MountTuning;
 import com.darkona.feathers.network.FeathersNetwork;
 import com.darkona.feathers.weight.ArmorWeights;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -132,17 +133,40 @@ public final class FeathersServiceImpl implements FeathersService {
         return mount && entity.getAttribute(FeathersAttributes.MAX_FEATHERS.get()) != null;
     }
 
-    /** Tags, data maps or the config changed: every entity type's mount verdict is worked out again. */
+    /** Tags, data maps or the config changed: every entity type's mount verdict and tuning is worked out again. */
     public static void invalidateMountTypes() {
         mountTypes = new byte[BuiltInRegistries.ENTITY_TYPE.size()];
+        mountTunings = new MountTuning[0];
     }
 
     /**
-     * The creature's mount tuning from the data map, or {@link MountStats#DEFAULT} (the config) without an entry.
+     * The creature's mount stats from the data map, or {@link MountStats#DEFAULT} (the config) without an entry.
      */
     public static MountStats mountStats(LivingEntity entity) {
         MountStats stats = DataMaps.mountStats(entity.getType());
         return stats != null ? stats : MountStats.DEFAULT;
+    }
+
+    private static volatile MountTuning[] mountTunings = new MountTuning[0];
+
+    /**
+     * The creature's mount stats with the config filled in, worked out once per type (see invalidateMountTypes):
+     * a ridden mount reads them every tick.
+     */
+    public static MountTuning mountTuning(LivingEntity entity) {
+        int id = BuiltInRegistries.ENTITY_TYPE.getId(entity.getType());
+        MountTuning[] tunings = mountTunings;
+        if (tunings.length == 0) {
+            tunings = new MountTuning[BuiltInRegistries.ENTITY_TYPE.size()];
+            mountTunings = tunings;
+        }
+        if (id < 0 || id >= tunings.length) return MountTuning.of(mountStats(entity));
+        MountTuning tuning = tunings[id];
+        if (tuning == null) {
+            tuning = MountTuning.of(mountStats(entity));
+            tunings[id] = tuning;
+        }
+        return tuning;
     }
 
     /**

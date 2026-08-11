@@ -11,7 +11,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.20.1 with the same featu
 - Feathers regenerate on their own after a short pause once you spend some.
 - When you run out you can keep going into red strain feathers. Regeneration pays strain back first, slowly.
 - **Exhaustion:** spend absolutely everything and you can't exert yourself until you catch your breath.
-- **Resting:** standing still, crouching or sitting (boats, horses, most furniture seats) pays strain back faster. Sleeping through the night restores everything.
+- **Resting:** standing still, crouching or sitting (boats, horses, most furniture seats) pays strain back faster. Sleeping through the night restores everything, also when a sleep mod skips the night; leaving the bed before morning does not.
 - **Food (optional):** a full food bar with saturation left speeds regeneration up, hunger slows it down (`saturation_regen_bonus`, `hunger_regen_penalty`). Off by default.
 - On its own, sprinting and jumping cost feathers; Actions of Stamina takes over player actions when installed.
 

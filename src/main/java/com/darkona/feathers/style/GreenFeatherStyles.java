@@ -11,8 +11,8 @@ import static com.darkona.feathers.api.client.FeatherVariants.*;
 import static com.darkona.feathers.api.registry.FeathersIds.id;
 
 /**
- * Green Feathers' own sprites and styles, registered like any other mod's. The colors are the ones that tint each
- * variant back into the old hand-drawn set it was made from.
+ * Green Feathers' own sprites and styles, registered like any other mod's. The colors tint each variant into the
+ * hand-drawn feathers it reproduces.
  */
 public final class GreenFeatherStyles {
 

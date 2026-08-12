@@ -1,7 +1,6 @@
 # Green Feathers
 
-**Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods
-decide cost feathers. Run out and you can push on for a while, at a price.
+**Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
 Minecraft 1.20.1 · Forge · based on Elenai's Feathers
 
@@ -10,25 +9,15 @@ Minecraft 1.20.1 · Forge · based on Elenai's Feathers
 ## How it plays
 
 - **Feathers come back on their own**, a little every second, after a short pause once you've spent some.
-- **Push past empty.** When you run out you can keep going into red *strain* feathers. Regeneration pays strain
-  back before anything else, slowly, so overdoing it leaves you drained for a while.
-- **Rest to recover.** Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods)
-  pays strain back faster. Sleep restores everything.
-- **Exhaustion.** Spend absolutely everything and you're exhausted: no exerting yourself until you've caught your
-  breath.
-- **Weather and climate matter.** Cold weather slows your recovery. Heat makes everything cost double, and the
-  Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
-- **Heavy armor weighs you down** (optional). Every piece holds back some feathers you can't use, shown in that
-  piece's own color, head to feet. Netherite is heavy; the *Lightweight* enchantment and the *Feather Ring* help.
-- **Mounts tire too** (optional). Horses, donkeys, mules and camels have their own feathers, shown instead of yours
-  while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount
-  slows down and can't jump. Horse armor weighs a little too. Like speed and health, each animal is born with its
-  own stamina, and foals take after their parents.
+- **Push past empty.** When you run out you can keep going into red *strain* feathers. Regeneration pays strain back before anything else, slowly, so overdoing it leaves you drained for a while.
+- **Rest to recover.** Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back faster. Sleep restores everything.
+- **Exhaustion.** Spend absolutely everything and you're exhausted: no exerting yourself until you've caught your breath.
+- **Weather and climate matter.** Cold weather slows your recovery. Heat makes everything cost double, and the Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
+- **Heavy armor weighs you down** (optional). Every piece holds back some feathers you can't use, shown in that piece's own color, head to feet. Netherite is heavy; the *Lightweight* enchantment and the *Feather Ring* help.
+- **Mounts tire too** (optional). Horses, donkeys, mules and camels have their own feathers, shown instead of yours while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount slows down and can't jump. Horse armor weighs a little too. Like speed and health, each animal is born with its own stamina, and foals take after their parents.
 - **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
-On its own, Green Feathers makes sprinting and jumping cost feathers. Install
-[Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and
-movement mods like ParCool, Paragliders and Better Combat.
+On its own, Green Feathers makes sprinting and jumping cost feathers. Install [Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and movement mods like ParCool, Paragliders and Better Combat.
 
 ## Plays well with others
 

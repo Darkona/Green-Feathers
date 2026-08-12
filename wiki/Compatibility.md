@@ -21,9 +21,7 @@ Supported out of the box, each with its own switch in `Feathers-Compat.toml`:
 | Jade | Shows a mount's stamina when you look at it |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
 
-Mods that change what the player does (ParCool, Paragliders, Better Combat, Combat Roll, Epic Fight, Wall-Jump TXF,
-Gliders) are covered by [Actions of Stamina](https://github.com/Darkona/actions-of-stamina), which spends feathers
-for them.
+Mods that change what the player does (ParCool, Paragliders, Better Combat, Combat Roll, Epic Fight, Wall-Jump TXF, Gliders) are covered by [Actions of Stamina](https://github.com/Darkona/actions-of-stamina), which spends feathers for them.
 
 ## Versions
 

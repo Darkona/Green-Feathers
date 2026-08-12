@@ -8,9 +8,7 @@ Green Feathers has three config files in `config/feathers/`:
 | `Feathers-Compat.toml` | Server | One section per supported mod, each with its own switch |
 | `Feathers-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
 
-Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same
-rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each
-player's own.
+Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each player's own.
 
 Changes to the server configs apply while the game runs.
 
@@ -23,8 +21,8 @@ Operators (permission level 2) can inspect and adjust feathers:
 | `/feathers info <targets>` | Shows their feathers, strain, weight and state |
 | `/feathers set <targets> <amount>` | Sets their feathers; above zero it also clears their strain |
 | `/feathers reset <targets>` | Full feathers, no strain, not exhausted |
-| `/feathers max <targets> <amount>` | Sets their base maximum feathers (kept across rejoins) |
-| `/feathers regen <targets> <amount>` | Sets their base regeneration, in feathers per second (kept across rejoins) |
+| `/feathers max <targets> <amount>` | Sets their base maximum feathers (kept across rejoins; lost on death, like every attribute base in 1.20.1) |
+| `/feathers regen <targets> <amount>` | Sets their base regeneration, in feathers per second (kept across rejoins; lost on death) |
 | `/feathers spend <targets> <amount>` | Spends feathers as if an action had |
 | `/feathers debug <targets> [seconds]` | Lists what spent their feathers recently, by source |
 

@@ -6,8 +6,7 @@ Green Feathers is built to be spent by other mods. Compile against the API jar a
 compileOnly "com.darkona.feathers:greenfeathers-api:1.21.1-2.0.0"
 ```
 
-Guard every call with `ModList.get().isLoaded("greenfeathers")`, and keep the calls in a class that only loads when
-it is: your mod then works with and without Green Feathers.
+Guard every call with `ModList.get().isLoaded("greenfeathers")`, and keep the calls in a class that only loads when it is: your mod then works with and without Green Feathers.
 
 `com.darkona.feathers.api.FeathersAPI` is the place to start; every class in the API is documented.
 
@@ -27,8 +26,7 @@ The source (`MY_DASH`) is your own `ResourceLocation`: it shows in `/feathers de
 
 ## Reading
 
-`FeathersAPI.get(entity)` returns a `FeathersView`: feathers, maximum, strain, bonus, weight, exhaustion, rest state.
-Players and mounts with feathers have one; everything else answers `hasFeathers() == false`.
+`FeathersAPI.get(entity)` returns a `FeathersView`: feathers, maximum, strain, bonus, weight, exhaustion, rest state. Players and mounts with feathers have one; everything else answers `hasFeathers() == false`.
 
 ## Hooks
 
@@ -44,8 +42,7 @@ Players and mounts with feathers have one; everything else answers `hasFeathers(
 
 ### Weight sources
 
-A weight source can name a color or an item: its share of the weight is then drawn after the boots in that color,
-or in the item's colors. Without either it's drawn grey.
+A weight source can name a color or an item: its share of the weight is then drawn after the boots in that color, or in the item's colors. Without either it's drawn grey.
 
 ```java
 FeathersAPI.registerWeightSource(MY_BACKPACK, new WeightSource() {
@@ -57,5 +54,4 @@ FeathersAPI.registerWeightSource(MY_BACKPACK, new WeightSource() {
 
 ## Events
 
-On the NeoForge event bus: `SpendEvent.Pre` (cancel or change a spend) and `SpendEvent.Post`, `GainEvent`,
-`DrainEvent`, `ExhaustionEvent`, `StrainEvent`, `RegenEvent`, and `ArmorWeightEvent` (change the total weight).
+On the NeoForge event bus: `SpendEvent.Pre` (cancel or change a spend) and `SpendEvent.Post`, `GainEvent`, `DrainEvent`, `ExhaustionEvent`, `StrainEvent`, `RegenEvent`, and `ArmorWeightEvent` (change the total weight).

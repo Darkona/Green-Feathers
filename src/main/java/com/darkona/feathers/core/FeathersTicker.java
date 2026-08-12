@@ -125,11 +125,15 @@ public final class FeathersTicker {
 
     @SubscribeEvent
     public static void onWakeUp(PlayerWakeUpEvent event) {
-        // Only a night slept through: leaving the bed at once ("Leave Bed") wakes up too.
-        if (FeathersServerConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get() && !event.getEntity().level.isClientSide()
-                && event.getEntity().isSleepingLongEnough()) {
-            FeathersServiceImpl.INSTANCE.reset(event.getEntity());
-        }
+        Player player = event.getEntity();
+        if (player.level.isClientSide() || !FeathersServerConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
+        // Only a night slept through: a broken bed or death wakes at once, and "Leave Bed" wakes at any time. The
+        // level wakes everyone with no sleeper list update once it skipped the night; the day itself wakes a player
+        // still in bed with one. So with an update, only by day: "Leave Bed" after five seconds with the other players
+        // up would restore everything at night.
+        if (event.wakeImmediately() || !player.isSleepingLongEnough()) return;
+        if (event.updateLevel() && !player.level.isDay()) return;
+        FeathersServiceImpl.INSTANCE.reset(player);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

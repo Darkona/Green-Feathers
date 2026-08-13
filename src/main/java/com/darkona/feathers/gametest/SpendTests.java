@@ -99,6 +99,34 @@ public class SpendTests {
     }
 
     /**
+     * A gift while strained pays the strain back first, as regeneration does: stamina and strain never sit side by
+     * side. Clearing the last of it posts the event, like the tick's own recovery.
+     */
+    @GameTest(template = "empty")
+    public static void gainsPayStrainBackFirst(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        FeathersAPI.spend(player, TEST, Stamina.ofFeathers(24));
+        boolean[] cleared = {false};
+        Consumer<StrainEvent.Cleared> listener = event -> cleared[0] |= event.getEntity() == player;
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, StrainEvent.Cleared.class, listener);
+        try {
+            assertValueEqual(helper, FeathersAPI.gain(player, TEST, Stamina.ofFeathers(3)), Stamina.ofFeathers(3), "stamina used by a gift under strain");
+            FeathersView f = FeathersAPI.get(player);
+            assertValueEqual(helper, f.strain(), Stamina.ofFeathers(1), "strain left after the gift");
+            assertValueEqual(helper, f.stamina(), 0, "no stamina while strain is left");
+            assertFalse(helper, cleared[0], "strain not cleared yet");
+
+            assertValueEqual(helper, FeathersAPI.gain(player, TEST, Stamina.ofFeathers(5)), Stamina.ofFeathers(5), "stamina used by a gift past the strain");
+            assertValueEqual(helper, f.strain(), 0, "strain paid back");
+            assertValueEqual(helper, f.stamina(), Stamina.ofFeathers(4), "the rest of the gift");
+            assertTrue(helper, cleared[0], "clearing the strain posts its event");
+        } finally {
+            MinecraftForge.EVENT_BUS.unregister(listener);
+        }
+        helper.succeed();
+    }
+
+    /**
      * Strain turned off in the config while a player is strained: the strain goes on the next tick, with its event,
      * and the strained effect is not put on the player on the way out.
      */

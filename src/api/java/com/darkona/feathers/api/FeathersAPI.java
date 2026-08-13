@@ -188,12 +188,12 @@ public final class FeathersAPI {
     /* Giving */
 
     /**
-     * Gives stamina, up to the maximum.
+     * Gives stamina: pays strain back first, as regeneration does, then fills the bar up to the maximum.
      *
      * @param entity  the entity that receives stamina
      * @param source  a stable identifier for the reason
      * @param stamina the amount to offer in stamina units
-     * @return the stamina actually gained
+     * @return the stamina actually used: strain paid back plus stamina gained
      */
     public static int gain(LivingEntity entity, ResourceLocation source, int stamina) {
         return service().gain(entity, source, stamina);

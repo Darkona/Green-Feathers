@@ -18,7 +18,7 @@ public interface ClientFeathersService {
 
     FeathersView mount();
 
-    SpendResult predictSpend(int stamina, boolean allowStrain);
+    SpendResult predictSpend(ResourceLocation source, int stamina, SpendOptions options);
 
     void requestSpend(ResourceLocation source, int stamina, SpendOptions options);
 }

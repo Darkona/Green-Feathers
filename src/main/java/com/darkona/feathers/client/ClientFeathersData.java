@@ -129,18 +129,20 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         return entity == Minecraft.getInstance().player;
     }
 
-    private static final SpendOptions NO_STRAIN = SpendOptions.DEFAULT.withoutStrain();
-
+    /**
+     * Goes through the common service, which prices the cost for the local player and calls {@link #payPredicted}.
+     */
     @Override
-    public SpendResult predictSpend(int cost, boolean allowStrain) {
-        return predictSpend(cost, allowStrain ? SpendOptions.DEFAULT : NO_STRAIN);
+    public SpendResult predictSpend(ResourceLocation source, int stamina, SpendOptions options) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return player != null ? FeathersServiceImpl.INSTANCE.spend(player, source, stamina, options) : SpendResult.EXEMPT;
     }
 
     /**
      * Pays locally the way the server would (bonus, stamina, then strain) so the HUD reacts at once.
      */
     @Override
-    public SpendResult predictSpend(int cost, SpendOptions options) {
+    public SpendResult payPredicted(int cost, SpendOptions options) {
         if (!synced) return SpendResult.EXEMPT;
         SpendResult check = FeathersServiceImpl.simulateAgainst(this, cost, options.allowStrain(), options.ignoreExhaustion());
         if (check != SpendResult.OK) return check;

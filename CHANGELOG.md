@@ -53,7 +53,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.19.2 (through the 1.20.1
 
 ### Compatibility
 
-Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.19.2 Forge builds:
+Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.19.2 Forge builds. Cold Sweat, Thirst Was Taken, Curios, Jade and Overflowing Bars accept versions up to their next major one: another version stops the game at load with a message instead of a crash in play. Tough As Nails and Serene Seasons jars declare no version, so they have no range.
 
 - Cold Sweat 2.4.3: body temperature decides cold and heat.
 - Tough As Nails 8.0.0.78: its temperature decides cold and heat; its thirst affects regeneration.

@@ -107,10 +107,13 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
 
     SpendLog spendLog;
 
-    /* Attribute instances read every tick. An entity keeps its instances for life, and vanilla's lookup allocates a
+    /* Attribute instances the tick reads. An entity keeps its instances for life, and vanilla's lookup allocates a
        lambda on every call. */
     @Nullable AttributeInstance regenAttribute;
     @Nullable AttributeInstance usageAttribute;
+    @Nullable AttributeInstance maxFeathersAttribute;
+    @Nullable AttributeInstance maxStrainAttribute;
+    @Nullable AttributeInstance weightMultiplierAttribute;
 
     RestState restState = RestState.NONE;
     double restMultiplier = 1.0;
@@ -389,6 +392,21 @@ public final class FeathersData implements FeathersView, INBTSerializable<Compou
     @Nullable AttributeInstance usageAttribute(LivingEntity entity) {
         if (usageAttribute == null) usageAttribute = entity.getAttribute(FeathersAttributes.USAGE_MULTIPLIER.get());
         return usageAttribute;
+    }
+
+    @Nullable AttributeInstance maxFeathersAttribute(LivingEntity entity) {
+        if (maxFeathersAttribute == null) maxFeathersAttribute = entity.getAttribute(FeathersAttributes.MAX_FEATHERS.get());
+        return maxFeathersAttribute;
+    }
+
+    @Nullable AttributeInstance maxStrainAttribute(LivingEntity entity) {
+        if (maxStrainAttribute == null) maxStrainAttribute = entity.getAttribute(FeathersAttributes.MAX_STRAIN.get());
+        return maxStrainAttribute;
+    }
+
+    @Nullable AttributeInstance weightMultiplierAttribute(LivingEntity entity) {
+        if (weightMultiplierAttribute == null) weightMultiplierAttribute = entity.getAttribute(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER.get());
+        return weightMultiplierAttribute;
     }
 
     /* Compat counters */

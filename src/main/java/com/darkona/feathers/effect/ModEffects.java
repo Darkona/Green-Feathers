@@ -6,6 +6,7 @@ import com.darkona.feathers.api.registry.FeathersIds;
 import com.darkona.feathers.api.registry.FeathersMobEffects;
 import com.darkona.feathers.compatibility.coldsweat.ColdSweatCompat;
 import com.darkona.feathers.config.FeathersServerConfig;
+import com.darkona.feathers.core.FeathersServiceImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -16,6 +17,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.Nullable;
 
 import static com.darkona.feathers.api.registry.FeathersAttributes.FEATHERS_PER_SECOND;
 import static com.darkona.feathers.api.registry.FeathersAttributes.MAX_FEATHERS;
@@ -32,6 +34,11 @@ public final class ModEffects {
     /** Bonus stamina source of the Endurance effect. */
     public static final ResourceLocation ENDURANCE_BONUS = id("endurance_effect");
 
+    /** Endurance's golden feathers: eight per level. */
+    private static int enduranceBonus(MobEffectInstance instance) {
+        return Stamina.ofFeathers((instance.getAmplifier() + 1) * 8);
+    }
+
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, FeathersIds.MOD_ID);
 
     static {
@@ -41,12 +48,19 @@ public final class ModEffects {
                 return super.canApply(entity) && FeathersServerConfig.ENABLE_ENDURANCE.get();
             }
 
-            /** Eight golden feathers per level, for as long as the effect lasts or until spent. */
+            /**
+             * The golden feathers, for as long as the effect lasts or until spent. A refresh extends what
+             * is left of them, and a stronger level adds its extra feathers to it: a potion never refills the pool.
+             */
             @Override
-            public void onApplied(LivingEntity entity, MobEffectInstance instance) {
-                FeathersAPI.addBonusStamina(entity, ENDURANCE_BONUS, Stamina.ofFeathers((instance.getAmplifier() + 1) * 8),
-                        FeathersMobEffect.isPermanent(instance) ? -1 : instance.getDuration());
+            public void onApplied(LivingEntity entity, MobEffectInstance instance, @Nullable MobEffectInstance previous) {
+                if (!FeathersAPI.hasFeathers(entity)) return;
+                int full = enduranceBonus(instance);
+                int left = FeathersServiceImpl.data(entity).bonusStamina(ENDURANCE_BONUS);
+                int amount = previous != null && left > 0 ? Math.min(full, left + Math.max(0, full - enduranceBonus(previous))) : full;
+                FeathersAPI.addBonusStamina(entity, ENDURANCE_BONUS, amount, FeathersMobEffect.isPermanent(instance) ? -1 : instance.getDuration());
             }
+
 
             @Override
             public void onEnded(LivingEntity entity, MobEffectInstance instance) {

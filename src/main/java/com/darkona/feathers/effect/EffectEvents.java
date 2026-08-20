@@ -33,7 +33,7 @@ public final class EffectEvents {
         if (old != null && (added.getAmplifier() < old.getAmplifier()
                 || added.getAmplifier() == old.getAmplifier() && added.getDuration() <= old.getDuration())) return;
         if (added.getEffect() instanceof FeathersMobEffect effect && !event.getEntity().level.isClientSide()) {
-            effect.onApplied(event.getEntity(), added);
+            effect.onApplied(event.getEntity(), added, old);
         }
     }
 

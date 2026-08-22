@@ -87,5 +87,4 @@ public class FeathersMobEffect extends MobEffect {
     public static boolean isProtectedFromHeat(LivingEntity entity) {
         return entity.hasEffect(MobEffects.FIRE_RESISTANCE) || entity.hasEffect(FeathersMobEffects.COOLING.get());
     }
-
 }

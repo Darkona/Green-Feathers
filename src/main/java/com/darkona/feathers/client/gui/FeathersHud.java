@@ -226,7 +226,7 @@ public final class FeathersHud {
         // Armor weight: the first feathers are held back; spending stops when it reaches them.
         drawWeight(poseStack, view, wearer, x, y);
 
-        // Frost, flames: over the whole row, like the old frozen feathers.
+        // Frost, flames: over the whole row.
         if (overlay && look.overlay) drawOverlay(poseStack, x, y, backgroundIcons, look);
 
         if (view == DATA && regenFlashTicks >= 16) {

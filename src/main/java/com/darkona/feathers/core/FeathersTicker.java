@@ -189,12 +189,8 @@ public final class FeathersTicker {
         AttributeInstance instance = entity.getAttribute(attribute.get());
         if (instance == null) return;
         if (data.counters.containsKey(key) && instance.getBaseValue() != data.getCounter(key)) return;
-        setBase(instance, value);
+        if (instance.getBaseValue() != value) instance.setBaseValue(value);
         data.setCounter(key, value);
-    }
-
-    private static void setBase(AttributeInstance attribute, double value) {
-        if (attribute != null && attribute.getBaseValue() != value) attribute.setBaseValue(value);
     }
 
     /* Tick */

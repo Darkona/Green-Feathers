@@ -41,15 +41,17 @@ public final class ClientFeathers {
 
     /**
      * For actions decided on the client (e.g. a dodge key): checks the local feathers and, if they allow it,
-     * lowers them immediately to keep the HUD responsive. The server's next sync is authoritative. Pair this call
-     * with a server-side {@code FeathersAPI.spend}, or use {@link #requestSpend}.
+     * lowers them immediately to keep the HUD responsive. The cost goes through the usage multiplier and the stamina
+     * modifiers, as on the server. The server's next sync is authoritative. Pair this call with a server-side
+     * {@code FeathersAPI.spend} with the same source and cost, or use {@link #requestSpend}.
      *
-     * @param stamina    the predicted cost in stamina units
-     * @param allowStrain whether the prediction may create more strain
+     * @param source  a stable identifier for the action, the one the server-side spend uses
+     * @param stamina the base cost in stamina units
+     * @param options the spend options; {@link SpendOptions#simulate()} only checks
      * @return the predicted outcome
      */
-    public static SpendResult predictSpend(int stamina, boolean allowStrain) {
-        return service().predictSpend(stamina, allowStrain);
+    public static SpendResult predictSpend(ResourceLocation source, int stamina, SpendOptions options) {
+        return service().predictSpend(source, stamina, options);
     }
 
     /**

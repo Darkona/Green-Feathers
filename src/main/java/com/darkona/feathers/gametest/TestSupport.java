@@ -72,6 +72,7 @@ final class TestSupport {
     }
 
     static ServerPlayer player(GameTestHelper helper) {
+        clearNoon(helper.getLevel());
         ServerPlayer player = new TestPlayer(helper.getLevel(), new GameProfile(UUID.randomUUID(), "feathers-test"));
         player.moveTo(helper.absoluteVec(Vec3.ZERO));
         FeathersAPI.get(player);
@@ -102,6 +103,18 @@ final class TestSupport {
         public BlockPos blockPosition() {
             return new BlockPos(getBlockX(), getBlockY(), getBlockZ());
         }
+    }
+
+    /**
+     * Noon under a clear sky, whenever the batch happens to run: the vanilla climate and Serene Seasons read the sun,
+     * and rain on a cold biome chills.
+     */
+    static void clearNoon(ServerLevel level) {
+        level.setDayTime(6000);
+        level.setWeatherParameters(24000, 0, false, false);
+        level.setRainLevel(0);
+        level.setThunderLevel(0);
+        level.updateSkyBrightness();
     }
 
     static void tick(ServerPlayer player, int ticks) {

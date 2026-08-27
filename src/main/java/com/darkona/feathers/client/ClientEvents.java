@@ -101,6 +101,7 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         ClientFeathersData.INSTANCE.clear();
+        FeathersHud.reset();
         // A remote server's data maps; a singleplayer world loads its own. Minecraft forgets its singleplayer server
         // before this event, so the in-memory connection is what tells them apart.
         if (event.getConnection() == null || !event.getConnection().isMemoryConnection()) DataMaps.accept(DataMaps.Raw.EMPTY);

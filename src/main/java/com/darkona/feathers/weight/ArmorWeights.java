@@ -11,6 +11,8 @@ import com.darkona.feathers.data.DataMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -21,7 +23,6 @@ import net.minecraft.world.item.HorseArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.Nullable;
@@ -200,10 +201,40 @@ public final class ArmorWeights {
     public static double pieceWeight(ItemStack stack) {
         int base = baseWeight(stack);
         if (base == 0) return 0;
-        int lightweight = enchantmentLevel(FeathersEnchantments.LIGHTWEIGHT.get(), stack);
-        int heavy = enchantmentLevel(FeathersEnchantments.HEAVY.get(), stack);
-        double lightness = Math.max(0.0, 1.0 - lightweight * FeathersServerConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
-        return base * lightness * (1 + heavy);
+        EnchantmentLevels levels = enchantmentLevels(stack);
+        double lightness = Math.max(0.0, 1.0 - levels.lightweight() * FeathersServerConfig.LIGHTWEIGHT_REDUCTION_PER_LEVEL.get());
+        return base * lightness * (1 + levels.heavy());
+    }
+
+    /** A stack's Lightweight and Heavy levels, read from its enchantment list. */
+    private record EnchantmentLevels(@Nullable ListTag enchantments, int size, int lightweight, int heavy) {}
+
+    private static final EnchantmentLevels NO_LEVELS = new EnchantmentLevels(null, 0, 0, 0);
+    /**
+     * The last list read: a tooltip asks for the same stack every frame. Keyed by the list and its size, since
+     * enchanting a stack appends to its list and replacing its enchantments puts a new list.
+     */
+    private static volatile EnchantmentLevels lastLevels = NO_LEVELS;
+
+    /**
+     * Reads the levels straight from the stack's enchantment tags, so no registry lookup is needed.
+     */
+    private static EnchantmentLevels enchantmentLevels(ItemStack stack) {
+        if (stack.isEmpty() || !stack.isEnchanted()) return NO_LEVELS;
+        ListTag enchantments = stack.getEnchantmentTags();
+        EnchantmentLevels levels = lastLevels;
+        if (levels.enchantments() == enchantments && levels.size() == enchantments.size()) return levels;
+        int lightweight = 0;
+        int heavy = 0;
+        for (int i = 0; i < enchantments.size(); i++) {
+            CompoundTag entry = enchantments.getCompound(i);
+            ResourceLocation id = EnchantmentHelper.getEnchantmentId(entry);
+            if (FeathersEnchantments.LIGHTWEIGHT.getId().equals(id)) lightweight = EnchantmentHelper.getEnchantmentLevel(entry);
+            else if (FeathersEnchantments.HEAVY.getId().equals(id)) heavy = EnchantmentHelper.getEnchantmentLevel(entry);
+        }
+        levels = new EnchantmentLevels(enchantments, enchantments.size(), lightweight, heavy);
+        lastLevels = levels;
+        return levels;
     }
 
     /** The head armor share in a {@link WeightSplit}. */
@@ -334,10 +365,5 @@ public final class ArmorWeights {
     private static void setFeathers(WeightSplit split, int i, int feathers) {
         if (i < PARTS) split.parts[i] = feathers;
         else split.sources.set(2 * (i - PARTS) + 1, feathers);
-    }
-
-    public static int enchantmentLevel(Enchantment enchantment, ItemStack stack) {
-        if (stack.isEmpty() || !stack.isEnchanted()) return 0;
-        return EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
     }
 }

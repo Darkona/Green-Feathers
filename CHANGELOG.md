@@ -38,7 +38,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.18.2 (through the 1.20.1
 
 ### Potions
 
-- Endurance (golden bonus feathers), Energy (faster regeneration), Momentum (cheaper actions), Cooling, Coldness and Heat.
+- Endurance (golden bonus feathers; another potion extends what is left, a stronger one adds its extra feathers), Energy (faster regeneration), Momentum (cheaper actions), Cooling, Coldness and Heat.
 
 ### HUD
 

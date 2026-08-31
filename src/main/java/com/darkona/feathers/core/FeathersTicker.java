@@ -127,12 +127,13 @@ public final class FeathersTicker {
     public static void onWakeUp(PlayerWakeUpEvent event) {
         Player player = event.getPlayer();
         if (player.level.isClientSide() || !FeathersServerConfig.SLEEPING_ALWAYS_RESTORES_FEATHERS.get()) return;
-        // Only a night slept through: a broken bed or death wakes at once, and "Leave Bed" wakes at any time. The
-        // level wakes everyone with no sleeper list update once it skipped the night; the day itself wakes a player
-        // still in bed with one. So with an update, only by day: "Leave Bed" after five seconds with the other players
-        // up would restore everything at night.
-        if (event.wakeImmediately() || !player.isSleepingLongEnough()) return;
-        if (event.updateWorld() && !player.level.isDay()) return;
+        // Only a night slept through. The level wakes everyone with no sleeper list update once it skipped the night.
+        // Every other wake-up updates the list: "Leave Bed", the day breaking over a player still in bed, and
+        // stopSleeping(), which wakes at once (hurt, death, a broken bed, or a sleep mod after skipping the night on
+        // its own). Those count only by day: "Leave Bed" after five seconds with the other players up must not
+        // restore everything at night. A disconnect wakes at once with no update, and never counts.
+        if (!player.isSleepingLongEnough()) return;
+        if (event.updateWorld() ? !player.level.isDay() : event.wakeImmediately()) return;
         FeathersServiceImpl.INSTANCE.reset(player);
     }
 

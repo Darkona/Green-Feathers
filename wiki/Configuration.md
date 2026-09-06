@@ -1,12 +1,12 @@
 # Configuration
 
-Green Feathers has three config files in `config/feathers/`:
+Feathers of Fatigue has three config files in `config/feathers_of_fatigue/`:
 
 | File | Kind | What's in it |
 |---|---|---|
-| `Feathers-Server.toml` | Server | Feathers, regeneration, strain, exhaustion, effects, resting, armor weights, basic exertion, mounts |
-| `Feathers-Compat.toml` | Server | One section per supported mod, each with its own switch |
-| `Feathers-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
+| `FeathersOfFatigue-Server.toml` | Server | Feathers, regeneration, strain, exhaustion, effects, resting, armor weights, basic exertion, mounts |
+| `FeathersOfFatigue-Compat.toml` | Server | One section per supported mod, each with its own switch |
+| `FeathersOfFatigue-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
 
 Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each player's own.
 
@@ -28,16 +28,16 @@ Operators (permission level 2) can inspect and adjust feathers:
 
 Targets can be mounts too.
 
-## Default `Feathers-Server.toml`
+## Default `FeathersOfFatigue-Server.toml`
 
 ```toml
 [general]
 	#Feathers a player has. Two feathers make one icon, like hearts: 20 is a full row.
-	#This is the base of the greenfeathers:max_feathers attribute; effects and items modify it.
+	#This is the base of the feathers_of_fatigue:max_feathers attribute; effects and items modify it.
 	# Default: 20
 	# Range: 0 ~ 1000
 	max_feathers = 20
-	#Feathers regenerated per second. Base of the greenfeathers:feathers_per_second attribute;
+	#Feathers regenerated per second. Base of the feathers_of_fatigue:feathers_per_second attribute;
 	#Cold halves it, Energized doubles it. Any value works, however small: fractions carry over.
 	# Default: 0.4
 	# Range: -40.0 ~ 40.0
@@ -74,7 +74,7 @@ Targets can be mounts too.
 	#max_strained_feathers. Regeneration pays the strain back first, slowly; resting speeds it up.
 	#Mods can still ask for a spend that never strains.
 	strain_enabled = true
-	#How far into strain a player can go, in feathers. Base of the greenfeathers:max_strain attribute.
+	#How far into strain a player can go, in feathers. Base of the feathers_of_fatigue:max_strain attribute.
 	# Default: 6
 	# Range: 1 ~ 1000
 	max_strained_feathers = 6
@@ -146,7 +146,7 @@ Targets can be mounts too.
 	#Weight rules, as 'target=weight'. The most specific matching rule wins:
 	#  minecraft:iron_chestplate=3      one item
 	#  #mymod:heavy_armor=6            every item in an item tag
-	#  (the greenfeathers:armor_weight data map, which mods and datapacks can ship, comes here)
+	#  (the feathers_of_fatigue:armor_weight data map, which mods and datapacks can ship, comes here)
 	#  @minecraft:iron/chestplate=3    one piece of an armor material (helmet, chestplate, leggings, boots, body for horse armor)
 	#  @minecraft:iron=2               every piece of an armor material
 	#Armor that matches nothing weighs its defense points times unlisted_armor_weight_per_defense.
@@ -161,7 +161,7 @@ Targets can be mounts too.
 	lightweight_reduction_per_level = 0.25
 
 [basic_exertion]
-	#Sprinting and jumping cost feathers, so Green Feathers does something on its own.
+	#Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.
 	#Always off when Actions of Stamina is installed: it takes over player actions.
 	basic_exertion_enabled = true
 	#Feathers per second while sprinting. Regeneration pauses while sprinting.
@@ -213,7 +213,7 @@ Targets can be mounts too.
 	debug_mode = false
 ```
 
-## Default `Feathers-Compat.toml`
+## Default `FeathersOfFatigue-Compat.toml`
 
 ```toml
 #Cold Sweat: body temperature decides Cold, Heat and Fatigue instead of biomes.
@@ -255,10 +255,10 @@ Targets can be mounts too.
 	# Range: 0.0 ~ 20.0
 	thirst_per_regenerated_feather = 0.0
 
-#Blue Droplets (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.
+#Droplets of Thirst (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.
 #Ignored for players whose thirst is off.
-[blue_droplets]
-	#Use Blue Droplets when it is installed.
+[droplets_of_thirst]
+	#Use Droplets of Thirst when it is installed.
 	enabled = true
 	#Feathers per second lost per missing thirst point (20 points = full).
 	# Default: 0.02
@@ -342,7 +342,7 @@ Targets can be mounts too.
 	summer_heat_from_temperature = 0.8
 ```
 
-## Default `Feathers-Client.toml`
+## Default `FeathersOfFatigue-Client.toml`
 
 ```toml
 [hud]

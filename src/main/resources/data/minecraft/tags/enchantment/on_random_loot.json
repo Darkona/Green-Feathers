@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "greenfeathers:lightweight",
-    "greenfeathers:heavy"
+    "feathers_of_fatigue:lightweight",
+    "feathers_of_fatigue:heavy"
   ]
 }

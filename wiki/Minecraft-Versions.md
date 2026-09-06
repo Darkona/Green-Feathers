@@ -1,6 +1,6 @@
 # Minecraft Versions
 
-This wiki describes the newest version of Green Feathers, for **Minecraft 1.21.1 (NeoForge)**. The same mod is also made for older Minecraft versions, with the same features, config options and API wherever the game allows it. This page lists only what is different in each of them.
+This wiki describes the newest version of Feathers of Fatigue, for **Minecraft 1.21.1 (NeoForge)**. The same mod is also made for older Minecraft versions, with the same features, config options and API wherever the game allows it. This page lists only what is different in each of them.
 
 | Minecraft | Loader | Download | Differences |
 |---|---|---|---|
@@ -9,7 +9,7 @@ This wiki describes the newest version of Green Feathers, for **Minecraft 1.21.1
 | 1.19.2 | Forge 43 | Supported | [1.19.2](#1192-forge-43) |
 | 1.18.2 | Forge 40.2.4 or later | Supported | [1.18.2](#1182-forge-40) |
 
-Files and folders are the same in every version: `serverconfig/feathers/Feathers-Server.toml` and `Feathers-Compat.toml` for the game rules (synced to clients), `config/feathers/Feathers-Client.toml` for the HUD, `defaultconfigs/feathers/` for modpack defaults.
+Files and folders are the same in every version: `serverconfig/feathers_of_fatigue/FeathersOfFatigue-Server.toml` and `FeathersOfFatigue-Compat.toml` for the game rules (synced to clients), `config/feathers_of_fatigue/FeathersOfFatigue-Client.toml` for the HUD, `defaultconfigs/feathers_of_fatigue/` for modpack defaults.
 
 ## 1.20.1 (Forge 47)
 

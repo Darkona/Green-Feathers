@@ -6,6 +6,13 @@ Changes by feature, newest version first.
 
 A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 
+### Renamed to Feathers of Fatigue
+
+- Green Feathers is now **Feathers of Fatigue**. Every id follows: the mod id and resource namespace are `feathers_of_fatigue` (attributes, effects, enchantments, tags, data maps, lang keys), the code lives in `com.darkona.feathersoffatigue` (the API in `com.darkona.feathersoffatigue.api`), and the jars are `feathers-of-fatigue` and `feathers-of-fatigue-api` (group `com.darkona.feathersoffatigue`).
+- Config files are `FeathersOfFatigue-Server.toml`, `FeathersOfFatigue-Compat.toml` and `FeathersOfFatigue-Client.toml`, in `serverconfig/feathers_of_fatigue/` and `config/feathers_of_fatigue/`. The `/feathers` command keeps its name.
+- Blue Droplets support follows its rename to Droplets of Thirst (mod id `droplets_of_thirst`): its compat section is now `[droplets_of_thirst]`.
+- Worlds and configs from earlier builds do not carry over: stored feathers, enchantments and items under the old ids are lost, and the old config files are ignored.
+
 ### Stamina
 
 - Feathers regenerate on their own after a short pause once you spend some.

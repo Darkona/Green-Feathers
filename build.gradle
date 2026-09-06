@@ -9,7 +9,7 @@ version = "${minecraft_version}-${mod_version}"
 group = mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = archives_base_name
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -21,7 +21,7 @@ java.withSourcesJar()
 if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
     def mergedDataMaps = layout.buildDirectory.dir('gametest-datamaps')
     def mergeTestDataMaps = tasks.register('mergeTestDataMaps') {
-        def modMaps = file('src/main/resources/data/greenfeathers/data_maps/entity_type')
+        def modMaps = file('src/main/resources/data/feathers_of_fatigue/data_maps/entity_type')
         def testMaps = file('src/gametest/datamaps')
         inputs.dir(modMaps)
         inputs.dir(testMaps)
@@ -32,7 +32,7 @@ if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
                 def modFile = new File(modMaps, testFile.name)
                 def merged = modFile.exists() ? slurper.parse(modFile) : [replace: false, values: [:]]
                 merged.values.putAll(slurper.parse(testFile).values)
-                def out = mergedDataMaps.get().file("data/greenfeathers/data_maps/entity_type/${testFile.name}").asFile
+                def out = mergedDataMaps.get().file("data/feathers_of_fatigue/data_maps/entity_type/${testFile.name}").asFile
                 out.parentFile.mkdirs()
                 out.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(merged))
             }
@@ -43,16 +43,16 @@ if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
 }
 
 // The public API lives in its own source set and ships twice: inside the mod jar, and alone as
-// greenfeathers-api for other mods to compile against.
+// feathers-of-fatigue-api for other mods to compile against.
 sourceSets {
     api
 }
 
 repositories {
     mavenCentral()
-    // Blue Droplets: `./gradlew publishToMavenLocal` in its repository.
+    // Droplets of Thirst: `./gradlew publishToMavenLocal` in its repository.
     mavenLocal {
-        content { includeGroup 'com.darkona.droplets' }
+        content { includeGroup 'com.darkona.dropletsofthirst' }
     }
     maven {
         name = 'Curios'
@@ -119,7 +119,7 @@ dependencies {
     // Optional compat: every use sits behind a ModList check.
     compileOnly "maven.modrinth:cold-sweat:${cold_sweat_version}"
     compileOnly "maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"
-    compileOnly "com.darkona.droplets:bluedroplets-api:${blue_droplets_version}"
+    compileOnly "com.darkona.dropletsofthirst:droplets-of-thirst-api:${droplets_of_thirst_version}"
     compileOnly "maven.modrinth:tough-as-nails:${tough_as_nails_version}"
     compileOnly "maven.modrinth:serene-seasons:${serene_seasons_version}"
     compileOnly "maven.modrinth:legendary-survival-overhaul:${lso_version}"
@@ -136,7 +136,7 @@ dependencies {
 def compatRuntime = [
         coldsweat      : ["maven.modrinth:cold-sweat:${cold_sweat_version}"],
         thirst         : ["maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"],
-        bluedroplets   : ["com.darkona.droplets:BlueDroplets:${blue_droplets_version}"],
+        dropletsofthirst: ["com.darkona.dropletsofthirst:droplets-of-thirst:${droplets_of_thirst_version}"],
         toughasnails   : ["maven.modrinth:tough-as-nails:${tough_as_nails_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         lso            : ["maven.modrinth:legendary-survival-overhaul:${lso_version}"],
@@ -171,7 +171,7 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             mod_description        : mod_description,
             cold_sweat_range       : cold_sweat_range,
             thirst_range           : thirst_range,
-            blue_droplets_range    : blue_droplets_range,
+            droplets_of_thirst_range: droplets_of_thirst_range,
             tough_as_nails_range   : tough_as_nails_range,
             serene_seasons_range   : serene_seasons_range,
             lso_range              : lso_range,
@@ -195,11 +195,11 @@ tasks.named('sourcesJar', Jar) {
 }
 
 var apiJar = tasks.register('apiJar', Jar) {
-    archiveBaseName = "${mod_id}-api"
+    archiveBaseName = "${archives_base_name}-api"
     from sourceSets.api.output
 }
 var apiSourcesJar = tasks.register('apiSourcesJar', Jar) {
-    archiveBaseName = "${mod_id}-api"
+    archiveBaseName = "${archives_base_name}-api"
     archiveClassifier = 'sources'
     from sourceSets.api.allSource
 }
@@ -215,7 +215,7 @@ publishing {
             from components.java
         }
         register('api', MavenPublication) {
-            artifactId = "${mod_id}-api"
+            artifactId = "${archives_base_name}-api"
             artifact apiJar
             artifact apiSourcesJar
         }

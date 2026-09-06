@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
 license = "${mod_license}"
-issueTrackerURL = "https://github.com/Darkona/green-feathers/issues"
+issueTrackerURL = "https://github.com/Darkona/feathers-of-fatigue/issues"
 
 [[mods]]
 modId = "${mod_id}"
@@ -40,9 +40,9 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${mod_id}]]
-modId = "bluedroplets"
+modId = "droplets_of_thirst"
 type = "optional"
-versionRange = "${blue_droplets_range}"
+versionRange = "${droplets_of_thirst_range}"
 ordering = "NONE"
 side = "BOTH"
 
@@ -89,4 +89,4 @@ ordering = "NONE"
 side = "BOTH"
 
 [[mixins]]
-config = "greenfeathers.mixins.json"
+config = "feathers_of_fatigue.mixins.json"

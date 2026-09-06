@@ -1,4 +1,4 @@
-# Green Feathers
+# Feathers of Fatigue
 
 **Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
@@ -32,20 +32,20 @@ Supported out of the box, each switchable in the config:
 | Cold Sweat | Your body temperature decides when you're cold or overheating |
 | Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
 | Legendary Survival Overhaul | The same, from its temperature and hydration |
-| Blue Droplets | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
-| Thirst Was Taken | The same, for worlds still on the original mod (Blue Droplets is its maintained continuation) |
+| Droplets of Thirst | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
+| Thirst Was Taken | The same, for worlds still on the original mod (Droplets of Thirst is its maintained continuation) |
 | Serene Seasons | Winter outdoors is cold, summer sun is hot |
 | Curios | The Feather Ring goes in a ring slot |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
 
 ## Documentation
 
-The [wiki](https://github.com/Darkona/green-feathers/wiki) has the details:
+The [wiki](https://github.com/Darkona/feathers-of-fatigue/wiki) has the details:
 
-- [How It Plays](https://github.com/Darkona/green-feathers/wiki/How-It-Plays): every mechanic, with the numbers.
-- [Configuration](https://github.com/Darkona/green-feathers/wiki/Configuration): every option, and the `/feathers` command.
-- [Modpack Makers](https://github.com/Darkona/green-feathers/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
-- [Mod Developers](https://github.com/Darkona/green-feathers/wiki/Mod-Developers): the API, to spend feathers from your own mod.
+- [How It Plays](https://github.com/Darkona/feathers-of-fatigue/wiki/How-It-Plays): every mechanic, with the numbers.
+- [Configuration](https://github.com/Darkona/feathers-of-fatigue/wiki/Configuration): every option, and the `/feathers` command.
+- [Modpack Makers](https://github.com/Darkona/feathers-of-fatigue/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
+- [Mod Developers](https://github.com/Darkona/feathers-of-fatigue/wiki/Mod-Developers): the API, to spend feathers from your own mod.
 
 ## License
 

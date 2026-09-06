@@ -87,7 +87,7 @@ xvfb-run -n 97 -f "$XAUTH" -s "-screen 0 1920x1080x24" ./gradlew runBootCheck --
 PID=$!
 logs() { cat "$LOG" "$GAME_LOG" 2>/dev/null; }
 
-FAIL_RE='InvalidInjectionException|Mixin apply failed|Preparing crash report|Exception in thread "Render thread"|Failed to load builder \(greenfeathers|FileNotFoundException: .*feathers'
+FAIL_RE='InvalidInjectionException|Mixin apply failed|Preparing crash report|Exception in thread "Render thread"|Failed to load builder \(feathers_of_fatigue|FileNotFoundException: .*feathers'
 OK_RE='joined the game'
 verdict="TIMEOUT after ${TIMEOUT}s"
 for _ in $(seq 1 "$TIMEOUT"); do

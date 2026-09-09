@@ -1,14 +1,14 @@
 # Mod Developers
 
-Green Feathers is built to be spent by other mods. Compile against the API jar and treat it as optional:
+Feathers of Fatigue is built to be spent by other mods. Compile against the API jar and treat it as optional:
 
 ```groovy
-compileOnly "com.darkona.feathers:greenfeathers-api:1.21.1-2.0.0"
+compileOnly "com.darkona.feathersoffatigue:feathers-of-fatigue-api:1.21.1-2.0.0"
 ```
 
-Guard every call with `ModList.get().isLoaded("greenfeathers")`, and keep the calls in a class that only loads when it is: your mod then works with and without Green Feathers.
+Guard every call with `ModList.get().isLoaded("feathers_of_fatigue")`, and keep the calls in a class that only loads when it is: your mod then works with and without Feathers of Fatigue.
 
-`com.darkona.feathers.api.FeathersAPI` is the place to start; every class in the API is documented.
+`com.darkona.feathersoffatigue.api.FeathersAPI` is the place to start; every class in the API is documented.
 
 ## Spending
 

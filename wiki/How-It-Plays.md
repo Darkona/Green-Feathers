@@ -8,7 +8,7 @@ Feathers come back on their own, a little every second, after a short pause once
 
 The color is yours to pick in the client config: green, blue (like Elenai's original) or white (chicken feathers).
 
-| ![Green feathers](images/color-green.png) | ![Blue feathers](images/color-blue.png) | ![White feathers](images/color-white.png) |
+| ![Green color](images/color-green.png) | ![Blue color](images/color-blue.png) | ![White color](images/color-white.png) |
 |---|---|---|
 | Green | Blue | White |
 

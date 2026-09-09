@@ -1,6 +1,6 @@
 # Compatibility
 
-Green Feathers stacks neatly with the other bars on the right: food, air bubbles, thirst.
+Feathers of Fatigue stacks neatly with the other bars on the right: food, air bubbles, thirst.
 
 | ![With Thirst Was Taken, Cold Sweat and AppleSkin](images/compat-thirst.png) | ![With Tough As Nails, Serene Seasons and AppleSkin](images/compat-tan.png) |
 |---|---|
@@ -8,7 +8,7 @@ Green Feathers stacks neatly with the other bars on the right: food, air bubbles
 | ![Underwater in iron armor](images/underwater.png) | ![Jade showing a horse's stamina](images/jade.png) |
 | Underwater in iron armor: feathers above the air bubbles | Jade shows a mount's stamina |
 
-Supported out of the box, each with its own switch in `Feathers-Compat.toml`:
+Supported out of the box, each with its own switch in `FeathersOfFatigue-Compat.toml`:
 
 | Mod | What it does with feathers |
 |---|---|
@@ -25,7 +25,7 @@ Mods that change what the player does (ParCool, Paragliders, Better Combat, Comb
 
 ## Versions
 
-Green Feathers calls into these mods directly, so it accepts the versions it was tested with, up to the next major version. With a version outside that range, the game stops at load and names the mod and the range, instead of crashing later in the middle of play.
+Feathers of Fatigue calls into these mods directly, so it accepts the versions it was tested with, up to the next major version. With a version outside that range, the game stops at load and names the mod and the range, instead of crashing later in the middle of play.
 
 | Mod | Accepted versions (1.20.1) |
 |---|---|

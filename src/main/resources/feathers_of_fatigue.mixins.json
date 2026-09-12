@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.darkona.feathersoffatigue.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "feathers_of_fatigue.refmap.json",
+  "mixins": [
+    "AbstractHorseMixin",
+    "ServerGamePacketListenerImplMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

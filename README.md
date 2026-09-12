@@ -1,10 +1,10 @@
-# Green Feathers
+# Feathers of Fatigue
 
 **Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
 Minecraft 1.19.2 · Forge · based on Elenai's Feathers
 
-![Feathers above the food bar, with a golden row of Endurance feathers](https://raw.githubusercontent.com/Darkona/Green-Feathers/main/wiki/images/hud.png)
+![Feathers above the food bar, with a golden row of Endurance feathers](https://raw.githubusercontent.com/Darkona/feathers-of-fatigue/main/wiki/images/hud.png)
 
 ## How it plays
 
@@ -17,13 +17,13 @@ Minecraft 1.19.2 · Forge · based on Elenai's Feathers
 - **Mounts tire too** (optional). Horses, donkeys and mules have their own feathers, shown instead of yours while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount slows down and can't jump. Horse armor weighs a little too. Like speed and health, each animal is born with its own stamina, and foals take after their parents.
 - **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
 
-On its own, Green Feathers makes sprinting and jumping cost feathers. Install [Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and movement mods like ParCool, Paragliders and Better Combat.
+On its own, Feathers of Fatigue makes sprinting and jumping cost feathers. Install [Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and movement mods like ParCool, Paragliders and Better Combat.
 
 ## Plays well with others
 
 It stacks neatly with the other bars on the right: food, air bubbles, thirst.
 
-| ![With Thirst Was Taken, Cold Sweat and AppleSkin](https://raw.githubusercontent.com/Darkona/Green-Feathers/main/wiki/images/compat-thirst.png) | ![Riding a horse](https://raw.githubusercontent.com/Darkona/Green-Feathers/main/wiki/images/mount-white.png) |
+| ![With Thirst Was Taken, Cold Sweat and AppleSkin](https://raw.githubusercontent.com/Darkona/feathers-of-fatigue/main/wiki/images/compat-thirst.png) | ![Riding a horse](https://raw.githubusercontent.com/Darkona/feathers-of-fatigue/main/wiki/images/mount-white.png) |
 |---|---|
 | With Thirst Was Taken, Cold Sweat and AppleSkin | Riding a horse: its feathers, in its colors |
 
@@ -41,12 +41,12 @@ Supported out of the box, each switchable in the config:
 
 ## Documentation
 
-The [wiki](https://github.com/Darkona/green-feathers/wiki) has the details:
+The [wiki](https://github.com/Darkona/feathers-of-fatigue/wiki) has the details:
 
-- [How It Plays](https://github.com/Darkona/green-feathers/wiki/How-It-Plays): every mechanic, with the numbers.
-- [Configuration](https://github.com/Darkona/green-feathers/wiki/Configuration): every option, and the `/feathers` command.
-- [Modpack Makers](https://github.com/Darkona/green-feathers/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
-- [Mod Developers](https://github.com/Darkona/green-feathers/wiki/Mod-Developers): the API, to spend feathers from your own mod.
+- [How It Plays](https://github.com/Darkona/feathers-of-fatigue/wiki/How-It-Plays): every mechanic, with the numbers.
+- [Configuration](https://github.com/Darkona/feathers-of-fatigue/wiki/Configuration): every option, and the `/feathers` command.
+- [Modpack Makers](https://github.com/Darkona/feathers-of-fatigue/wiki/Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
+- [Mod Developers](https://github.com/Darkona/feathers-of-fatigue/wiki/Mod-Developers): the API, to spend feathers from your own mod.
 
 The wiki describes the Minecraft 1.21.1 version. What is different on 1.19.2 (file paths, API types, what isn't available) is in the [changelog](CHANGELOG.md).
 

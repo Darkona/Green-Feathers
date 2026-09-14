@@ -9,7 +9,7 @@ version = "${minecraft_version}-${mod_version}"
 group = mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = archives_base_name
 }
 
 // Minecraft 1.18.2 runs on Java 17: compile for it and run the game on it.
@@ -22,7 +22,7 @@ java.withSourcesJar()
 if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
     def mergedDataMaps = layout.buildDirectory.dir('gametest-datamaps')
     def mergeTestDataMaps = tasks.register('mergeTestDataMaps') {
-        def modMaps = file('src/main/resources/data/greenfeathers/data_maps/entity_type')
+        def modMaps = file('src/main/resources/data/feathers_of_fatigue/data_maps/entity_type')
         def testMaps = file('src/gametest/datamaps')
         inputs.dir(modMaps)
         inputs.dir(testMaps)
@@ -33,7 +33,7 @@ if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
                 def modFile = new File(modMaps, testFile.name)
                 def merged = modFile.exists() ? slurper.parse(modFile) : [replace: false, values: [:]]
                 merged.values.putAll(slurper.parse(testFile).values)
-                def out = mergedDataMaps.get().file("data/greenfeathers/data_maps/entity_type/${testFile.name}").asFile
+                def out = mergedDataMaps.get().file("data/feathers_of_fatigue/data_maps/entity_type/${testFile.name}").asFile
                 out.parentFile.mkdirs()
                 out.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(merged))
             }
@@ -44,7 +44,7 @@ if (gradle.startParameter.taskNames.any { it.contains('GameTest') }) {
 }
 
 // The public API lives in its own source set and ships twice: inside the mod jar, and alone as
-// greenfeathers-api for other mods to compile against.
+// feathers-of-fatigue-api for other mods to compile against.
 sourceSets {
     api
 }
@@ -209,11 +209,11 @@ tasks.named('sourcesJar', Jar) {
 }
 
 var apiJar = tasks.register('apiJar', Jar) {
-    archiveBaseName = "${mod_id}-api"
+    archiveBaseName = "${archives_base_name}-api"
     from sourceSets.api.output
 }
 var apiSourcesJar = tasks.register('apiSourcesJar', Jar) {
-    archiveBaseName = "${mod_id}-api"
+    archiveBaseName = "${archives_base_name}-api"
     archiveClassifier = 'sources'
     from sourceSets.api.allSource
 }
@@ -221,7 +221,7 @@ var apiSourcesJar = tasks.register('apiSourcesJar', Jar) {
 apiJar.configure { destinationDirectory = layout.buildDirectory.dir('devlibs') }
 var reobfApiJar = tasks.register('reobfApiJar', net.neoforged.moddevgradle.legacyforge.tasks.RemapJar) {
     input = apiJar.flatMap { it.archiveFile }
-    archiveBaseName = "${mod_id}-api"
+    archiveBaseName = "${archives_base_name}-api"
     destinationDirectory = layout.buildDirectory.dir('libs')
     libraries.from(sourceSets.api.compileClasspath)
     obfuscation.configureNamedToSrgOperation(remapOperation)
@@ -238,7 +238,7 @@ publishing {
             from components.java
         }
         register('api', MavenPublication) {
-            artifactId = "${mod_id}-api"
+            artifactId = "${archives_base_name}-api"
             artifact reobfApiJar
             artifact apiSourcesJar
         }

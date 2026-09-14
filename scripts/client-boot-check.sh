@@ -87,7 +87,7 @@ rm -f "$SRV/gfboot/session.lock"
 # A fresh player, placed at the world spawn in survival, or the HUD under test (hearts, food, feathers) is hidden.
 rm -rf "$SRV/gfboot/playerdata"
 # Server configs come from run/bootserver/defaultconfigs (Forge copies them into a world without its own), so a check
-# can set game rules there, e.g. defaultconfigs/feathers/Feathers-Server.toml with armor_weights_enabled = true.
+# can set game rules there, e.g. defaultconfigs/feathers_of_fatigue/FeathersOfFatigue-Server.toml with armor_weights_enabled = true.
 rm -rf "$SRV/gfboot/serverconfig"
 write_props gfboot
 # The client plays as GFBoot (build.gradle), an operator so the setup commands run. Offline UUID, as the server computes it.

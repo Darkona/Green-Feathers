@@ -6,6 +6,12 @@ Changes by feature, newest version first.
 
 The Green Feathers rewrite of 1.21.1, ported to Forge 1.18.2 (through the 1.20.1 and 1.19.2 ports) with the same features, config options and API. It replaces the 1.3.0 code of this branch, and its API. Needs Forge 40.2.3 or later.
 
+### Renamed to Feathers of Fatigue
+
+- Green Feathers is now **Feathers of Fatigue**. Every id follows: the mod id and resource namespace are `feathers_of_fatigue` (attributes, effects, enchantments, tags, lang keys), the code lives in `com.darkona.feathersoffatigue` (the API in `com.darkona.feathersoffatigue.api`), and the jars are `feathers-of-fatigue` and `feathers-of-fatigue-api` (group `com.darkona.feathersoffatigue`).
+- Config files are `FeathersOfFatigue-Server.toml`, `FeathersOfFatigue-Compat.toml` and `FeathersOfFatigue-Client.toml`, in `serverconfig/feathers_of_fatigue/` and `config/feathers_of_fatigue/`. The `/feathers` command keeps its name.
+- Worlds and configs from earlier builds do not carry over: stored feathers, enchantments and items under the old ids are lost, and the old config files are ignored.
+
 ### Stamina
 
 - Feathers regenerate on their own after a short pause once you spend some.

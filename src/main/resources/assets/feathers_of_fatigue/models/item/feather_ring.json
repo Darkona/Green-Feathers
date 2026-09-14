@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "feathers_of_fatigue:item/feather_ring"
+  }
+}

@@ -5,7 +5,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 
-version = "${minecraft_version}-${mod_version}"
+version = "${minecraft_label}-${mod_version}"
 group = mod_group_id
 
 base {
@@ -166,7 +166,7 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,
-            mod_version            : mod_version,
+            mod_version            : project.version.toString(),
             mod_authors            : mod_authors,
             mod_description        : mod_description,
             cold_sweat_range       : cold_sweat_range,

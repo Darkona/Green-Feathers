@@ -2,7 +2,7 @@
 
 Changes by feature, newest version first.
 
-## 2.0.0 (Minecraft 1.21.1, NeoForge), unreleased
+## 1.21.1-2.0.0 (NeoForge), unreleased
 
 A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 

@@ -2,7 +2,7 @@
 
 Changes by feature, newest version first.
 
-## 2.0.0 (Minecraft 1.18.2, Forge 40), unreleased
+## 1.18.2-2.0.0 (Forge 40), unreleased
 
 The Green Feathers rewrite of 1.21.1, ported to Forge 1.18.2 (through the 1.20.1 and 1.19.2 ports) with the same features, config options and API. It replaces the 1.3.0 code of this branch, and its API. Needs Forge 40.2.3 or later.
 

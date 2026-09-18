@@ -64,7 +64,8 @@ Each one only does something when its mod is installed, and can be turned off in
 - Cold Sweat 2.4.3.2: body temperature decides cold and heat.
 - Tough As Nails 9.2.0.171: its temperature decides cold and heat; its thirst affects regeneration.
 - Legendary Survival Overhaul 1.20.1-2.4.7: its temperature and hydration, the same way.
-- Thirst Was Taken 1.20.1-1.4.0: thirst slows regeneration, being well quenched speeds it up.
+- Droplets of Thirst 1.20.1-1.0.0, the maintained continuation of Thirst Was Taken: thirst slows regeneration, being well quenched speeds it up, and regenerating can cost thirst (optional, `thirst_per_regenerated_feather` in `[droplets_of_thirst]`). Players with thirst turned off are not affected.
+- Thirst Was Taken 1.20.1-1.4.0: the same, for packs still on the original mod.
 - Serene Seasons 9.1.0.3: winter outdoors is cold, summer sun is hot.
 - Curios 5.14.1: the Feather Ring goes in a ring slot.
 - Jade 11.13.3: looking at a mount shows its stamina.

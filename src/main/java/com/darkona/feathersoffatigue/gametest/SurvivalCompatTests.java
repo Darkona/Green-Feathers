@@ -6,11 +6,13 @@ import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.compatibility.coldsweat.ColdSweatCompat;
+import com.darkona.feathersoffatigue.compatibility.dropletsofthirst.DropletsOfThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.lso.LegendarySurvivalCompat;
 import com.darkona.feathersoffatigue.compatibility.sereneseasons.SereneSeasonsCompat;
 import com.darkona.feathersoffatigue.compatibility.thirst.ThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.toughasnails.ToughAsNailsCompat;
 import com.darkona.feathersoffatigue.gametest.scenario.ColdSweatScenario;
+import com.darkona.feathersoffatigue.gametest.scenario.DropletsOfThirstScenario;
 import com.darkona.feathersoffatigue.gametest.scenario.LegendarySurvivalScenario;
 import com.darkona.feathersoffatigue.gametest.scenario.SereneSeasonsScenario;
 import com.darkona.feathersoffatigue.gametest.scenario.ThirstScenario;
@@ -83,6 +85,36 @@ public class SurvivalCompatTests {
             helper.assertTrue(regenAfterFactors(player) < 0.05, "parched: regeneration nearly stops, was " + FeathersAPI.getRegenPerSecond(player));
             ThirstScenario.thirst(player, 20, 10);
             helper.assertTrue(regenAfterFactors(player) > 0.4, "quenched: regeneration above base, was " + FeathersAPI.getRegenPerSecond(player));
+        });
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void dropletsOfThirstSlowsRegeneration(GameTestHelper helper) {
+        if (DropletsOfThirstCompat.LOADED) withCompat(() -> {
+            ServerPlayer player = player(helper);
+            DropletsOfThirstScenario.thirst(player, 0, 0);
+            helper.assertTrue(regenAfterFactors(player) < 0.05, "parched: regeneration nearly stops, was " + FeathersAPI.getRegenPerSecond(player));
+            DropletsOfThirstScenario.thirst(player, 20, 10);
+            helper.assertTrue(regenAfterFactors(player) > 0.4, "quenched: regeneration above base, was " + FeathersAPI.getRegenPerSecond(player));
+        });
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void dropletsOfThirstRegenerationCostsThirst(GameTestHelper helper) {
+        if (DropletsOfThirstCompat.LOADED) withCompat(() -> {
+            FeathersCompatConfig.DROPLETS_OF_THIRST_THIRST_PER_FEATHER.set(1.0);
+            try {
+                ServerPlayer player = player(helper);
+                DropletsOfThirstScenario.thirst(player, 20, 0);
+                FeathersAPI.setStamina(player, 0);
+                tick(player, 200);
+                int thirst = DropletsOfThirstScenario.thirst(player);
+                helper.assertTrue(thirst <= 18, "one thirst point per regenerated feather: thirst should drop, was " + thirst);
+            } finally {
+                FeathersCompatConfig.DROPLETS_OF_THIRST_THIRST_PER_FEATHER.set(0.0);
+            }
         });
         helper.succeed();
     }

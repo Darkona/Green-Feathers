@@ -40,6 +40,13 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${mod_id}]]
+modId = "droplets_of_thirst"
+mandatory = false
+versionRange = "${droplets_of_thirst_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
 modId = "overflowingbars"
 mandatory = false
 versionRange = "${overflowing_bars_range}"

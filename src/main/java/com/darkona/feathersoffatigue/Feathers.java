@@ -5,6 +5,7 @@ import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.compatibility.coldsweat.ColdSweatCompat;
 import com.darkona.feathersoffatigue.compatibility.curios.CuriosCompat;
+import com.darkona.feathersoffatigue.compatibility.dropletsofthirst.DropletsOfThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.sereneseasons.SereneSeasonsCompat;
 import com.darkona.feathersoffatigue.compatibility.thirst.ThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.toughasnails.ToughAsNailsCompat;
@@ -73,6 +74,7 @@ public final class Feathers {
         BuiltInFeatherStyles.register();
         ColdSweatCompat.init();
         ThirstCompat.init();
+        DropletsOfThirstCompat.init();
         ToughAsNailsCompat.init();
         SereneSeasonsCompat.init();
     }

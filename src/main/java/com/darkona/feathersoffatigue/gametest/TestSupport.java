@@ -35,7 +35,7 @@ final class TestSupport {
 
     /** Compatibility switches that keep optional thirst or temperature mods from changing ordinary tests. */
     private static final List<ForgeConfigSpec.BooleanValue> COMPATS = List.of(FeathersCompatConfig.COLD_SWEAT, FeathersCompatConfig.THIRST,
-            FeathersCompatConfig.TAN, FeathersCompatConfig.SEASONS);
+            FeathersCompatConfig.DROPLETS_OF_THIRST, FeathersCompatConfig.TAN, FeathersCompatConfig.SEASONS);
 
     static {
         stopWatchingConfigFiles();

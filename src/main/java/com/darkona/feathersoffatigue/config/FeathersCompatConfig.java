@@ -26,6 +26,12 @@ public final class FeathersCompatConfig {
     public static final DoubleValue QUENCH_REGEN_BONUS;
     public static final DoubleValue THIRST_PER_FEATHER;
 
+    /* Droplets of Thirst */
+    public static final BooleanValue DROPLETS_OF_THIRST;
+    public static final DoubleValue DROPLETS_OF_THIRST_REGEN_REDUCTION;
+    public static final DoubleValue DROPLETS_OF_THIRST_QUENCH_BONUS;
+    public static final DoubleValue DROPLETS_OF_THIRST_THIRST_PER_FEATHER;
+
     /* Tough As Nails */
     public static final BooleanValue TAN;
     public static final BooleanValue TAN_TEMPERATURE;
@@ -71,6 +77,18 @@ public final class FeathersCompatConfig {
         QUENCH_REGEN_BONUS = builder.comment("Feathers per second gained per point of quench (thirst saturation).")
                 .defineInRange("regen_bonus_per_quench_point", 0.02, 0.0, 20.0);
         THIRST_PER_FEATHER = builder.comment("Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.")
+                .defineInRange("thirst_per_regenerated_feather", 0.0, 0.0, 20.0);
+        builder.pop();
+
+        builder.comment("Droplets of Thirst (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.",
+                "Ignored for players whose thirst is off.").push("droplets_of_thirst");
+        DROPLETS_OF_THIRST = builder.comment("Use Droplets of Thirst when it is installed.")
+                .define("enabled", true);
+        DROPLETS_OF_THIRST_REGEN_REDUCTION = builder.comment("Feathers per second lost per missing thirst point (20 points = full).")
+                .defineInRange("regen_reduction_per_thirst_point", 0.02, 0.0, 20.0);
+        DROPLETS_OF_THIRST_QUENCH_BONUS = builder.comment("Feathers per second gained per point of quenched (thirst saturation).")
+                .defineInRange("regen_bonus_per_quench_point", 0.02, 0.0, 20.0);
+        DROPLETS_OF_THIRST_THIRST_PER_FEATHER = builder.comment("Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.")
                 .defineInRange("thirst_per_regenerated_feather", 0.0, 0.0, 20.0);
         builder.pop();
 

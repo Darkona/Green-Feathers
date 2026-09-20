@@ -33,7 +33,8 @@ Supported out of the box, each switchable in the config:
 |---|---|
 | Cold Sweat | Your body temperature decides when you're cold or overheating |
 | Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
-| Thirst Was Taken | Being thirsty slows recovery, being well quenched speeds it up |
+| Droplets of Thirst | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
+| Thirst Was Taken | The same, for worlds still on the original mod (Droplets of Thirst is its maintained continuation) |
 | Serene Seasons | Winter outdoors is cold, summer sun is hot |
 | Curios | The Feather Ring goes in a ring slot |
 | Jade | Looking at a mount shows its stamina |

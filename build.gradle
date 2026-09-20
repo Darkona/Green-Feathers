@@ -51,6 +51,10 @@ sourceSets {
 
 repositories {
     mavenCentral()
+    // Droplets of Thirst: `./gradlew publishToMavenLocal` in its repository.
+    mavenLocal {
+        content { includeGroup 'com.darkona.dropletsofthirst' }
+    }
     maven {
         name = 'Curios'
         url = 'https://maven.theillusivec4.top/'
@@ -140,6 +144,7 @@ dependencies {
     // Optional compat: every use sits behind a ModList check.
     modCompileOnly "maven.modrinth:cold-sweat:${cold_sweat_version}"
     modCompileOnly "maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"
+    modCompileOnly "com.darkona.dropletsofthirst:droplets-of-thirst-api:${droplets_of_thirst_version}"
     modCompileOnly "maven.modrinth:tough-as-nails:${tough_as_nails_version}"
     modCompileOnly "maven.modrinth:serene-seasons:${serene_seasons_version}"
     modCompileOnly "maven.modrinth:overflowing-bars:${overflowing_bars_version}"
@@ -156,6 +161,7 @@ dependencies {
 def compatRuntime = [
         coldsweat      : ["maven.modrinth:cold-sweat:${cold_sweat_version}"],
         thirst         : ["maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"],
+        dropletsofthirst: ["com.darkona.dropletsofthirst:droplets-of-thirst:${droplets_of_thirst_version}"],
         toughasnails   : ["maven.modrinth:tough-as-nails:${tough_as_nails_version}"],
         sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}"],
         appleskin      : ["maven.modrinth:appleskin:${appleskin_version}"],
@@ -188,6 +194,7 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             mod_description        : mod_description,
             cold_sweat_range       : cold_sweat_range,
             thirst_range           : thirst_range,
+            droplets_of_thirst_range: droplets_of_thirst_range,
             overflowing_bars_range : overflowing_bars_range,
             curios_range           : curios_range,
             jade_range             : jade_range,

@@ -59,11 +59,12 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.18.2 (through the 1.20.1
 
 ### Compatibility
 
-Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.18.2 Forge builds. Cold Sweat, Thirst Was Taken, Curios, Jade and Overflowing Bars accept versions up to their next major one: another version stops the game at load with a message instead of a crash in play. Tough As Nails and Serene Seasons jars declare no version, so they have no range.
+Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.18.2 Forge builds. Cold Sweat, Droplets of Thirst, Thirst Was Taken, Curios, Jade and Overflowing Bars accept versions up to their next major one: another version stops the game at load with a message instead of a crash in play. Tough As Nails and Serene Seasons jars declare no version, so they have no range.
 
 - Cold Sweat 2.4.3: body temperature decides cold and heat.
 - Tough As Nails 7.0.0.73: its temperature decides cold and heat; its thirst affects regeneration.
-- Thirst Was Taken 1.18.2-1.3.11: thirst slows regeneration, being well quenched speeds it up.
+- Droplets of Thirst 1.18.2-1.0.0, the maintained continuation of Thirst Was Taken: thirst slows regeneration, being well quenched speeds it up, and regenerating can cost thirst (optional, `thirst_per_regenerated_feather` in `[droplets_of_thirst]`). Players with thirst turned off are not affected.
+- Thirst Was Taken 1.18.2-1.3.11: the same, for packs still on the original mod.
 - Serene Seasons 7.0.0.15: winter outdoors is cold, summer sun is hot.
 - Curios 1.18.2-5.0.9.2: the Feather Ring goes in a ring slot.
 - Jade 5.3.2: looking at a mount shows its stamina (it can be turned off in Jade's plugin settings).

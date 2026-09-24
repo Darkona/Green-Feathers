@@ -3,7 +3,7 @@ package com.darkona.feathersoffatigue.client.gui;
 import com.darkona.feathersoffatigue.api.client.FeatherStyle;
 import com.darkona.feathersoffatigue.api.client.FeatherVariants;
 import com.darkona.feathersoffatigue.api.client.FeatherVariants.Sprites;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * A {@link FeatherStyle} resolved for drawing: its colors, where its variant's and overlay's cells are. Filled in place
@@ -16,16 +16,16 @@ final class Look {
     int body;
     int border;
     /** The variant's texture, its size and cell row. */
-    ResourceLocation sheet = FeatherVariants.SHEET;
+    Identifier sheet = FeatherVariants.SHEET;
     int sheetWidth = FeatherVariants.SHEET_WIDTH;
     int sheetHeight = FeatherVariants.SHEET_HEIGHT;
     int row = 1;
     /** Where the empty slot's fill is (row 0), and that texture's size. */
-    ResourceLocation slotSheet = FeatherVariants.SHEET;
+    Identifier slotSheet = FeatherVariants.SHEET;
     int slotWidth = FeatherVariants.SHEET_WIDTH;
     int slotHeight = FeatherVariants.SHEET_HEIGHT;
     boolean overlay;
-    ResourceLocation overlaySheet = FeatherVariants.SHEET;
+    Identifier overlaySheet = FeatherVariants.SHEET;
     int overlayWidth = FeatherVariants.SHEET_WIDTH;
     int overlayHeight = FeatherVariants.SHEET_HEIGHT;
     int overlayRow;
@@ -36,7 +36,7 @@ final class Look {
         body = style.body();
         border = style.border();
         // A style's own sprites are laid out like the sheet, so they have its size.
-        ResourceLocation override = style.sprites();
+        Identifier override = style.sprites();
         Sprites variant = FeatherVariants.variant(style.variant());
         if (variant == null) variant = FeatherVariants.variant(FeatherVariants.FEATHER);
         if (variant == null) variant = FALLBACK;

@@ -16,17 +16,17 @@ import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.style.FeatherStylePack;
 import com.darkona.feathersoffatigue.weight.ArmorWeights;
 import com.darkona.feathersoffatigue.weight.WeightSplit;
-import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.overflowingbars.client.gui.RowCountRenderer;
+import fuzs.overflowingbars.common.client.gui.RowCountRenderer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -48,8 +48,8 @@ import static com.darkona.feathersoffatigue.client.gui.Icons.*;
  */
 public final class FeathersHud {
 
-    public static final ResourceLocation LAYER_ID = id("feathers");
-    private static final ResourceLocation ICONS = FeatherVariants.SHEET;
+    public static final Identifier LAYER_ID = id("feathers");
+    private static final Identifier ICONS = FeatherVariants.SHEET;
     private static final int ICONS_PER_ROW = 10;
     private static final int FEATHERS_PER_ROW = ICONS_PER_ROW * 2;
     private static final int ROW_HEIGHT = 10;
@@ -86,6 +86,8 @@ public final class FeathersHud {
     private static final Look TINTED = new Look().set(FALLBACK);
     /** FeatherColors' pairs are RGB: full alpha on top. */
     private static final int OPAQUE = 0xFF000000;
+    /** The ARGB color icons are drawn in, fade included: set before each run of icons. */
+    private static int color = -1;
 
     private FeathersHud() {}
 
@@ -102,6 +104,7 @@ public final class FeathersHud {
         shakeClock = 0;
         pulsePhase = 0;
         pulse = 0;
+        FeatherColors.forgetCreature();
     }
 
     public static void tickAnimations() {
@@ -152,7 +155,7 @@ public final class FeathersHud {
         }
     }
 
-    public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode == null || !mc.gameMode.canHurtPlayer() || !(mc.getCameraEntity() instanceof LocalPlayer player)) return;
         if (!DATA.hasFeathers() || DATA.maxStamina() <= 0) return;
@@ -172,8 +175,7 @@ public final class FeathersHud {
         if (stack) gui.rightHeight += ROW_HEIGHT * (1 + bonusRows);
 
         if (alpha > 0) {
-            RenderSystem.enableBlend();
-            graphics.setColor(1f, 1f, 1f, alpha);
+            color = ARGB.white(alpha);
             if (riding) {
                 long tint = FeatherColors.of(vehicle);
                 drawRow(graphics, mount, TINTED.colors(OPAQUE | FeatherColors.body(tint), OPAQUE | FeatherColors.outline(tint)), false, vehicle, x, y);
@@ -181,8 +183,6 @@ public final class FeathersHud {
                 drawRow(graphics, DATA, OWN, true, player, x, y);
             }
             drawBonus(graphics, shown, x, y - ROW_HEIGHT, bonusRows);
-            graphics.setColor(1f, 1f, 1f, 1f);
-            RenderSystem.disableBlend();
         }
 
         if (FeathersServerConfig.DEBUG_MODE.get()) drawDebug(graphics, mc.font, player);
@@ -201,7 +201,7 @@ public final class FeathersHud {
      * One row of feathers in {@code look} (its overlay only when {@code overlay}). {@code wearer} colors the armor weight
      * by piece. A null wearer leaves the weight gray.
      */
-    private static void drawRow(GuiGraphics graphics, FeathersView view, Look look, boolean overlay, LivingEntity wearer, int x, int y) {
+    private static void drawRow(GuiGraphicsExtractor graphics, FeathersView view, Look look, boolean overlay, LivingEntity wearer, int x, int y) {
         int maxFeathers = view.maxFeathers();
         int feathers = view.feathers();
         int body = look.body;
@@ -236,7 +236,7 @@ public final class FeathersHud {
         if (layers > 1) drawRowCount(graphics, x, y, layers);
     }
 
-    private static void drawBonus(GuiGraphics graphics, FeathersView view, int x, int y, int rows) {
+    private static void drawBonus(GuiGraphicsExtractor graphics, FeathersView view, int x, int y, int rows) {
         int bonusFeathers = Stamina.toFeathersCeil(view.bonusStamina());
         for (int row = 0; row < rows; row++) {
             int inRow = Math.min(FEATHERS_PER_ROW, bonusFeathers - row * FEATHERS_PER_ROW);
@@ -250,7 +250,7 @@ public final class FeathersHud {
      * Armor weight from the right, head to feet: each piece's share in that piece's colors (leather in its dye), and
      * weight from other sources in gray.
      */
-    private static void drawWeight(GuiGraphics graphics, FeathersView view, LivingEntity wearer, int x, int y) {
+    private static void drawWeight(GuiGraphicsExtractor graphics, FeathersView view, LivingEntity wearer, int x, int y) {
         int weight = Math.min(FEATHERS_PER_ROW, view.weight());
         if (weight <= 0) return;
         if (wearer == null || !(view instanceof SyncedFeathers synced)) {
@@ -292,7 +292,7 @@ public final class FeathersHud {
     /** Shares from here on are colored weight sources. */
     private static final int SOURCE = ArmorWeights.PARTS;
 
-    private static void drawPart(GuiGraphics graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer, WeightSplit split) {
+    private static void drawPart(GuiGraphicsExtractor graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer, WeightSplit split) {
         if (part >= SOURCE) {
             int tint = split.tint(part - SOURCE);
             drawTinted(graphics, x, y, index, half, tint >= 0 ? FeatherColors.ofColor(tint) : FeatherColors.of(BuiltInRegistries.ITEM.byId(-tint - 1)));
@@ -307,18 +307,18 @@ public final class FeathersHud {
     }
 
     /** One plain feather in a FeatherColors pair: its body color, outlined in the complementary one. */
-    private static void drawTinted(GuiGraphics graphics, int x, int y, int index, boolean half, long tint) {
+    private static void drawTinted(GuiGraphicsExtractor graphics, int x, int y, int index, boolean half, long tint) {
         drawIcons(graphics, x, y, index, index + 1, half, OPAQUE | FeatherColors.body(tint), OPAQUE | FeatherColors.outline(tint), TINTED);
     }
 
-    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, Look look) {
+    private static void drawFeathers(GuiGraphicsExtractor graphics, int x, int y, int count, Look look) {
         drawFeathers(graphics, x, y, count, look.body, look.border, look);
     }
 
     /**
      * {@code count} feathers from the right, two per icon; an odd count ends in a half icon.
      */
-    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, int body, int border, Look sprites) {
+    private static void drawFeathers(GuiGraphicsExtractor graphics, int x, int y, int count, int body, int border, Look sprites) {
         if (count <= 0) return;
         drawIcons(graphics, x, y, 0, (count + 1) / 2, (count & 1) == 1, body, border, sprites);
     }
@@ -328,63 +328,62 @@ public final class FeathersHud {
      * {@code halfLast}: all bodies in one color, all shines, then all borders in the other, so the color changes three
      * times per run instead of per icon. A border with alpha 0 is not drawn.
      */
-    private static void drawIcons(GuiGraphics graphics, int x, int y, int from, int to, boolean halfLast, int body, int border, Look sprites) {
-        ResourceLocation sheet = sprites.sheet;
+    private static void drawIcons(GuiGraphicsExtractor graphics, int x, int y, int from, int to, boolean halfLast, int body, int border, Look sprites) {
+        Identifier sheet = sprites.sheet;
         int width = sprites.sheetWidth;
         int height = sprites.sheetHeight;
         int v = sprites.row * SIZE;
         int halfIcon = halfLast ? to - 1 : -1;
         setColor(graphics, pulse > 0 ? brighten(body) : body);
         for (int i = from; i < to; i++) draw(graphics, sheet, width, height, x, y, i, i == halfIcon ? BODY_HALF_U : BODY_FULL_U, v);
-        graphics.setColor(1f, 1f, 1f, alpha);
+        color = ARGB.white(alpha);
         for (int i = from; i < to; i++) draw(graphics, sheet, width, height, x, y, i, i == halfIcon ? SHINE_HALF_U : SHINE_FULL_U, v);
         if ((border >>> 24) != 0) {
             setColor(graphics, border);
             for (int i = from; i < to; i++) draw(graphics, sheet, width, height, x, y, i, i == halfIcon ? BORDER_HALF_U : BORDER_FULL_U, v);
-            graphics.setColor(1f, 1f, 1f, alpha);
+            color = ARGB.white(alpha);
         }
     }
 
     /** Empty slots: the fill in the style's body color, the outline (its variant's) in its border color. */
-    private static void drawSlots(GuiGraphics graphics, int x, int y, int icons, Look look) {
+    private static void drawSlots(GuiGraphicsExtractor graphics, int x, int y, int icons, Look look) {
         setColor(graphics, look.body);
         for (int i = 0; i < icons; i++) draw(graphics, look.slotSheet, look.slotWidth, look.slotHeight, x, y, i, EMPTY_U, 0);
         if ((look.border >>> 24) != 0) {
             setColor(graphics, look.border);
             for (int i = 0; i < icons; i++) draw(graphics, look.sheet, look.sheetWidth, look.sheetHeight, x, y, i, BORDER_FULL_U, look.row * SIZE);
         }
-        graphics.setColor(1f, 1f, 1f, alpha);
+        color = ARGB.white(alpha);
     }
 
     /** The style's overlay over {@code icons} slots: primary, then accent. */
-    private static void drawOverlay(GuiGraphics graphics, int x, int y, int icons, Look look) {
+    private static void drawOverlay(GuiGraphicsExtractor graphics, int x, int y, int icons, Look look) {
         int v = look.overlayRow * SIZE;
         setColor(graphics, look.overlayColor);
         for (int i = 0; i < icons; i++) draw(graphics, look.overlaySheet, look.overlayWidth, look.overlayHeight, x, y, i, OVERLAY_U, v);
         setColor(graphics, look.overlayAccent);
         for (int i = 0; i < icons; i++) draw(graphics, look.overlaySheet, look.overlayWidth, look.overlayHeight, x, y, i, OVERLAY_ACCENT_U, v);
-        graphics.setColor(1f, 1f, 1f, alpha);
+        color = ARGB.white(alpha);
     }
 
-    /** An ARGB color, its alpha times the fade. */
-    private static void setColor(GuiGraphics graphics, int argb) {
-        graphics.setColor(FastColor.ARGB32.red(argb) / 255f, FastColor.ARGB32.green(argb) / 255f, FastColor.ARGB32.blue(argb) / 255f,
-                FastColor.ARGB32.alpha(argb) / 255f * alpha);
+    /** The color the next icons are drawn in: an ARGB color, its alpha times the fade. */
+    private static void setColor(GuiGraphicsExtractor graphics, int argb) {
+        color = ARGB.multiplyAlpha(argb, alpha);
     }
 
     /** The color moved toward white by the pulse. */
     private static int brighten(int argb) {
-        int r = FastColor.ARGB32.red(argb);
-        int g = FastColor.ARGB32.green(argb);
-        int b = FastColor.ARGB32.blue(argb);
+        int r = ARGB.red(argb);
+        int g = ARGB.green(argb);
+        int b = ARGB.blue(argb);
         r += (int) ((255 - r) * pulse);
         g += (int) ((255 - g) * pulse);
         b += (int) ((255 - b) * pulse);
-        return FastColor.ARGB32.color(FastColor.ARGB32.alpha(argb), r, g, b);
+        return ARGB.color(ARGB.alpha(argb), r, g, b);
     }
 
-    private static void draw(GuiGraphics graphics, ResourceLocation sheet, int width, int height, int x, int y, int index, int u, int v) {
-        graphics.blit(sheet, x - index * 8, y + offset(index), u, v, SIZE, SIZE, width, height);
+    private static void draw(GuiGraphicsExtractor graphics, Identifier sheet, int width, int height, int x, int y, int index, int u, int v) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, sheet, x - index * 8, y + offset(index), u, v, SIZE, SIZE, width, height, color);
     }
 
     /**
@@ -412,21 +411,18 @@ public final class FeathersHud {
         for (int i = 0; i < ROW_COUNTS.length; i++) ROW_COUNTS[i] = "x" + i;
     }
 
-    private static void drawRowCount(GuiGraphics graphics, int x, int y, int layers) {
-        Font font = Minecraft.getInstance().font;
+    private static void drawRowCount(GuiGraphicsExtractor graphics, int x, int y, int layers) {
         if (overflowingBars) {
             try {
                 // Its count is value / maxRowCount: rows of one each, so the layer count comes out as is.
-                RowCountRenderer.drawBarRowCount(graphics, x + 18, y, layers, true, 1, font);
-                // It resets the color, fade included.
-                graphics.setColor(1f, 1f, 1f, alpha);
+                RowCountRenderer.drawBarRowCount(graphics, x + 18, y, layers, true, 1);
                 return;
             } catch (LinkageError e) {
                 overflowingBars = false;
                 Feathers.LOGGER.warn("Overflowing Bars' row count renderer isn't compatible, using the built-in one", e);
             }
         }
-        graphics.drawString(font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, 0xFFFFFF);
+        graphics.text(Minecraft.getInstance().font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, ARGB.white(alpha));
     }
 
     /**
@@ -434,7 +430,7 @@ public final class FeathersHud {
      * packs' changes included.
      */
     private static void refreshStyles(LocalPlayer player) {
-        ResourceLocation chosen = FeatherStyles.select(player, DATA);
+        Identifier chosen = FeatherStyles.select(player, DATA);
         FeatherStyle style = chosen != null ? FeatherStylePack.resolve(chosen) : null;
         OWN.set(style != null ? style : style(switch (FeathersClientConfig.FEATHER_COLOR.get()) {
             case GREEN -> FeatherStyles.GREEN;
@@ -449,25 +445,25 @@ public final class FeathersHud {
         TINTED.set(FALLBACK);
     }
 
-    private static FeatherStyle style(ResourceLocation id) {
+    private static FeatherStyle style(Identifier id) {
         FeatherStyle style = FeatherStylePack.resolve(id);
         return style != null ? style : FALLBACK;
     }
 
-    private static void drawDebug(GuiGraphics graphics, Font font, LocalPlayer player) {
+    private static void drawDebug(GuiGraphicsExtractor graphics, Font font, LocalPlayer player) {
         int line = 2;
-        graphics.drawString(font, "Feathers %d/%d  stamina %d/%d  bonus %d  weight %d".formatted(DATA.feathers(), DATA.maxFeathers(),
-                DATA.stamina(), DATA.maxStamina(), DATA.bonusStamina(), DATA.weight()), 2, line, 0xFFFFFF);
+        graphics.text(font, "Feathers %d/%d  stamina %d/%d  bonus %d  weight %d".formatted(DATA.feathers(), DATA.maxFeathers(),
+                DATA.stamina(), DATA.maxStamina(), DATA.bonusStamina(), DATA.weight()), 2, line, 0xFFFFFFFF);
         line += 10;
-        graphics.drawString(font, "Strain %d/%d  regen delay %d  exhausted %s  rest %s".formatted(DATA.strain(), DATA.maxStrain(),
-                DATA.regenDelay(), DATA.exhausted(), DATA.restState()), 2, line, 0xFF8080);
+        graphics.text(font, "Strain %d/%d  regen delay %d  exhausted %s  rest %s".formatted(DATA.strain(), DATA.maxStrain(),
+                DATA.regenDelay(), DATA.exhausted(), DATA.restState()), 2, line, 0xFFFF8080);
         line += 10;
-        graphics.drawString(font, "Regen %.2f f/s  usage x%.2f".formatted(FeathersAPI.getRegenPerSecond(player),
-                FeathersAPI.getUsageMultiplier(player)), 2, line, 0xDDDD00);
+        graphics.text(font, "Regen %.2f f/s  usage x%.2f".formatted(FeathersAPI.getRegenPerSecond(player),
+                FeathersAPI.getUsageMultiplier(player)), 2, line, 0xFFDDDD00);
         line += 10;
-        ResourceLocation source = DATA.lastSpendSource();
+        Identifier source = DATA.lastSpendSource();
         if (source != null) {
-            graphics.drawString(font, "Spent %d on %s".formatted(DATA.lastSpendCost(), source), 2, line, 0x80FF80);
+            graphics.text(font, "Spent %d on %s".formatted(DATA.lastSpendCost(), source), 2, line, 0xFF80FF80);
         }
     }
 }

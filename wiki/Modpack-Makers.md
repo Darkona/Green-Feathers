@@ -55,7 +55,7 @@ armor_weights = [
 ]
 ```
 
-`body` is horse armor. The data map sets weights per item from a datapack, in `data/feathers_of_fatigue/data_maps/item/armor_weight.json`:
+`body` is horse armor. On Minecraft 26.x the material is the armor's equipment model (`asset_id` of its `minecraft:equippable` component), which for vanilla armor is its material: `minecraft:turtle_scute` for the turtle shell, `minecraft:copper` for copper armor. On 1.21.1 and older it is the armor material (`minecraft:turtle`). The data map sets weights per item from a datapack, in `data/feathers_of_fatigue/data_maps/item/armor_weight.json`:
 
 ```json
 {

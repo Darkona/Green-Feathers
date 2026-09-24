@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
@@ -12,12 +12,12 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 /**
  * Debug mode only: what the player just spent, and on what, for the debug overlay.
  */
-public record SpendDebugPayload(ResourceLocation source, int cost) implements CustomPacketPayload {
+public record SpendDebugPayload(Identifier source, int cost) implements CustomPacketPayload {
 
     public static final Type<SpendDebugPayload> TYPE = new Type<>(id("spend_debug"));
 
     public static final StreamCodec<ByteBuf, SpendDebugPayload> STREAM_CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, SpendDebugPayload::source,
+            Identifier.STREAM_CODEC, SpendDebugPayload::source,
             ByteBufCodecs.VAR_INT, SpendDebugPayload::cost,
             SpendDebugPayload::new);
 

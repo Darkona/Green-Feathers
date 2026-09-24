@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,12 +16,12 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
  * A client asks the server to spend its own feathers, for mods that decide actions on the client. It can only
  * ever cost the sender.
  */
-public record SpendRequestPayload(ResourceLocation source, int stamina, boolean allowStrain, int regenDelayTicks) implements CustomPacketPayload {
+public record SpendRequestPayload(Identifier source, int stamina, boolean allowStrain, int regenDelayTicks) implements CustomPacketPayload {
 
     public static final Type<SpendRequestPayload> TYPE = new Type<>(id("spend_request"));
 
     public static final StreamCodec<ByteBuf, SpendRequestPayload> STREAM_CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, SpendRequestPayload::source,
+            Identifier.STREAM_CODEC, SpendRequestPayload::source,
             ByteBufCodecs.VAR_INT, SpendRequestPayload::stamina,
             ByteBufCodecs.BOOL, SpendRequestPayload::allowStrain,
             ByteBufCodecs.VAR_INT, SpendRequestPayload::regenDelayTicks,

@@ -1,7 +1,7 @@
 package com.darkona.feathersoffatigue.api.registry;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
@@ -31,7 +31,7 @@ public final class FeathersIds {
      * @param path the resource path
      * @return {@code feathers_of_fatigue:path}
      */
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }

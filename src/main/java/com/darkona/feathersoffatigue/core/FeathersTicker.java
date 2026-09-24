@@ -17,7 +17,7 @@ import com.darkona.feathersoffatigue.mount.MountTraits;
 import com.darkona.feathersoffatigue.network.FeathersNetwork;
 import com.darkona.feathersoffatigue.weight.ArmorWeights;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -54,7 +54,7 @@ public final class FeathersTicker {
     private static final int ATTRIBUTE_INTERVAL = 10;
     private static final int REGEN_FACTOR_INTERVAL = 20;
     private static final double STILL_EPSILON_SQR = 1.0E-4;
-    private static final ResourceLocation REGEN_FACTORS = id("regen_factors");
+    private static final Identifier REGEN_FACTORS = id("regen_factors");
 
     private FeathersTicker() {}
 
@@ -135,7 +135,7 @@ public final class FeathersTicker {
         // its own). Those count only by day: "Leave Bed" after five seconds with the other players up must not
         // restore everything at night. A disconnect wakes at once with no update, and never counts.
         if (!player.isSleepingLongEnough()) return;
-        if (event.updateLevel() ? !player.level().isDay() : event.wakeImmediately()) return;
+        if (event.updateLevel() ? !player.level().isBrightOutside() : event.wakeImmediately()) return;
         FeathersServiceImpl.INSTANCE.reset(player);
     }
 
@@ -153,7 +153,7 @@ public final class FeathersTicker {
     public static void onTagsUpdated(TagsUpdatedEvent event) {
         ArmorWeights.invalidate();
         FeathersServiceImpl.invalidateMountTypes();
-        if (event.getUpdateCause() != TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) return;
+        if (!(event instanceof TagsUpdatedEvent.ServerDataLoad)) return;
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) server.getPlayerList().getPlayers().forEach(FeathersServiceImpl.INSTANCE::recalculateWeight);
     }

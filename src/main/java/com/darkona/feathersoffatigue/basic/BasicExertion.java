@@ -5,7 +5,7 @@ import com.darkona.feathersoffatigue.api.SpendResult;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -22,8 +22,8 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 @EventBusSubscriber(modid = FeathersIds.MOD_ID)
 public final class BasicExertion {
 
-    public static final ResourceLocation SPRINT = id("sprint");
-    public static final ResourceLocation JUMP = id("jump");
+    public static final Identifier SPRINT = id("sprint");
+    public static final Identifier JUMP = id("jump");
 
     private static final boolean ACTIONS_OF_STAMINA = ModList.get().isLoaded("actionsofstamina");
 

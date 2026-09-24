@@ -43,7 +43,7 @@ public final class ModPotions {
     public static final DeferredHolder<Potion, Potion> LONG_ENERGIZED_POTION = potion("long_energized_potion", ENERGIZED, 2600, 0);
 
     private static DeferredHolder<Potion, Potion> potion(String name, Holder<MobEffect> effect, int duration, int amplifier) {
-        return POTIONS.register(name, () -> new Potion(new MobEffectInstance(effect, duration, amplifier)));
+        return POTIONS.register(name, () -> new Potion(name, new MobEffectInstance(effect, duration, amplifier)));
     }
 
     public static void register(IEventBus modEventBus) {

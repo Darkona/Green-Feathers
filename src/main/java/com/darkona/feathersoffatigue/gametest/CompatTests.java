@@ -2,13 +2,9 @@ package com.darkona.feathersoffatigue.gametest;
 
 import com.darkona.feathersoffatigue.api.Climate;
 import com.darkona.feathersoffatigue.api.FeathersAPI;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.core.Extensions;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.withCompat;
@@ -18,8 +14,6 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.withCompat;
  * so each bridge actually links against the other mod. Meaningful with compat mods on the runtime
  * ({@code -Pcompat=...}). Without them, only the built-in integrations run.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class CompatTests {
 
     @GameTest(template = "empty")

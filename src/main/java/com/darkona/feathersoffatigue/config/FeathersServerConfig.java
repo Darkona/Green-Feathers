@@ -155,7 +155,7 @@ public final class FeathersServerConfig {
                 .defineInRange("cold_temperature", -0.3, -2.0, 2.0);
 
         ENABLE_HEAT = builder
-                .comment("Heat effect: doubles costs. First heat tier: a hot biome under the sun, or Cold Sweat's hot_threshold.",
+                .comment("Heat effect: doubles costs. First heat tier: a hot biome under the sun, or a temperature mod's heat.",
                         "Fire Resistance and the Cooling effect prevent it.")
                 .define("effect_hot_enabled", true);
 
@@ -165,7 +165,7 @@ public final class FeathersServerConfig {
 
         ENABLE_FATIGUE = builder
                 .comment("Fatigue effect: 4 fewer max feathers per level. Second heat tier, on top of Heat: the Nether, burning,",
-                        "lava, or Cold Sweat's severe_hot_threshold. Other mods may apply it too. Fire Resistance and Cooling prevent it.")
+                        "lava, or a temperature mod's severe heat. Other mods may apply it too. Fire Resistance and Cooling prevent it.")
                 .define("effect_fatigue_enabled", true);
 
         FATIGUE_FROM_NETHER = builder
@@ -236,13 +236,15 @@ public final class FeathersServerConfig {
                 .defineListAllowEmpty("armor_weights", List.of(
                         "@minecraft:leather=1",
                         "@minecraft:chainmail=1",
-                        "@minecraft:turtle=1",
+                        "@minecraft:turtle_scute=1",
+                        "@minecraft:copper=1",
                         "@minecraft:gold=2",
                         "@minecraft:iron=2",
                         "@minecraft:diamond=3",
                         "@minecraft:netherite=4",
                         // Horse armor: light, since nothing raises a mount's feathers yet.
                         "@minecraft:leather/body=1",
+                        "@minecraft:copper/body=1",
                         "@minecraft:gold/body=1",
                         "@minecraft:iron/body=2",
                         "@minecraft:diamond/body=2"), () -> "", o -> o instanceof String);

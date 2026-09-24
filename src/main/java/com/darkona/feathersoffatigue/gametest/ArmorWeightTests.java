@@ -3,7 +3,6 @@ package com.darkona.feathersoffatigue.gametest;
 import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.registry.FeathersAttributes;
 import com.darkona.feathersoffatigue.api.registry.FeathersEnchantments;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.core.FeathersData;
 import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
@@ -14,7 +13,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -25,10 +23,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,8 +39,6 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.tick;
 /**
  * Armor weight with the default rules (per material), Lightweight, and the weight multiplier attribute.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class ArmorWeightTests {
 
     private static final EquipmentSlot[] SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
@@ -148,7 +143,7 @@ public class ArmorWeightTests {
     public static void featherRingTooltipNamesItsSlot(GameTestHelper helper) {
         List<Component> tooltip = new ArrayList<>();
         ItemStack ring = new ItemStack(ModItems.FEATHER_RING.get());
-        ring.getItem().appendHoverText(ring, Item.TooltipContext.EMPTY, tooltip, TooltipFlag.NORMAL);
+        ring.getItem().appendHoverText(ring, Item.TooltipContext.EMPTY, TooltipDisplay.DEFAULT, tooltip::add, TooltipFlag.NORMAL);
         String where = ModList.get().isLoaded("curios") ? "ring" : "offhand";
         helper.assertTrue(tooltip.size() == 1 && tooltip.getFirst().getContents() instanceof TranslatableContents contents
                 && contents.getKey().equals("item.feathers_of_fatigue.feather_ring.tooltip." + where), "the ring's tooltip names where it goes: " + tooltip);

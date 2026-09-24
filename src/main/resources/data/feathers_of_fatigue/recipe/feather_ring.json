@@ -7,8 +7,8 @@
     " G "
   ],
   "key": {
-    "F": { "item": "minecraft:feather" },
-    "G": { "item": "minecraft:gold_ingot" }
+    "F": "minecraft:feather",
+    "G": "minecraft:gold_ingot"
   },
   "result": {
     "id": "feathers_of_fatigue:feather_ring",

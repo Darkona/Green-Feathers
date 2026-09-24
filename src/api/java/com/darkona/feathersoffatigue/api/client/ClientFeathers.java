@@ -3,7 +3,7 @@ package com.darkona.feathersoffatigue.api.client;
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.SpendOptions;
 import com.darkona.feathersoffatigue.api.SpendResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
@@ -50,7 +50,7 @@ public final class ClientFeathers {
      * @param options the spend options; {@link SpendOptions#simulate()} only checks
      * @return the predicted outcome
      */
-    public static SpendResult predictSpend(ResourceLocation source, int stamina, SpendOptions options) {
+    public static SpendResult predictSpend(Identifier source, int stamina, SpendOptions options) {
         return service().predictSpend(source, stamina, options);
     }
 
@@ -63,7 +63,7 @@ public final class ClientFeathers {
      * @param stamina the base cost in stamina units
      * @param options the server-side spend options
      */
-    public static void requestSpend(ResourceLocation source, int stamina, SpendOptions options) {
+    public static void requestSpend(Identifier source, int stamina, SpendOptions options) {
         service().requestSpend(source, stamina, options);
     }
 

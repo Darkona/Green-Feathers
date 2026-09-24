@@ -2,7 +2,7 @@ package com.darkona.feathersoffatigue.api.client;
 
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.spi.Registrations;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,7 @@ public final class FeatherAnimations {
      * @param priority the selection priority
      * @param provider the registered provider
      */
-    public record ProviderEntry(ResourceLocation id, int priority, FeatherAnimationProvider provider) {}
+    public record ProviderEntry(Identifier id, int priority, FeatherAnimationProvider provider) {}
 
     private static volatile ProviderEntry[] providers = new ProviderEntry[0];
 
@@ -39,7 +39,7 @@ public final class FeatherAnimations {
      * @param priority its selection priority
      * @param provider the provider to register
      */
-    public static synchronized void registerProvider(ResourceLocation id, int priority, FeatherAnimationProvider provider) {
+    public static synchronized void registerProvider(Identifier id, int priority, FeatherAnimationProvider provider) {
         ProviderEntry entry = new ProviderEntry(Objects.requireNonNull(id), priority, Objects.requireNonNull(provider));
         ProviderEntry[] next = Registrations.withEntry(providers, entry, ProviderEntry::id);
         Arrays.sort(next, Comparator.comparingInt(ProviderEntry::priority).reversed());

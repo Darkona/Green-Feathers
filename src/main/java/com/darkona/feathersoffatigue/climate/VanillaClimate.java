@@ -20,10 +20,10 @@ public final class VanillaClimate {
 
         if (entity.isFreezing() || isColdWeather(level, pos)) return Climate.COLD;
 
-        if (entity.wasOnFire || entity.isOnFire() || entity.isInLava()) return Climate.HOT;
+        if (entity.isOnFire() || entity.isInLava()) return Climate.HOT;
         if (level.dimension() == Level.NETHER) return Climate.HOT;
         if (entity.isInPowderSnow || entity.isInWaterOrRain()) return Climate.NEUTRAL;
-        if (!level.isDay() || !level.canSeeSky(pos)) return Climate.NEUTRAL;
+        if (!level.isBrightOutside() || !level.canSeeSky(pos)) return Climate.NEUTRAL;
 
         return level.getBiome(pos).value().getModifiedClimateSettings().temperature() >= FeathersServerConfig.HOT_TEMPERATURE.get()
                 ? Climate.HOT : Climate.NEUTRAL;
@@ -36,7 +36,7 @@ public final class VanillaClimate {
     private static boolean isColdWeather(Level level, BlockPos pos) {
         if (!level.isRaining() || !level.canSeeSky(pos)) return false;
         Biome biome = level.getBiome(pos).value();
-        if (biome.getPrecipitationAt(pos) == Biome.Precipitation.NONE) return false;
-        return biome.coldEnoughToSnow(pos) || biome.getModifiedClimateSettings().temperature() < FeathersServerConfig.COLD_TEMPERATURE.get();
+        if (biome.getPrecipitationAt(pos, level.getSeaLevel()) == Biome.Precipitation.NONE) return false;
+        return biome.coldEnoughToSnow(pos, level.getSeaLevel()) || biome.getModifiedClimateSettings().temperature() < FeathersServerConfig.COLD_TEMPERATURE.get();
     }
 }

@@ -4,19 +4,15 @@ import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.client.FeatherStyle;
 import com.darkona.feathersoffatigue.api.client.FeatherStyles;
 import com.darkona.feathersoffatigue.api.client.FeatherVariants;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.style.FeatherStylePack;
 import com.darkona.feathersoffatigue.style.FeatherStylePack.Patch;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,25 +24,23 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
  * The feather style API: registry, providers and resource packs' feather_styles.json. None of it touches client
  * classes, so it runs here. Registrations are global and permanent, so providers only answer for tagged players.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class StyleTests {
 
     private static final String MARK = "feathers_of_fatigue_style_test";
     private static final String HIGH_MARK = "feathers_of_fatigue_style_test_high";
-    private static final ResourceLocation LOW = id("test_style_low");
-    private static final ResourceLocation HIGH = id("test_style_high");
+    private static final Identifier LOW = id("test_style_low");
+    private static final Identifier HIGH = id("test_style_high");
 
     static {
         FeatherStyles.registerStyle(LOW, FeatherStyle.opaque(0x112233, 0x000000));
         FeatherStyles.registerStyle(HIGH, FeatherStyle.opaque(0x445566, 0xFFFFFF));
-        FeatherStyles.registerStyleProvider(id("test_style_low"), 500, (player, feathers) -> player.getTags().contains(MARK) ? LOW : null);
-        FeatherStyles.registerStyleProvider(id("test_style_high"), 1000, (player, feathers) -> player.getTags().contains(HIGH_MARK) ? HIGH : null);
+        FeatherStyles.registerStyleProvider(id("test_style_low"), 500, (player, feathers) -> player.entityTags().contains(MARK) ? LOW : null);
+        FeatherStyles.registerStyleProvider(id("test_style_high"), 1000, (player, feathers) -> player.entityTags().contains(HIGH_MARK) ? HIGH : null);
     }
 
     @GameTest(template = "empty")
     public static void feathersOfFatigueRegistersItsStyles(GameTestHelper helper) {
-        for (ResourceLocation id : new ResourceLocation[]{FeatherStyles.GREEN, FeatherStyles.BLUE, FeatherStyles.WHITE, FeatherStyles.COLD,
+        for (Identifier id : new Identifier[]{FeatherStyles.GREEN, FeatherStyles.BLUE, FeatherStyles.WHITE, FeatherStyles.COLD,
                 FeatherStyles.HOT, FeatherStyles.ENERGIZED, FeatherStyles.MOMENTUM, FeatherStyles.STRAIN, FeatherStyles.ENDURANCE,
                 FeatherStyles.ARMOR, FeatherStyles.EMPTY, FeatherStyles.EXHAUSTED}) {
             helper.assertTrue(FeatherStyles.get(id) != null, id + " is registered");
@@ -57,7 +51,7 @@ public class StyleTests {
         helper.assertValueEqual(FeatherStyles.get(FeatherStyles.COLD).overlay(), FeatherVariants.FROST, "and frost over them");
         helper.assertTrue(FeatherStyles.get(FeatherStyles.HOT).overlay() == null, "heat keeps the plain orange feather, no flames");
         helper.assertTrue(FeatherVariants.overlay(FeatherVariants.HEAT) != null, "the flames overlay stays registered for styles and packs");
-        for (ResourceLocation id : new ResourceLocation[]{FeatherVariants.FEATHER, FeatherVariants.CRYSTAL, FeatherVariants.GLINT,
+        for (Identifier id : new Identifier[]{FeatherVariants.FEATHER, FeatherVariants.CRYSTAL, FeatherVariants.GLINT,
                 FeatherVariants.STRAINED, FeatherVariants.PLAIN}) {
             helper.assertTrue(FeatherVariants.variant(id) != null, id + " is a registered variant");
         }
@@ -67,7 +61,7 @@ public class StyleTests {
 
     @GameTest(template = "empty")
     public static void sheetSizesAreChecked(GameTestHelper helper) {
-        ResourceLocation texture = id("textures/gui/test.png");
+        Identifier texture = id("textures/gui/test.png");
         FeatherVariants.registerVariant(id("test_variant_sized"), texture, 6, 64, 64);
         helper.assertValueEqual(FeatherVariants.variant(id("test_variant_sized")), new FeatherVariants.Sprites(texture, 6, 64, 64), "a 64x64 texture keeps its size");
         helper.assertTrue(rejects(() -> FeatherVariants.registerVariant(id("test_variant_bad"), texture, 0, 60, 72)), "a width that is not a multiple of 8");
@@ -90,7 +84,7 @@ public class StyleTests {
 
     @GameTest(template = "empty")
     public static void registeringAgainReplaces(GameTestHelper helper) {
-        ResourceLocation id = id("test_style_replaced");
+        Identifier id = id("test_style_replaced");
         FeatherStyles.registerStyle(id, FeatherStyle.opaque(0x000001, 0));
         int version = FeatherStyles.version();
         FeatherStyle replacement = new FeatherStyle(0x80FFFFFF, FeatherStyle.NO_BORDER).withSprites(id("textures/gui/test.png"));
@@ -145,12 +139,12 @@ public class StyleTests {
 
     @GameTest(template = "empty")
     public static void resourcePackFilesRecolorStyles(GameTestHelper helper) {
-        ResourceLocation partial = id("test_style_partial");
-        ResourceLocation added = id("test_style_added");
-        ResourceLocation bodyless = id("test_style_bodyless");
+        Identifier partial = id("test_style_partial");
+        Identifier added = id("test_style_added");
+        Identifier bodyless = id("test_style_bodyless");
         FeatherStyle registered = FeatherStyle.opaque(0x123456, 0x654321).withVariant(FeatherVariants.CRYSTAL).withOverlay(FeatherVariants.FROST, -1, -1);
         FeatherStyles.registerStyle(partial, registered);
-        Map<ResourceLocation, Patch> lower = FeatherStylePack.parse(JsonParser.parseString("""
+        Map<Identifier, Patch> lower = FeatherStylePack.parse(JsonParser.parseString("""
                 {"styles": {
                   "feathers_of_fatigue:test_style_partial": {"border": "#FF0000", "sprites": "feathers_of_fatigue:textures/gui/lower.png", "overlay": "none"},
                   "feathers_of_fatigue:test_style_added": {"body": "#00FF00"},
@@ -159,12 +153,12 @@ public class StyleTests {
                   "Not An Id": {"body": "#000000"}
                 }}"""), "lower");
         helper.assertValueEqual(lower.size(), 3, "broken entries are skipped, the rest kept");
-        Map<ResourceLocation, Patch> higher = FeatherStylePack.parse(JsonParser.parseString("""
+        Map<Identifier, Patch> higher = FeatherStylePack.parse(JsonParser.parseString("""
                 {"styles": {"feathers_of_fatigue:test_style_partial": {"sprites": "feathers_of_fatigue:textures/gui/higher.png", "variant": "feathers_of_fatigue:glint"},
                             "feathers_of_fatigue:test_style_added": {"overlay": "feathers_of_fatigue:heat", "overlay_accent": "#80FF0000"}}}"""), "higher");
         helper.assertValueEqual(FeatherStylePack.parse(JsonParser.parseString("[]"), "not an object").size(), 0, "no styles object, nothing");
 
-        Map<ResourceLocation, Patch> merged = new HashMap<>();
+        Map<Identifier, Patch> merged = new HashMap<>();
         FeatherStylePack.merge(merged, lower);
         FeatherStylePack.merge(merged, higher);
         FeatherStylePack.setPatches(merged);

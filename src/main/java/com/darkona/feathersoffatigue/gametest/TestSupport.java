@@ -8,9 +8,11 @@ import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
 import com.darkona.feathersoffatigue.core.FeathersTicker;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -27,8 +29,8 @@ final class TestSupport {
     private TestSupport() {}
 
     /** Compatibility switches that keep optional thirst or temperature mods from changing ordinary tests. */
-    private static final List<ModConfigSpec.BooleanValue> COMPATS = List.of(FeathersCompatConfig.COLD_SWEAT, FeathersCompatConfig.THIRST,
-            FeathersCompatConfig.DROPLETS_OF_THIRST, FeathersCompatConfig.TAN, FeathersCompatConfig.LSO, FeathersCompatConfig.SEASONS);
+    private static final List<ModConfigSpec.BooleanValue> COMPATS = List.of(FeathersCompatConfig.DROPLETS_OF_THIRST,
+            FeathersCompatConfig.TAN, FeathersCompatConfig.SEASONS);
 
     static {
         COMPATS.forEach(value -> value.set(false));
@@ -49,7 +51,7 @@ final class TestSupport {
     static ServerPlayer player(GameTestHelper helper) {
         clearNoon(helper.getLevel());
         ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "feathers-test"));
-        player.moveTo(helper.absoluteVec(Vec3.ZERO));
+        player.snapTo(helper.absoluteVec(Vec3.ZERO));
         FeathersAPI.get(player);
         return player;
     }
@@ -59,10 +61,15 @@ final class TestSupport {
      * and rain on a cold biome chills.
      */
     static void clearNoon(ServerLevel level) {
-        level.setDayTime(6000);
-        level.setWeatherParameters(24000, 0, false, false);
+        level.getServer().setWeatherParameters(24000, 0, false, false);
         level.setRainLevel(0);
         level.setThunderLevel(0);
+        setDayTime(level, 6000);
+    }
+
+    /** Moves the level's clock to {@code ticks} and updates the sky darkness that day and night are read from. */
+    static void setDayTime(ServerLevel level, long ticks) {
+        level.dimensionType().defaultClock().ifPresent(clock -> level.clockManager().setTotalTicks(clock, ticks));
         level.updateSkyBrightness();
     }
 
@@ -77,9 +84,10 @@ final class TestSupport {
      * The player's feathers as they would come back from a save.
      */
     static FeathersView saveAndLoad(GameTestHelper helper, ServerPlayer player) {
-        CompoundTag tag = FeathersServiceImpl.data(player).serializeNBT(helper.getLevel().registryAccess());
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        FeathersServiceImpl.data(player).serialize(output);
         FeathersData loaded = new FeathersData();
-        loaded.deserializeNBT(helper.getLevel().registryAccess(), tag);
+        loaded.deserialize(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), output.buildResult()));
         return loaded;
     }
 }

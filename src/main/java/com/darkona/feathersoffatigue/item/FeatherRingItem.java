@@ -5,9 +5,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class FeatherRingItem extends Item {
 
@@ -19,7 +20,8 @@ public class FeatherRingItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
-        tooltip.add(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull TooltipDisplay display,
+            @NotNull Consumer<Component> tooltip, @NotNull TooltipFlag flag) {
+        tooltip.accept(Component.translatable(TOOLTIP).withStyle(ChatFormatting.GRAY));
     }
 }

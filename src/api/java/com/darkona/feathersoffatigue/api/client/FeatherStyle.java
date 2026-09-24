@@ -3,7 +3,7 @@ package com.darkona.feathersoffatigue.api.client;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -26,8 +26,8 @@ import java.util.Optional;
  *                      style's sprites from instead, or null. The colors still tint it: white body and border draw a
  *                      hand-colored sheet as is.
  */
-public record FeatherStyle(int body, int border, ResourceLocation variant, @Nullable ResourceLocation overlay, int overlayColor, int overlayAccent,
-                           @Nullable ResourceLocation sprites) {
+public record FeatherStyle(int body, int border, Identifier variant, @Nullable Identifier overlay, int overlayColor, int overlayAccent,
+                           @Nullable Identifier sprites) {
 
     /** An alpha value that disables the border. */
     public static final int NO_BORDER = 0;
@@ -47,11 +47,11 @@ public record FeatherStyle(int body, int border, ResourceLocation variant, @Null
     public static final Codec<FeatherStyle> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             COLOR_CODEC.fieldOf("body").forGetter(FeatherStyle::body),
             COLOR_CODEC.optionalFieldOf("border", BLACK).forGetter(FeatherStyle::border),
-            ResourceLocation.CODEC.optionalFieldOf("variant", FeatherVariants.FEATHER).forGetter(FeatherStyle::variant),
-            ResourceLocation.CODEC.optionalFieldOf("overlay").forGetter(style -> Optional.ofNullable(style.overlay())),
+            Identifier.CODEC.optionalFieldOf("variant", FeatherVariants.FEATHER).forGetter(FeatherStyle::variant),
+            Identifier.CODEC.optionalFieldOf("overlay").forGetter(style -> Optional.ofNullable(style.overlay())),
             COLOR_CODEC.optionalFieldOf("overlay_color", WHITE).forGetter(FeatherStyle::overlayColor),
             COLOR_CODEC.optionalFieldOf("overlay_accent", WHITE).forGetter(FeatherStyle::overlayAccent),
-            ResourceLocation.CODEC.optionalFieldOf("sprites").forGetter(style -> Optional.ofNullable(style.sprites()))
+            Identifier.CODEC.optionalFieldOf("sprites").forGetter(style -> Optional.ofNullable(style.sprites()))
     ).apply(instance, (body, border, variant, overlay, overlayColor, overlayAccent, sprites) ->
             new FeatherStyle(body, border, variant, overlay.orElse(null), overlayColor, overlayAccent, sprites.orElse(null))));
 
@@ -111,7 +111,7 @@ public record FeatherStyle(int body, int border, ResourceLocation variant, @Null
      * @param variant the id of a registered variant
      * @return a copy with the new variant
      */
-    public FeatherStyle withVariant(ResourceLocation variant) {
+    public FeatherStyle withVariant(Identifier variant) {
         return new FeatherStyle(body, border, variant, overlay, overlayColor, overlayAccent, sprites);
     }
 
@@ -123,7 +123,7 @@ public record FeatherStyle(int body, int border, ResourceLocation variant, @Null
      * @param accent  the accent ARGB color
      * @return a copy with the new overlay settings
      */
-    public FeatherStyle withOverlay(@Nullable ResourceLocation overlay, int color, int accent) {
+    public FeatherStyle withOverlay(@Nullable Identifier overlay, int color, int accent) {
         return new FeatherStyle(body, border, variant, overlay, color, accent, sprites);
     }
 
@@ -133,7 +133,7 @@ public record FeatherStyle(int body, int border, ResourceLocation variant, @Null
      * @param sprites the sprite sheet texture, or {@code null} to use the variant texture
      * @return a copy with the new sprite sheet
      */
-    public FeatherStyle withSprites(@Nullable ResourceLocation sprites) {
+    public FeatherStyle withSprites(@Nullable Identifier sprites) {
         return new FeatherStyle(body, border, variant, overlay, overlayColor, overlayAccent, sprites);
     }
 

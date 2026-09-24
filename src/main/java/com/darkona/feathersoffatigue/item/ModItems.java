@@ -29,10 +29,10 @@ public final class ModItems {
      * Halves armor weight. Worn in a Curios ring slot when Curios is installed, otherwise held in the off hand. It
      * does nothing special in code: an attribute modifier on armor_weight_multiplier, what any mod's item can do.
      */
-    public static final DeferredItem<Item> FEATHER_RING = ITEMS.registerItem("feather_ring", FeatherRingItem::new, featherRingProperties());
+    public static final DeferredItem<Item> FEATHER_RING = ITEMS.registerItem("feather_ring", FeatherRingItem::new, ModItems::featherRingProperties);
 
-    private static Item.Properties featherRingProperties() {
-        Item.Properties properties = new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON);
+    private static Item.Properties featherRingProperties(Item.Properties properties) {
+        properties.stacksTo(1).rarity(Rarity.UNCOMMON);
         if (!CURIOS) {
             properties.attributes(ItemAttributeModifiers.builder()
                     .add(FeathersAttributes.ARMOR_WEIGHT_MULTIPLIER,

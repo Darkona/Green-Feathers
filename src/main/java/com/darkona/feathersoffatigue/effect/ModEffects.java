@@ -4,11 +4,10 @@ import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
-import com.darkona.feathersoffatigue.compatibility.coldsweat.ColdSweatCompat;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -31,7 +30,7 @@ import static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operati
 public final class ModEffects {
 
     /** Bonus stamina source of the Endurance effect. */
-    public static final ResourceLocation ENDURANCE_BONUS = id("endurance_effect");
+    public static final Identifier ENDURANCE_BONUS = id("endurance_effect");
 
     /** Endurance's golden feathers: eight per level. */
     private static int enduranceBonus(MobEffectInstance instance) {
@@ -71,7 +70,6 @@ public final class ModEffects {
             @Override
             public boolean canApply(LivingEntity entity) {
                 if (!super.canApply(entity) || !FeathersServerConfig.ENABLE_COLD.get()) return false;
-                if (!ColdSweatCompat.canApplyCold(entity)) return false;
                 // Cold and Hot never coexist. Climate replaces one with the other, and potions cannot stack them.
                 return !entity.hasEffect(FeathersMobEffects.ENERGIZED) && !entity.hasEffect(FeathersMobEffects.HOT);
             }
@@ -84,7 +82,6 @@ public final class ModEffects {
             @Override
             public boolean canApply(LivingEntity entity) {
                 if (!super.canApply(entity) || !FeathersServerConfig.ENABLE_HEAT.get() || isProtectedFromHeat(entity)) return false;
-                if (!ColdSweatCompat.canApplyHeat(entity)) return false;
                 return !entity.hasEffect(FeathersMobEffects.MOMENTUM) && !entity.hasEffect(FeathersMobEffects.COLD);
             }
         }.addAttributeModifier(USAGE_MULTIPLIER, id("effect.hot"), 1.0, ADD_VALUE));

@@ -12,21 +12,24 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.item.equipment.Equippable;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +58,7 @@ public final class ArmorWeights {
     private static final Reference2IntOpenHashMap<Item> itemRules = new Reference2IntOpenHashMap<>();
     private static final List<TagRule> tagRules = new ArrayList<>();
     private static final Object2IntOpenHashMap<String> materialPieceRules = new Object2IntOpenHashMap<>();
-    private static final Object2IntOpenHashMap<ResourceLocation> materialRules = new Object2IntOpenHashMap<>();
+    private static final Object2IntOpenHashMap<Identifier> materialRules = new Object2IntOpenHashMap<>();
     private static final Reference2IntOpenHashMap<Item> baseWeightCache = new Reference2IntOpenHashMap<>();
     private static boolean rulesLoaded;
 
@@ -104,21 +107,21 @@ public final class ArmorWeights {
 
             switch (target.charAt(0)) {
                 case '#' -> {
-                    ResourceLocation id = ResourceLocation.tryParse(target.substring(1));
+                    Identifier id = Identifier.tryParse(target.substring(1));
                     if (id != null) tagRules.add(new TagRule(TagKey.create(Registries.ITEM, id), weight));
                     else Feathers.LOGGER.warn("Armor weight rule '{}' has an invalid tag, ignored.", rule);
                 }
                 case '@' -> {
                     String material = target.substring(1);
                     int slash = material.indexOf('/');
-                    ResourceLocation id = ResourceLocation.tryParse(slash < 0 ? material : material.substring(0, slash));
+                    Identifier id = Identifier.tryParse(slash < 0 ? material : material.substring(0, slash));
                     if (id == null) Feathers.LOGGER.warn("Armor weight rule '{}' has an invalid material, ignored.", rule);
                     else if (slash < 0) materialRules.put(id, weight);
                     else materialPieceRules.put(id + "/" + material.substring(slash + 1), weight);
                 }
                 default -> {
-                    ResourceLocation id = ResourceLocation.tryParse(target);
-                    if (id != null && BuiltInRegistries.ITEM.containsKey(id)) itemRules.put(BuiltInRegistries.ITEM.get(id), weight);
+                    Identifier id = Identifier.tryParse(target);
+                    if (id != null && BuiltInRegistries.ITEM.containsKey(id)) itemRules.put(BuiltInRegistries.ITEM.getValue(id), weight);
                     else Feathers.LOGGER.warn("Armor weight rule '{}' names an unknown item, ignored.", rule);
                 }
             }
@@ -151,20 +154,51 @@ public final class ArmorWeights {
             if (stack.is(rule.tag())) return rule.weight();
         }
 
-        Integer mapped = stack.getItemHolder().getData(FeathersDataMaps.ARMOR_WEIGHT);
+        Integer mapped = stack.typeHolder().getData(FeathersDataMaps.ARMOR_WEIGHT);
         if (mapped != null) return mapped;
 
-        if (item instanceof ArmorItem armor) {
-            ResourceLocation material = armor.getMaterial().unwrapKey().map(ResourceKey::location).orElse(null);
-            if (material != null) {
-                weight = materialPieceRules.getInt(material + "/" + armor.getType().getName());
-                if (weight != UNRESOLVED) return weight;
-                weight = materialRules.getInt(material);
-                if (weight != UNRESOLVED) return weight;
-            }
-            return (int) Math.round(armor.getDefense() * FeathersServerConfig.UNLISTED_ARMOR_WEIGHT_PER_DEFENSE.get());
+        Equippable armor = armor(stack);
+        if (armor != null) {
+            Identifier material = armor.assetId().orElseThrow().identifier();
+            weight = materialPieceRules.getInt(material + "/" + pieceName(armor.slot()));
+            if (weight != UNRESOLVED) return weight;
+            weight = materialRules.getInt(material);
+            if (weight != UNRESOLVED) return weight;
+            return (int) Math.round(defense(stack, armor.slot()) * FeathersServerConfig.UNLISTED_ARMOR_WEIGHT_PER_DEFENSE.get());
         }
         return 0;
+    }
+
+    /**
+     * The equippable component of an armor piece, or null: worn in an armor slot or on a mount's body, with an
+     * equipment model, whose id is the armor material ({@code minecraft:iron}). Carved pumpkins and heads have none.
+     */
+    public static @Nullable Equippable armor(ItemStack stack) {
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        return equippable != null && equippable.assetId().isPresent() && equippable.slot().isArmor() ? equippable : null;
+    }
+
+    /** The piece name in material rules: helmet, chestplate, leggings, boots, or body for a mount's armor. */
+    private static String pieceName(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> "helmet";
+            case CHEST -> "chestplate";
+            case LEGS -> "leggings";
+            case FEET -> "boots";
+            default -> "body";
+        };
+    }
+
+    /** The armor points the piece adds in its slot. */
+    private static double defense(ItemStack stack, EquipmentSlot slot) {
+        double defense = 0;
+        for (ItemAttributeModifiers.Entry entry : stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY).modifiers()) {
+            if (entry.attribute().is(Attributes.ARMOR) && entry.modifier().operation() == AttributeModifier.Operation.ADD_VALUE
+                    && entry.slot().test(slot)) {
+                defense += entry.modifier().amount();
+            }
+        }
+        return defense;
     }
 
     /**

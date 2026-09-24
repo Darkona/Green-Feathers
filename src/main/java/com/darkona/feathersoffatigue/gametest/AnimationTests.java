@@ -5,16 +5,12 @@ import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.client.FeatherAnimation;
 import com.darkona.feathersoffatigue.api.client.FeatherAnimations;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.config.FeathersClientConfig.StrainAnimation;
 import com.darkona.feathersoffatigue.style.BuiltInFeatherAnimations;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Objects;
 
@@ -25,8 +21,6 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
  * Tests the feather animation API and built-in triggers with explicit settings. GameTests do not load the client
  * configuration or register the client-only built-in provider.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class AnimationTests {
 
     private static final String MARK = "feathers_of_fatigue_animation_test";
@@ -34,8 +28,8 @@ public class AnimationTests {
     private static final FeatherAnimation SLOW_WAVE = new FeatherAnimation(FeatherAnimation.Kind.WAVE, 0.5f, 3f);
 
     static {
-        FeatherAnimations.registerProvider(id("test_animation_low"), 100, (entity, feathers) -> entity.getTags().contains(MARK) ? SLOW_WAVE : null);
-        FeatherAnimations.registerProvider(id("test_animation_high"), 200, (entity, feathers) -> entity.getTags().contains(HIGH_MARK) ? FeatherAnimation.PULSE : null);
+        FeatherAnimations.registerProvider(id("test_animation_low"), 100, (entity, feathers) -> entity.entityTags().contains(MARK) ? SLOW_WAVE : null);
+        FeatherAnimations.registerProvider(id("test_animation_high"), 200, (entity, feathers) -> entity.entityTags().contains(HIGH_MARK) ? FeatherAnimation.PULSE : null);
     }
 
     @GameTest(template = "empty")

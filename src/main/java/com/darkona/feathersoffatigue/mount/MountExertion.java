@@ -10,7 +10,7 @@ import com.darkona.feathersoffatigue.core.FeathersAttachments;
 import com.darkona.feathersoffatigue.core.FeathersData;
 import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
 import com.darkona.feathersoffatigue.core.FeathersTicker;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -34,9 +34,9 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 @EventBusSubscriber(modid = FeathersIds.MOD_ID)
 public final class MountExertion {
 
-    public static final ResourceLocation GALLOP = id("mount_gallop");
-    public static final ResourceLocation JUMP = id("mount_jump");
-    private static final ResourceLocation EXHAUSTED_SLOWDOWN = id("mount_exhausted");
+    public static final Identifier GALLOP = id("mount_gallop");
+    public static final Identifier JUMP = id("mount_jump");
+    private static final Identifier EXHAUSTED_SLOWDOWN = id("mount_exhausted");
 
     private MountExertion() {}
 

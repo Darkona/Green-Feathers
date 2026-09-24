@@ -7,20 +7,16 @@ import com.darkona.feathersoffatigue.api.SpendResult;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.event.StrainEvent;
 import com.darkona.feathersoffatigue.api.registry.FeathersAttributes;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
 import net.minecraft.commands.Commands;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.function.Consumer;
 
@@ -33,11 +29,9 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.tick;
  * One-off spends: all or nothing, simulation, strain, exhaustion, bonus stamina, exemptions, multipliers.
  * Defaults: 20 max feathers, 6 max strain, strain and exhaustion on.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class SpendTests {
 
-    private static final ResourceLocation TEST = id("test");
+    private static final Identifier TEST = id("test");
 
     @GameTest(template = "empty")
     public static void newPlayersStartFull(GameTestHelper helper) {

@@ -7,7 +7,7 @@ import com.darkona.feathersoffatigue.api.client.FeatherAnimation;
 import com.darkona.feathersoffatigue.api.client.FeatherAnimations;
 import com.darkona.feathersoffatigue.config.FeathersClientConfig;
 import com.darkona.feathersoffatigue.config.FeathersClientConfig.StrainAnimation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +19,7 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
  */
 public final class BuiltInFeatherAnimations {
 
-    public static final ResourceLocation STATUS_PROVIDER = id("status");
+    public static final Identifier STATUS_PROVIDER = id("status");
 
     private BuiltInFeatherAnimations() {}
 

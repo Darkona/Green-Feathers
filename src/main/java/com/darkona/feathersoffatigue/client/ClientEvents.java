@@ -11,15 +11,15 @@ import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
 import com.darkona.feathersoffatigue.style.FeatherStylePack;
 import com.darkona.feathersoffatigue.style.BuiltInFeatherAnimations;
+import com.darkona.feathersoffatigue.weight.ArmorWeights;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,7 +27,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -37,7 +37,7 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 @EventBusSubscriber(modid = FeathersIds.MOD_ID, value = Dist.CLIENT)
 public final class ClientEvents {
 
-    private static final ResourceLocation FEATHER_FONT = id("feather_font");
+    private static final FontDescription FEATHER_FONT = new FontDescription.Resource(id("feather_font"));
     /** The weight tooltip's icons, in the feather font: built once, since a tooltip is rebuilt every frame. */
     private static final Style FEATHER_ICONS = Style.EMPTY.withFont(FEATHER_FONT);
 
@@ -57,8 +57,8 @@ public final class ClientEvents {
 
     /** Feather colors come from textures and resource packs' feather_styles.json: reread them when packs change. */
     @SubscribeEvent
-    public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((ResourceManagerReloadListener) manager -> {
+    public static void onRegisterReloadListeners(AddClientReloadListenersEvent event) {
+        event.addListener(id("feather_styles"), (ResourceManagerReloadListener) manager -> {
             FeatherColors.clear();
             FeatherStylePack.load(manager);
         });
@@ -66,7 +66,7 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
-        // Top of the right-hand stack: after air, where thirst mods such as Thirst Was Taken draw their bar.
+        // Top of the right-hand stack: after air, where thirst mods such as Droplets of Thirst draw their bar.
         event.registerAbove(VanillaGuiLayers.AIR_LEVEL, FeathersHud.LAYER_ID, FeathersHud::render);
     }
 
@@ -118,7 +118,7 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
-        if (!(stack.getItem() instanceof ArmorItem) || !FeathersClientConfig.DISPLAY_WEIGHTS.get()
+        if (ArmorWeights.armor(stack) == null || !FeathersClientConfig.DISPLAY_WEIGHTS.get()
                 || !FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.get()) return;
 
         double weight = FeathersAPI.getPieceWeight(stack);

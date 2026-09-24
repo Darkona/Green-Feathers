@@ -1,6 +1,6 @@
 package com.darkona.feathersoffatigue.api.event;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.ICancellableEvent;
 
@@ -9,7 +9,7 @@ import net.neoforged.bus.api.ICancellableEvent;
  */
 public final class GainEvent extends FeathersEvent implements ICancellableEvent {
 
-    private final ResourceLocation source;
+    private final Identifier source;
     private int amount;
 
     /**
@@ -19,7 +19,7 @@ public final class GainEvent extends FeathersEvent implements ICancellableEvent 
      * @param source the reason for the gain
      * @param amount the requested amount in stamina units
      */
-    public GainEvent(LivingEntity entity, ResourceLocation source, int amount) {
+    public GainEvent(LivingEntity entity, Identifier source, int amount) {
         super(entity);
         this.source = source;
         this.amount = amount;
@@ -30,7 +30,7 @@ public final class GainEvent extends FeathersEvent implements ICancellableEvent 
      *
      * @return the gain source
      */
-    public ResourceLocation getSource() {
+    public Identifier getSource() {
         return source;
     }
 

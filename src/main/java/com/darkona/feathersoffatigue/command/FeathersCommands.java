@@ -46,7 +46,7 @@ public final class FeathersCommands {
     @SubscribeEvent
     public static void register(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("feathers")
-                .requires(source -> source.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("info")
                         .then(Commands.argument(TARGETS, EntityArgument.entities()).executes(FeathersCommands::info)))
                 .then(Commands.literal("set")

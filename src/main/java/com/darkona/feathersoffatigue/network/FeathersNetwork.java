@@ -3,7 +3,7 @@ package com.darkona.feathersoffatigue.network;
 import com.darkona.feathersoffatigue.client.ClientFeathersData;
 import com.darkona.feathersoffatigue.core.FeathersData;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -43,7 +43,7 @@ public final class FeathersNetwork {
         send(player, SyncPayload.none(entity.getId()));
     }
 
-    public static void sendSpendDebug(LivingEntity entity, ResourceLocation source, int cost) {
+    public static void sendSpendDebug(LivingEntity entity, Identifier source, int cost) {
         if (entity instanceof ServerPlayer player) send(player, new SpendDebugPayload(source, cost));
     }
 

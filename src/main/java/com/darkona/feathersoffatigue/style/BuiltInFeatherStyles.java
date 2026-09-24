@@ -2,7 +2,7 @@ package com.darkona.feathersoffatigue.style;
 
 import com.darkona.feathersoffatigue.api.client.FeatherStyle;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +16,7 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
  */
 public final class BuiltInFeatherStyles {
 
-    public static final ResourceLocation STATUS_PROVIDER = id("status");
+    public static final Identifier STATUS_PROVIDER = id("status");
 
     private BuiltInFeatherStyles() {}
 
@@ -44,7 +44,7 @@ public final class BuiltInFeatherStyles {
         registerStyleProvider(STATUS_PROVIDER, STATUS_PRIORITY, (player, feathers) -> status(player));
     }
 
-    private static @Nullable ResourceLocation status(Player player) {
+    private static @Nullable Identifier status(Player player) {
         if (player.hasEffect(FeathersMobEffects.COLD)) return COLD;
         if (player.hasEffect(FeathersMobEffects.HOT)) return HOT;
         if (player.hasEffect(FeathersMobEffects.ENERGIZED)) return ENERGIZED;

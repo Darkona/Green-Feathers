@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.141'
+    id 'net.neoforged.moddev' version '2.0.148'
 }
 
 version = "${minecraft_label}-${mod_version}"
@@ -12,7 +12,7 @@ base {
     archivesName = archives_base_name
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 java.withSourcesJar()
 
 // Test-only data, on the classpath only when running the GameTests: src/gametest/resources as is (it wins over the
@@ -70,15 +70,9 @@ neoForge {
     version = project.neo_version
     addModdingDependenciesTo(sourceSets.api)
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
-
     runs {
         client {
             client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
         // Headless client straight into a copy of a world: scripts or `xvfb-run ./gradlew runBootCheck`.
         bootCheck {
@@ -89,11 +83,11 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
         gameTestServer {
             type = 'gameTestServer'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // Only this mod's tests: the game test server runs every test in the registry unless told which.
+            programArguments.addAll '--tests', "${project.mod_id}:*"
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -116,13 +110,11 @@ configurations {
 dependencies {
     implementation sourceSets.api.output
 
-    // Optional compat: every use sits behind a ModList check.
-    compileOnly "maven.modrinth:cold-sweat:${cold_sweat_version}"
-    compileOnly "maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"
+    // Optional compat: every use sits behind a ModList check. Mods without a build for this Minecraft version are in
+    // src/disabled (see its README).
     compileOnly "com.darkona.dropletsofthirst:droplets-of-thirst-api:${droplets_of_thirst_version}"
     compileOnly "maven.modrinth:tough-as-nails:${tough_as_nails_version}"
     compileOnly "maven.modrinth:serene-seasons:${serene_seasons_version}"
-    compileOnly "maven.modrinth:legendary-survival-overhaul:${lso_version}"
     compileOnly "maven.modrinth:overflowing-bars:${overflowing_bars_version}"
     compileOnly "maven.modrinth:puzzles-lib:${puzzles_lib_version}"
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
@@ -131,19 +123,14 @@ dependencies {
 }
 
 // Compat mods on the dev runtime, for boot checks and GameTests with them loaded:
-//   ./gradlew runGameTestServer -Pcompat=coldsweat,thirst,overflowingbars
+//   ./gradlew runGameTestServer -Pcompat=dropletsofthirst,overflowingbars
 //   ./gradlew runGameTestServer -Pcompat=toughasnails,sereneseasons
 def compatRuntime = [
-        coldsweat      : ["maven.modrinth:cold-sweat:${cold_sweat_version}"],
-        thirst         : ["maven.modrinth:thirst-was-taken:${thirst_was_taken_version}"],
         dropletsofthirst: ["com.darkona.dropletsofthirst:droplets-of-thirst:${droplets_of_thirst_version}"],
         toughasnails   : ["maven.modrinth:tough-as-nails:${tough_as_nails_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
-        lso            : ["maven.modrinth:legendary-survival-overhaul:${lso_version}"],
         appleskin      : ["maven.modrinth:appleskin:${appleskin_version}"],
         jade           : ["maven.modrinth:jade:${jade_version}"],
-        naturalist     : ["maven.modrinth:naturalist:${naturalist_version}", "maven.modrinth:geckolib:${geckolib_version}"],
-        mobwrangler    : ["maven.modrinth:mob-wrangler:${mob_wrangler_version}"],
         overflowingbars: ["maven.modrinth:overflowing-bars:${overflowing_bars_version}", "maven.modrinth:puzzles-lib:${puzzles_lib_version}"],
 ]
 if (project.hasProperty('compat')) {
@@ -169,12 +156,9 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             mod_version            : project.version.toString(),
             mod_authors            : mod_authors,
             mod_description        : mod_description,
-            cold_sweat_range       : cold_sweat_range,
-            thirst_range           : thirst_range,
             droplets_of_thirst_range: droplets_of_thirst_range,
             tough_as_nails_range   : tough_as_nails_range,
             serene_seasons_range   : serene_seasons_range,
-            lso_range              : lso_range,
             overflowing_bars_range : overflowing_bars_range,
             curios_range           : curios_range,
             jade_range             : jade_range,
@@ -207,6 +191,7 @@ tasks.named('assemble') { dependsOn apiJar, apiSourcesJar }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs.addAll(['-Xmaxerrs', '2000'])
 }
 
 publishing {

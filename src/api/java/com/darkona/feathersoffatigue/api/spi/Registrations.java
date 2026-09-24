@@ -1,6 +1,6 @@
 package com.darkona.feathersoffatigue.api.spi;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
@@ -27,8 +27,8 @@ public final class Registrations {
      * @param <T>   the entry type
      * @return a new array
      */
-    public static <T> T[] withEntry(T[] array, T entry, Function<T, ResourceLocation> id) {
-        ResourceLocation key = id.apply(entry);
+    public static <T> T[] withEntry(T[] array, T entry, Function<T, Identifier> id) {
+        Identifier key = id.apply(entry);
         for (int i = 0; i < array.length; i++) {
             if (id.apply(array[i]).equals(key)) {
                 T[] copy = array.clone();

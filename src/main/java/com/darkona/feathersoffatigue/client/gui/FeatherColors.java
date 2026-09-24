@@ -8,16 +8,22 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -32,10 +38,13 @@ public final class FeatherColors {
     public static final int LEATHER = 0x9A6A3F;
 
     private static final long UNKNOWN = Long.MIN_VALUE;
-    private static final Object2LongOpenHashMap<ResourceLocation> BY_TEXTURE = new Object2LongOpenHashMap<>();
+    private static final Object2LongOpenHashMap<Identifier> BY_TEXTURE = new Object2LongOpenHashMap<>();
     private static final Reference2LongOpenHashMap<Item> BY_ITEM = new Reference2LongOpenHashMap<>();
     private static final Int2IntOpenHashMap SHADES = new Int2IntOpenHashMap();
     private static final Int2LongOpenHashMap BY_DYE = new Int2LongOpenHashMap();
+    /** The creature last asked about, and its colors: the HUD asks every frame while riding. */
+    private static @Nullable LivingEntity lastEntity;
+    private static long lastEntityPair;
 
     static {
         BY_TEXTURE.defaultReturnValue(UNKNOWN);
@@ -59,19 +68,36 @@ public final class FeatherColors {
      * Colors for a creature, from the texture its renderer draws.
      */
     public static long of(LivingEntity entity) {
-        ResourceLocation texture;
+        // The texture comes from a render state built for the purpose: worked out once per creature ridden.
+        if (entity == lastEntity) return lastEntityPair;
+        Identifier texture;
         try {
-            texture = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity).getTextureLocation(entity);
+            texture = textureOf(entity);
         } catch (RuntimeException e) {
             texture = null;
         }
         // Some modded renderers have no texture to give: neutral leather, cached like any other.
         if (texture == null) texture = MissingTextureAtlasSprite.getLocation();
         long cached = BY_TEXTURE.getLong(texture);
-        if (cached != UNKNOWN) return cached;
-        long computed = pair(dominantOfTexture(texture));
-        BY_TEXTURE.put(texture, computed);
-        return computed;
+        if (cached == UNKNOWN) {
+            cached = pair(dominantOfTexture(texture));
+            BY_TEXTURE.put(texture, cached);
+        }
+        lastEntity = entity;
+        lastEntityPair = cached;
+        return cached;
+    }
+
+    /** The texture a creature's renderer draws it with, or null for renderers that are not a living entity's. */
+    @SuppressWarnings("unchecked")
+    private static @Nullable Identifier textureOf(LivingEntity entity) {
+        EntityRenderer<?, ?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
+        if (!(renderer instanceof LivingEntityRenderer<?, ?, ?> living)) return null;
+        return textureOf((LivingEntityRenderer<LivingEntity, LivingEntityRenderState, ?>) living, entity);
+    }
+
+    private static <T extends LivingEntity, S extends LivingEntityRenderState> Identifier textureOf(LivingEntityRenderer<T, S, ?> renderer, T entity) {
+        return renderer.getTextureLocation(renderer.createRenderState(entity, 1f));
     }
 
     /**
@@ -129,14 +155,20 @@ public final class FeatherColors {
         return cached != UNKNOWN ? cached : of(item.getDefaultInstance());
     }
 
+    /** Leaving the world: the creature last ridden goes with it. */
+    public static void forgetCreature() {
+        lastEntity = null;
+    }
+
     /** Resource packs changed: textures may have too. */
     public static void clear() {
+        lastEntity = null;
         BY_TEXTURE.clear();
         BY_ITEM.clear();
         BY_DYE.clear();
     }
 
-    private static int dominantOfTexture(ResourceLocation texture) {
+    private static int dominantOfTexture(Identifier texture) {
         Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(texture);
         if (resource.isEmpty()) return LEATHER;
         try (InputStream in = resource.get().open(); NativeImage image = NativeImage.read(in)) {
@@ -149,9 +181,11 @@ public final class FeatherColors {
 
     private static int dominantOfItem(ItemStack stack) {
         try {
-            TextureAtlasSprite sprite = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null, 0)
-                    .getParticleIcon(ModelData.EMPTY);
-            return dominant(sprite.contents().getOriginalImage());
+            ItemStackRenderState state = new ItemStackRenderState();
+            Minecraft.getInstance().getItemModelResolver().updateForTopItem(state, stack, ItemDisplayContext.GUI, null, null, 0);
+            Material.Baked material = state.pickParticleMaterial(RandomSource.create(0L));
+            if (material == null) return LEATHER;
+            return dominant(material.sprite().contents().getOriginalImage());
         } catch (RuntimeException e) {
             return LEATHER;
         }
@@ -168,11 +202,11 @@ public final class FeatherColors {
         long[] blue = new long[4096];
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
-                int abgr = image.getPixelRGBA(x, y);
-                if (FastColor.ABGR32.alpha(abgr) < 200) continue;
-                int r = FastColor.ABGR32.red(abgr);
-                int g = FastColor.ABGR32.green(abgr);
-                int b = FastColor.ABGR32.blue(abgr);
+                int argb = image.getPixel(x, y);
+                if (ARGB.alpha(argb) < 200) continue;
+                int r = ARGB.red(argb);
+                int g = ARGB.green(argb);
+                int b = ARGB.blue(argb);
                 if (r + g + b < 24) continue;
                 int bucket = (r >> 4) << 8 | (g >> 4) << 4 | b >> 4;
                 counts[bucket]++;
@@ -205,9 +239,9 @@ public final class FeatherColors {
     }
 
     private static float[] hsl(int rgb) {
-        float r = FastColor.ARGB32.red(rgb) / 255f;
-        float g = FastColor.ARGB32.green(rgb) / 255f;
-        float b = FastColor.ARGB32.blue(rgb) / 255f;
+        float r = ARGB.red(rgb) / 255f;
+        float g = ARGB.green(rgb) / 255f;
+        float b = ARGB.blue(rgb) / 255f;
         float max = Math.max(r, Math.max(g, b));
         float min = Math.min(r, Math.min(g, b));
         float l = (max + min) / 2;

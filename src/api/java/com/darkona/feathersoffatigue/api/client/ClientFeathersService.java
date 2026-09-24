@@ -3,7 +3,7 @@ package com.darkona.feathersoffatigue.api.client;
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.SpendOptions;
 import com.darkona.feathersoffatigue.api.SpendResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -18,7 +18,7 @@ public interface ClientFeathersService {
 
     FeathersView mount();
 
-    SpendResult predictSpend(ResourceLocation source, int stamina, SpendOptions options);
+    SpendResult predictSpend(Identifier source, int stamina, SpendOptions options);
 
-    void requestSpend(ResourceLocation source, int stamina, SpendOptions options);
+    void requestSpend(Identifier source, int stamina, SpendOptions options);
 }

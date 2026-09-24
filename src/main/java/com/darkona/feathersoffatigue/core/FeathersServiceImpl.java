@@ -16,10 +16,10 @@ import com.darkona.feathersoffatigue.mount.MountTuning;
 import com.darkona.feathersoffatigue.network.FeathersNetwork;
 import com.darkona.feathersoffatigue.weight.ArmorWeights;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
@@ -103,8 +103,8 @@ public final class FeathersServiceImpl implements FeathersService {
     private static volatile byte[] mountTypes = new byte[0];
 
     private static boolean computeMount(LivingEntity entity) {
-        if (entity.getType().is(FeathersIds.NO_FEATHERS)) return false;
-        boolean mount = entity instanceof AbstractHorse || entity.getType().is(FeathersIds.MOUNTS)
+        if (entity.is(FeathersIds.NO_FEATHERS)) return false;
+        boolean mount = entity instanceof AbstractHorse || entity.is(FeathersIds.MOUNTS)
                 || BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entity.getType())
                 .getData(FeathersDataMaps.MOUNT_STATS) != null;
         return mount && entity.getAttribute(FeathersAttributes.MAX_FEATHERS) != null;
@@ -211,7 +211,7 @@ public final class FeathersServiceImpl implements FeathersService {
     /**
      * A base cost after the usage multiplier and the stamina modifiers.
      */
-    static int effectiveCost(LivingEntity entity, FeathersData data, ResourceLocation source, double baseCost) {
+    static int effectiveCost(LivingEntity entity, FeathersData data, Identifier source, double baseCost) {
         return effectiveCost(entity, data, data.usageAttribute(entity), source, baseCost);
     }
 
@@ -221,7 +221,7 @@ public final class FeathersServiceImpl implements FeathersService {
      * registered on both sides.
      */
     public static int effectiveCost(LivingEntity entity, FeathersView feathers, @Nullable AttributeInstance usage,
-                                    ResourceLocation source, double baseCost) {
+                                    Identifier source, double baseCost) {
         // Clamped before narrowing: an "everything" cost times a multiplier would wrap negative and cost nothing.
         int cost = (int) Math.min(Integer.MAX_VALUE, Math.round(baseCost * (usage != null ? usage.getValue() : 1.0)));
         for (Extensions.ModifierEntry modifier : Extensions.modifiers()) {
@@ -231,12 +231,12 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     /** A cost priced on the client against its view of the local player's feathers. */
-    private static int clientCost(LivingEntity entity, FeathersView feathers, ResourceLocation source, double baseCost) {
+    private static int clientCost(LivingEntity entity, FeathersView feathers, Identifier source, double baseCost) {
         return effectiveCost(entity, feathers, entity.getAttribute(FeathersAttributes.USAGE_MULTIPLIER), source, baseCost);
     }
 
     @Override
-    public SpendResult spend(LivingEntity entity, ResourceLocation source, int stamina, SpendOptions options) {
+    public SpendResult spend(LivingEntity entity, Identifier source, int stamina, SpendOptions options) {
         if (!supports(entity) || isExempt(entity)) return SpendResult.EXEMPT;
 
         if (onClient(entity)) {
@@ -327,7 +327,7 @@ public final class FeathersServiceImpl implements FeathersService {
     /* Drains */
 
     @Override
-    public SpendResult startDrain(LivingEntity entity, ResourceLocation source, double staminaPerTick, DrainOptions options) {
+    public SpendResult startDrain(LivingEntity entity, Identifier source, double staminaPerTick, DrainOptions options) {
         if (!supports(entity) || isExempt(entity)) return SpendResult.EXEMPT;
         if (onClient(entity)) {
             ClientBridge bridge = clientBridge;
@@ -358,7 +358,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     @Override
-    public void stopDrain(LivingEntity entity, ResourceLocation source) {
+    public void stopDrain(LivingEntity entity, Identifier source) {
         if (!supports(entity) || onClient(entity)) return;
         FeathersData data = data(entity);
         int i = FeathersData.indexOf(data.drains, source);
@@ -368,14 +368,14 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     @Override
-    public boolean isDraining(LivingEntity entity, ResourceLocation source) {
+    public boolean isDraining(LivingEntity entity, Identifier source) {
         return supports(entity) && !onClient(entity) && data(entity).drain(source) != null;
     }
 
     /* Giving and setting */
 
     @Override
-    public int gain(LivingEntity entity, ResourceLocation source, int stamina) {
+    public int gain(LivingEntity entity, Identifier source, int stamina) {
         if (!supports(entity) || onClient(entity) || stamina <= 0) return 0;
         FeathersData data = data(entity);
         ensureInitialized(entity, data);
@@ -429,7 +429,7 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     @Override
-    public void addBonusStamina(LivingEntity entity, ResourceLocation source, int stamina, int ticks) {
+    public void addBonusStamina(LivingEntity entity, Identifier source, int stamina, int ticks) {
         if (!supports(entity) || onClient(entity)) return;
         FeathersData data = data(entity);
         if (stamina <= 0) data.removeBonus(source);
@@ -438,27 +438,27 @@ public final class FeathersServiceImpl implements FeathersService {
     }
 
     @Override
-    public void removeBonusStamina(LivingEntity entity, ResourceLocation source) {
+    public void removeBonusStamina(LivingEntity entity, Identifier source) {
         if (supports(entity) && !onClient(entity)) data(entity).removeBonus(source);
     }
 
     @Override
-    public void blockRegen(LivingEntity entity, ResourceLocation source, int ticks) {
+    public void blockRegen(LivingEntity entity, Identifier source, int ticks) {
         if (supports(entity) && !onClient(entity)) FeathersData.setTimed(data(entity).regenBlocks, source, 0, until(entity, ticks));
     }
 
     @Override
-    public void unblockRegen(LivingEntity entity, ResourceLocation source) {
+    public void unblockRegen(LivingEntity entity, Identifier source) {
         if (supports(entity) && !onClient(entity)) FeathersData.removeTimed(data(entity).regenBlocks, source);
     }
 
     @Override
-    public void setRestBonus(LivingEntity entity, ResourceLocation source, double multiplier, int ticks) {
+    public void setRestBonus(LivingEntity entity, Identifier source, double multiplier, int ticks) {
         if (supports(entity) && !onClient(entity)) FeathersData.setTimed(data(entity).restBonuses, source, multiplier, until(entity, ticks));
     }
 
     @Override
-    public void removeRestBonus(LivingEntity entity, ResourceLocation source) {
+    public void removeRestBonus(LivingEntity entity, Identifier source) {
         if (supports(entity) && !onClient(entity)) FeathersData.removeTimed(data(entity).restBonuses, source);
     }
 
@@ -489,22 +489,22 @@ public final class FeathersServiceImpl implements FeathersService {
     /* Extension points */
 
     @Override
-    public void registerClimateProvider(ResourceLocation id, int priority, ClimateProvider provider) {
+    public void registerClimateProvider(Identifier id, int priority, ClimateProvider provider) {
         Extensions.addClimate(id, priority, provider);
     }
 
     @Override
-    public void registerRegenFactor(ResourceLocation id, RegenFactor factor) {
+    public void registerRegenFactor(Identifier id, RegenFactor factor) {
         Extensions.addRegenFactor(id, factor);
     }
 
     @Override
-    public void registerWeightSource(ResourceLocation id, WeightSource source) {
+    public void registerWeightSource(Identifier id, WeightSource source) {
         Extensions.addWeightSource(id, source);
     }
 
     @Override
-    public void registerStaminaModifier(ResourceLocation id, int ordinal, StaminaModifier modifier) {
+    public void registerStaminaModifier(Identifier id, int ordinal, StaminaModifier modifier) {
         Extensions.addModifier(id, ordinal, modifier);
     }
 

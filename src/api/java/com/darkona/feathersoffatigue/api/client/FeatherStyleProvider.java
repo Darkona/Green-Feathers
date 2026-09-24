@@ -1,7 +1,7 @@
 package com.darkona.feathersoffatigue.api.client;
 
 import com.darkona.feathersoffatigue.api.FeathersView;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,5 +23,5 @@ public interface FeatherStyleProvider {
      * provider decide
      */
     @Nullable
-    ResourceLocation styleFor(Player player, FeathersView feathers);
+    Identifier styleFor(Player player, FeathersView feathers);
 }

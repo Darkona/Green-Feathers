@@ -14,7 +14,7 @@ public class FeathersJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        registration.registerEntityDataProvider(MountStaminaProvider.INSTANCE, LivingEntity.class);
+        registration.registerEntityDataProvider(MountStaminaData.INSTANCE, LivingEntity.class);
     }
 
     @Override

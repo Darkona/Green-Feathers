@@ -2,7 +2,7 @@
 
 **Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
-Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers. Also for 1.20.1, 1.19.2 and 1.18.2 (Forge): see [Minecraft Versions](Minecraft-Versions) for what differs.
+Minecraft 26.1 · NeoForge · based on Elenai's Feathers. Also for 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge): see [Minecraft Versions](Minecraft-Versions) for what differs.
 
 ![Feathers above the food bar, with a golden row of Endurance feathers](images/hud.png)
 
@@ -14,4 +14,4 @@ Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers. Also for 1.20.1, 1.1
 - [Modpack Makers](Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
 - [Mod Developers](Mod-Developers): spending feathers and hooking into them from your own mod.
 - [Resource Packs](Resource-Packs): recoloring the feathers, or drawing your own.
-- [Minecraft Versions](Minecraft-Versions): what is different on 1.20.1, 1.19.2 and 1.18.2.
+- [Minecraft Versions](Minecraft-Versions): what is different on each Minecraft version.

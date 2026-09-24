@@ -1,6 +1,6 @@
 package com.darkona.feathersoffatigue.api;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -21,7 +21,7 @@ public interface StaminaModifier {
      * @param cost the current cost in stamina units
      * @return the cost to charge, in stamina
      */
-    default int modifyCost(LivingEntity entity, FeathersView feathers, ResourceLocation source, int cost) {
+    default int modifyCost(LivingEntity entity, FeathersView feathers, Identifier source, int cost) {
         return cost;
     }
 

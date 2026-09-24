@@ -1,6 +1,6 @@
 package com.darkona.feathersoffatigue.api.event;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
  */
 public abstract class DrainEvent extends FeathersEvent {
 
-    private final ResourceLocation source;
+    private final Identifier source;
 
     /**
      * Creates a drain event for one source.
@@ -16,7 +16,7 @@ public abstract class DrainEvent extends FeathersEvent {
      * @param entity the affected entity
      * @param source the drain source
      */
-    protected DrainEvent(LivingEntity entity, ResourceLocation source) {
+    protected DrainEvent(LivingEntity entity, Identifier source) {
         super(entity);
         this.source = source;
     }
@@ -26,7 +26,7 @@ public abstract class DrainEvent extends FeathersEvent {
      *
      * @return the drain source
      */
-    public ResourceLocation getSource() {
+    public Identifier getSource() {
         return source;
     }
 
@@ -41,7 +41,7 @@ public abstract class DrainEvent extends FeathersEvent {
          * @param source         the drain source
          * @param staminaPerTick the configured rate in stamina units per tick
          */
-        public Started(LivingEntity entity, ResourceLocation source, double staminaPerTick) {
+        public Started(LivingEntity entity, Identifier source, double staminaPerTick) {
             super(entity, source);
             this.staminaPerTick = staminaPerTick;
         }
@@ -80,7 +80,7 @@ public abstract class DrainEvent extends FeathersEvent {
          * @param source the drain source
          * @param reason why the drain ended
          */
-        public Stopped(LivingEntity entity, ResourceLocation source, Reason reason) {
+        public Stopped(LivingEntity entity, Identifier source, Reason reason) {
             super(entity, source);
             this.reason = reason;
         }

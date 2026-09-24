@@ -1,7 +1,7 @@
 package com.darkona.feathersoffatigue.api.spi;
 
 import com.darkona.feathersoffatigue.api.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -19,31 +19,31 @@ public interface FeathersService {
 
     FeathersView view(LivingEntity entity);
 
-    SpendResult spend(LivingEntity entity, ResourceLocation source, int stamina, SpendOptions options);
+    SpendResult spend(LivingEntity entity, Identifier source, int stamina, SpendOptions options);
 
-    int gain(LivingEntity entity, ResourceLocation source, int stamina);
+    int gain(LivingEntity entity, Identifier source, int stamina);
 
     void setStamina(LivingEntity entity, int stamina);
 
     void reset(LivingEntity entity);
 
-    SpendResult startDrain(LivingEntity entity, ResourceLocation source, double staminaPerTick, DrainOptions options);
+    SpendResult startDrain(LivingEntity entity, Identifier source, double staminaPerTick, DrainOptions options);
 
-    void stopDrain(LivingEntity entity, ResourceLocation source);
+    void stopDrain(LivingEntity entity, Identifier source);
 
-    boolean isDraining(LivingEntity entity, ResourceLocation source);
+    boolean isDraining(LivingEntity entity, Identifier source);
 
-    void blockRegen(LivingEntity entity, ResourceLocation source, int ticks);
+    void blockRegen(LivingEntity entity, Identifier source, int ticks);
 
-    void unblockRegen(LivingEntity entity, ResourceLocation source);
+    void unblockRegen(LivingEntity entity, Identifier source);
 
-    void addBonusStamina(LivingEntity entity, ResourceLocation source, int stamina, int ticks);
+    void addBonusStamina(LivingEntity entity, Identifier source, int stamina, int ticks);
 
-    void removeBonusStamina(LivingEntity entity, ResourceLocation source);
+    void removeBonusStamina(LivingEntity entity, Identifier source);
 
-    void setRestBonus(LivingEntity entity, ResourceLocation source, double multiplier, int ticks);
+    void setRestBonus(LivingEntity entity, Identifier source, double multiplier, int ticks);
 
-    void removeRestBonus(LivingEntity entity, ResourceLocation source);
+    void removeRestBonus(LivingEntity entity, Identifier source);
 
     Climate getClimate(LivingEntity entity);
 
@@ -53,13 +53,13 @@ public interface FeathersService {
 
     void recalculateWeight(LivingEntity entity);
 
-    void registerClimateProvider(ResourceLocation id, int priority, ClimateProvider provider);
+    void registerClimateProvider(Identifier id, int priority, ClimateProvider provider);
 
-    void registerRegenFactor(ResourceLocation id, RegenFactor factor);
+    void registerRegenFactor(Identifier id, RegenFactor factor);
 
-    void registerWeightSource(ResourceLocation id, WeightSource source);
+    void registerWeightSource(Identifier id, WeightSource source);
 
-    void registerStaminaModifier(ResourceLocation id, int ordinal, StaminaModifier modifier);
+    void registerStaminaModifier(Identifier id, int ordinal, StaminaModifier modifier);
 
     void sync(LivingEntity entity);
 }

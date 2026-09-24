@@ -5,16 +5,12 @@ import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.StaminaModifier;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
@@ -25,25 +21,23 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.tick;
  * The extension points, used the way another mod would. Registrations are global and permanent, so each only
  * affects players carrying this test's tag.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class ExtensionTests {
 
     private static final String MARK = "feathers_of_fatigue_extension_test";
     /** Separate from MARK: a cold player regenerates at half speed, which would skew the other tests. */
     private static final String COLD_MARK = "feathers_of_fatigue_extension_test_cold";
-    private static final ResourceLocation FREE = id("test_free_action");
+    private static final Identifier FREE = id("test_free_action");
 
     static {
         FeathersAPI.registerStaminaModifier(id("test_free_actions"), 100, new StaminaModifier() {
             @Override
-            public int modifyCost(LivingEntity entity, FeathersView feathers, ResourceLocation source, int cost) {
-                return entity.getTags().contains(MARK) && source.equals(FREE) ? 0 : cost;
+            public int modifyCost(LivingEntity entity, FeathersView feathers, Identifier source, int cost) {
+                return entity.entityTags().contains(MARK) && source.equals(FREE) ? 0 : cost;
             }
         });
-        FeathersAPI.registerClimateProvider(id("test_climate"), 1000, entity -> entity.getTags().contains(COLD_MARK) ? Climate.COLD : null);
-        FeathersAPI.registerRegenFactor(id("test_regen"), (entity, feathers) -> entity.getTags().contains(MARK) ? 1.0 : 0.0);
-        FeathersAPI.registerWeightSource(id("test_backpack"), entity -> entity.getTags().contains(MARK) ? 3.0 : 0.0);
+        FeathersAPI.registerClimateProvider(id("test_climate"), 1000, entity -> entity.entityTags().contains(COLD_MARK) ? Climate.COLD : null);
+        FeathersAPI.registerRegenFactor(id("test_regen"), (entity, feathers) -> entity.entityTags().contains(MARK) ? 1.0 : 0.0);
+        FeathersAPI.registerWeightSource(id("test_backpack"), entity -> entity.entityTags().contains(MARK) ? 3.0 : 0.0);
     }
 
     private static ServerPlayer marked(GameTestHelper helper) {

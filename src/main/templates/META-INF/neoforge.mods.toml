@@ -7,7 +7,7 @@ issueTrackerURL = "https://github.com/Darkona/feathers-of-fatigue/issues"
 modId = "${mod_id}"
 version = "${mod_version}"
 displayName = "${mod_name}"
-logoFile = "feathers.png"
+logoFile = "assets/feathers_of_fatigue/feathers-of-fatigue-logo.png"
 authors = "${mod_authors}"
 description = '''${mod_description}'''
 
@@ -22,20 +22,6 @@ side = "BOTH"
 modId = "minecraft"
 type = "required"
 versionRange = "${minecraft_version_range}"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "cold_sweat"
-type = "optional"
-versionRange = "${cold_sweat_range}"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "thirst"
-type = "optional"
-versionRange = "${thirst_range}"
 ordering = "NONE"
 side = "BOTH"
 
@@ -57,13 +43,6 @@ side = "BOTH"
 modId = "sereneseasons"
 type = "optional"
 versionRange = "${serene_seasons_range}"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "legendarysurvivaloverhaul"
-type = "optional"
-versionRange = "${lso_range}"
 ordering = "NONE"
 side = "BOTH"
 

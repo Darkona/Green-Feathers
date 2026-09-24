@@ -5,11 +5,8 @@ import com.darkona.feathersoffatigue.api.registry.FeathersDataMaps;
 import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.compatibility.dropletsofthirst.DropletsOfThirstCompat;
-import com.darkona.feathersoffatigue.compatibility.coldsweat.ColdSweatCompat;
 import com.darkona.feathersoffatigue.compatibility.curios.CuriosCompat;
-import com.darkona.feathersoffatigue.compatibility.lso.LegendarySurvivalCompat;
 import com.darkona.feathersoffatigue.compatibility.sereneseasons.SereneSeasonsCompat;
-import com.darkona.feathersoffatigue.compatibility.thirst.ThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.toughasnails.ToughAsNailsCompat;
 import com.darkona.feathersoffatigue.config.FeathersClientConfig;
 import com.darkona.feathersoffatigue.config.FeathersCompatConfig;
@@ -19,6 +16,7 @@ import com.darkona.feathersoffatigue.core.FeathersServiceImpl;
 import com.darkona.feathersoffatigue.core.FeathersTicker;
 import com.darkona.feathersoffatigue.core.HungerRegen;
 import com.darkona.feathersoffatigue.effect.ModEffects;
+import com.darkona.feathersoffatigue.gametest.FeathersGameTests;
 import com.darkona.feathersoffatigue.item.ModItems;
 import com.darkona.feathersoffatigue.network.FeathersNetwork;
 import com.darkona.feathersoffatigue.registry.ModAttributes;
@@ -60,16 +58,14 @@ public final class Feathers {
             event.register(FeathersDataMaps.MOUNT_STATS);
         });
         modEventBus.addListener(Feathers::commonSetup);
+        FeathersGameTests.register(modEventBus);
 
         // Built-in extensions go through the same API as other mods' do.
         ClimateEffects.registerBuiltIn();
         HungerRegen.registerBuiltIn();
         BuiltInFeatherStyles.register();
-        ColdSweatCompat.init();
-        ThirstCompat.init();
         DropletsOfThirstCompat.init();
         ToughAsNailsCompat.init();
-        LegendarySurvivalCompat.init();
         SereneSeasonsCompat.init();
     }
 

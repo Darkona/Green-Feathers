@@ -5,17 +5,13 @@ import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.SpendOptions;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.registry.FeathersAttributes;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
@@ -24,12 +20,10 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.tick;
 /**
  * Regeneration, its pauses, and continuous drains. Default regeneration: 0.4 feathers/s = 20 stamina a tick.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class RegenTests {
 
-    private static final ResourceLocation TEST = id("test");
-    private static final ResourceLocation OTHER = id("other");
+    private static final Identifier TEST = id("test");
+    private static final Identifier OTHER = id("other");
 
     private static ServerPlayer emptyPlayer(GameTestHelper helper) {
         ServerPlayer player = player(helper);

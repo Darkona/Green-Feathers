@@ -4,19 +4,15 @@ import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.RestState;
 import com.darkona.feathersoffatigue.api.SpendOptions;
 import com.darkona.feathersoffatigue.api.Stamina;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.UUID;
 
@@ -27,8 +23,6 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.tick;
 /**
  * Resting speeds up paying strain back, and so do API rest bonuses. A night slept through restores everything.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class RestTests {
 
     private static ServerPlayer strainedPlayer(GameTestHelper helper) {
@@ -59,15 +53,10 @@ public class RestTests {
      * wake-up event checks, not the bed.
      */
     private static Player sleeper(GameTestHelper helper) {
-        Player player = new Player(helper.getLevel(), BlockPos.ZERO, 0f, new GameProfile(UUID.randomUUID(), "feathers-sleeper")) {
+        Player player = new Player(helper.getLevel(), new GameProfile(UUID.randomUUID(), "feathers-sleeper")) {
             @Override
-            public boolean isSpectator() {
-                return false;
-            }
-
-            @Override
-            public boolean isCreative() {
-                return false;
+            public GameType gameMode() {
+                return GameType.SURVIVAL;
             }
 
             @Override
@@ -92,8 +81,7 @@ public class RestTests {
     public static void onlyANightSleptThroughRestoresFeathers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         try {
-            level.setDayTime(18000);
-            level.updateSkyBrightness();
+            TestSupport.setDayTime(level, 18000);
             Player player = sleeper(helper);
             wakeUp(player, false, true);
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after leaving the bed at night");
@@ -106,8 +94,7 @@ public class RestTests {
             player.stopSleeping();
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(10), "feathers after being woken at once at night");
 
-            level.setDayTime(6000);
-            level.updateSkyBrightness();
+            TestSupport.setDayTime(level, 6000);
             player = sleeper(helper);
             wakeUp(player, false, true);
             helper.assertValueEqual(FeathersAPI.get(player).stamina(), Stamina.ofFeathers(20), "feathers after the day broke over the bed");

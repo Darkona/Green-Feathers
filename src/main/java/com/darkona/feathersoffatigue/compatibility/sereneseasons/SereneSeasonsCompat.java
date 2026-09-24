@@ -12,8 +12,8 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 
 /**
  * Serene Seasons compatibility, safe to load without it: calls go through {@link SereneSeasonsBridge}. Winter
- * outdoors is cold; a summer day in the sun is hot in warmer biomes. Below the body-temperature mods (Cold Sweat,
- * Tough As Nails, Legendary Survival Overhaul), which already account for seasons; above the vanilla climate.
+ * outdoors is cold; a summer day in the sun is hot in warmer biomes. Below Tough As Nails' body temperature,
+ * which already accounts for seasons; above the vanilla climate.
  * Anything it has no opinion on falls through to the vanilla climate.
  */
 public final class SereneSeasonsCompat {
@@ -38,7 +38,7 @@ public final class SereneSeasonsCompat {
             case WINTER -> FeathersCompatConfig.SEASONS_WINTER_COLD.get()
                     && level.getBiome(pos).value().getModifiedClimateSettings().temperature() < FeathersCompatConfig.SEASONS_WINTER_MAX_TEMPERATURE.get()
                     ? Climate.COLD : null;
-            case SUMMER -> FeathersCompatConfig.SEASONS_SUMMER_HEAT.get() && level.isDay() && !entity.isInWaterOrRain()
+            case SUMMER -> FeathersCompatConfig.SEASONS_SUMMER_HEAT.get() && level.isBrightOutside() && !entity.isInWaterOrRain()
                     && level.getBiome(pos).value().getModifiedClimateSettings().temperature() >= FeathersCompatConfig.SEASONS_SUMMER_MIN_TEMPERATURE.get()
                     ? Climate.HOT : null;
             case SPRING, AUTUMN -> null;

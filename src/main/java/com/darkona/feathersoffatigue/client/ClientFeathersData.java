@@ -11,10 +11,10 @@ import com.darkona.feathersoffatigue.network.SpendRequestPayload;
 import com.darkona.feathersoffatigue.network.SyncPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -33,7 +33,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
     /** The local player was seen riding {@link #mountId}. */
     private boolean mountSeated;
 
-    private ResourceLocation lastSpendSource;
+    private Identifier lastSpendSource;
     private int lastSpendCost;
     private int lastSpendTicks;
 
@@ -94,7 +94,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
         return mountSeated && mount.hasFeathers() ? mount : FeathersView.NONE;
     }
 
-    public ResourceLocation lastSpendSource() {
+    public Identifier lastSpendSource() {
         return lastSpendTicks > 0 ? lastSpendSource : null;
     }
 
@@ -124,7 +124,7 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
      * Goes through the common service, which prices the cost for the local player and calls {@link #payPredicted}.
      */
     @Override
-    public SpendResult predictSpend(ResourceLocation source, int stamina, SpendOptions options) {
+    public SpendResult predictSpend(Identifier source, int stamina, SpendOptions options) {
         LocalPlayer player = Minecraft.getInstance().player;
         return player != null ? FeathersServiceImpl.INSTANCE.spend(player, source, stamina, options) : SpendResult.EXEMPT;
     }
@@ -149,8 +149,8 @@ public final class ClientFeathersData extends SyncedFeathers implements ClientFe
     }
 
     @Override
-    public void requestSpend(ResourceLocation source, int stamina, SpendOptions options) {
-        PacketDistributor.sendToServer(new SpendRequestPayload(source, stamina, options.allowStrain(), options.regenDelayTicks()));
+    public void requestSpend(Identifier source, int stamina, SpendOptions options) {
+        ClientPacketDistributor.sendToServer(new SpendRequestPayload(source, stamina, options.allowStrain(), options.regenDelayTicks()));
     }
 
     @Override

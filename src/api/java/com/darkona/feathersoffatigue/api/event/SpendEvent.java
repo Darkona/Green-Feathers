@@ -2,7 +2,7 @@ package com.darkona.feathersoffatigue.api.event;
 
 import com.darkona.feathersoffatigue.api.SpendOptions;
 import com.darkona.feathersoffatigue.api.SpendResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.ICancellableEvent;
 
@@ -11,7 +11,7 @@ import net.neoforged.bus.api.ICancellableEvent;
  */
 public abstract class SpendEvent extends FeathersEvent {
 
-    private final ResourceLocation source;
+    private final Identifier source;
 
     /**
      * Creates a spend event for one source.
@@ -19,7 +19,7 @@ public abstract class SpendEvent extends FeathersEvent {
      * @param entity the entity that requested the spend
      * @param source the reason for the spend
      */
-    protected SpendEvent(LivingEntity entity, ResourceLocation source) {
+    protected SpendEvent(LivingEntity entity, Identifier source) {
         super(entity);
         this.source = source;
     }
@@ -29,7 +29,7 @@ public abstract class SpendEvent extends FeathersEvent {
      *
      * @return the spend source
      */
-    public ResourceLocation getSource() {
+    public Identifier getSource() {
         return source;
     }
 
@@ -48,7 +48,7 @@ public abstract class SpendEvent extends FeathersEvent {
          * @param cost    the modified cost in stamina units
          * @param options the spend options
          */
-        public Pre(LivingEntity entity, ResourceLocation source, int cost, SpendOptions options) {
+        public Pre(LivingEntity entity, Identifier source, int cost, SpendOptions options) {
             super(entity, source);
             this.cost = cost;
             this.options = options;
@@ -98,7 +98,7 @@ public abstract class SpendEvent extends FeathersEvent {
          * @param cost   the final cost in stamina units
          * @param result the completed spend result
          */
-        public Post(LivingEntity entity, ResourceLocation source, int cost, SpendResult result) {
+        public Post(LivingEntity entity, Identifier source, int cost, SpendResult result) {
             super(entity, source);
             this.cost = cost;
             this.result = result;

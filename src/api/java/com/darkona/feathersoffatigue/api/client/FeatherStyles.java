@@ -3,7 +3,7 @@ package com.darkona.feathersoffatigue.api.client;
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.spi.Registrations;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,29 +25,29 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 public final class FeatherStyles {
 
     /** The player's feathers, by the client config's feather color. */
-    public static final ResourceLocation GREEN = id("green");
+    public static final Identifier GREEN = id("green");
     /** The built-in blue player style. */
-    public static final ResourceLocation BLUE = id("blue");
+    public static final Identifier BLUE = id("blue");
     /** The built-in white player style. */
-    public static final ResourceLocation WHITE = id("white");
+    public static final Identifier WHITE = id("white");
     /** The player's feathers under Feathers of Fatigue's effects. */
-    public static final ResourceLocation COLD = id("cold");
+    public static final Identifier COLD = id("cold");
     /** The built-in style for the Hot effect. */
-    public static final ResourceLocation HOT = id("hot");
+    public static final Identifier HOT = id("hot");
     /** The built-in style for the Energized effect. */
-    public static final ResourceLocation ENERGIZED = id("energized");
+    public static final Identifier ENERGIZED = id("energized");
     /** The built-in style for the Momentum effect. */
-    public static final ResourceLocation MOMENTUM = id("momentum");
+    public static final Identifier MOMENTUM = id("momentum");
     /** Strain feathers, over the empty slots. */
-    public static final ResourceLocation STRAIN = id("strain");
+    public static final Identifier STRAIN = id("strain");
     /** Bonus feathers (Endurance), in rows above. */
-    public static final ResourceLocation ENDURANCE = id("endurance");
+    public static final Identifier ENDURANCE = id("endurance");
     /** Weight with no color of its own (no armor piece or colored weight source behind it). */
-    public static final ResourceLocation ARMOR = id("armor");
+    public static final Identifier ARMOR = id("armor");
     /** The empty slots behind the feathers, and the same while exhausted. The body color fills the slot. */
-    public static final ResourceLocation EMPTY = id("empty");
+    public static final Identifier EMPTY = id("empty");
     /** The built-in style for empty slots while exhausted. */
-    public static final ResourceLocation EXHAUSTED = id("exhausted");
+    public static final Identifier EXHAUSTED = id("exhausted");
 
     /** The priority Feathers of Fatigue's own states answer at: above it wins over them, below only applies without them. */
     public static final int STATUS_PRIORITY = 0;
@@ -59,9 +59,9 @@ public final class FeatherStyles {
      * @param priority the selection priority
      * @param provider the registered provider
      */
-    public record ProviderEntry(ResourceLocation id, int priority, FeatherStyleProvider provider) {}
+    public record ProviderEntry(Identifier id, int priority, FeatherStyleProvider provider) {}
 
-    private static volatile Object2ObjectOpenHashMap<ResourceLocation, FeatherStyle> styles = new Object2ObjectOpenHashMap<>();
+    private static volatile Object2ObjectOpenHashMap<Identifier, FeatherStyle> styles = new Object2ObjectOpenHashMap<>();
     private static volatile ProviderEntry[] providers = new ProviderEntry[0];
     private static volatile int version;
 
@@ -73,8 +73,8 @@ public final class FeatherStyles {
      * @param id    the style identifier
      * @param style the style to register
      */
-    public static synchronized void registerStyle(ResourceLocation id, FeatherStyle style) {
-        Object2ObjectOpenHashMap<ResourceLocation, FeatherStyle> next = new Object2ObjectOpenHashMap<>(styles);
+    public static synchronized void registerStyle(Identifier id, FeatherStyle style) {
+        Object2ObjectOpenHashMap<Identifier, FeatherStyle> next = new Object2ObjectOpenHashMap<>(styles);
         next.put(Objects.requireNonNull(id), Objects.requireNonNull(style));
         styles = next;
         version++;
@@ -88,7 +88,7 @@ public final class FeatherStyles {
      * @param priority its selection priority
      * @param provider the provider to register
      */
-    public static synchronized void registerStyleProvider(ResourceLocation id, int priority, FeatherStyleProvider provider) {
+    public static synchronized void registerStyleProvider(Identifier id, int priority, FeatherStyleProvider provider) {
         ProviderEntry entry = new ProviderEntry(Objects.requireNonNull(id), priority, Objects.requireNonNull(provider));
         ProviderEntry[] next = Registrations.withEntry(providers, entry, ProviderEntry::id);
         // Stable: equal priorities keep their registration order.
@@ -104,7 +104,7 @@ public final class FeatherStyles {
      * @param id the style identifier
      * @return the registered style, or {@code null}
      */
-    public static @Nullable FeatherStyle get(ResourceLocation id) {
+    public static @Nullable FeatherStyle get(Identifier id) {
         return styles.get(id);
     }
 
@@ -115,9 +115,9 @@ public final class FeatherStyles {
      * @param feathers the player's current client-side stamina view
      * @return the selected style id, or {@code null} to use the configured color
      */
-    public static @Nullable ResourceLocation select(Player player, FeathersView feathers) {
+    public static @Nullable Identifier select(Player player, FeathersView feathers) {
         for (ProviderEntry entry : providers) {
-            ResourceLocation id = entry.provider().styleFor(player, feathers);
+            Identifier id = entry.provider().styleFor(player, feathers);
             if (id != null) return id;
         }
         return null;

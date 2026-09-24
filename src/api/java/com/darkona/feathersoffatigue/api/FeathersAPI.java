@@ -4,7 +4,7 @@ import com.darkona.feathersoffatigue.api.client.ClientFeathers;
 import com.darkona.feathersoffatigue.api.registry.FeathersAttributes;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.api.spi.FeathersService;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +24,7 @@ import java.util.Objects;
  * <b>Entities.</b> Methods accept any {@link LivingEntity}. Players and configured mounts can have feathers. Other
  * entities return {@code false} from {@link #hasFeathers}, and their views report zero.
  * <p>
- * <b>Sources.</b> Every spend, drain, bonus and block names its source with a {@link ResourceLocation} of your mod,
+ * <b>Sources.</b> Every spend, drain, bonus and block names its source with a {@link Identifier} of your mod,
  * e.g. {@code mymod:dash}. Using the same source again replaces or refreshes your own entry and never touches
  * another mod's.
  * <p>
@@ -79,7 +79,7 @@ public final class FeathersAPI {
      * @param options rules for this spend
      * @return the outcome after modifiers, events, and available stamina are considered
      */
-    public static SpendResult spend(LivingEntity entity, ResourceLocation source, int stamina, SpendOptions options) {
+    public static SpendResult spend(LivingEntity entity, Identifier source, int stamina, SpendOptions options) {
         return service().spend(entity, source, stamina, options);
     }
 
@@ -91,7 +91,7 @@ public final class FeathersAPI {
      * @param stamina the base cost in stamina units
      * @return the outcome of the spend
      */
-    public static SpendResult spend(LivingEntity entity, ResourceLocation source, int stamina) {
+    public static SpendResult spend(LivingEntity entity, Identifier source, int stamina) {
         return spend(entity, source, stamina, SpendOptions.DEFAULT);
     }
 
@@ -103,7 +103,7 @@ public final class FeathersAPI {
      * @param feathers the base cost in feathers
      * @return the outcome of the spend
      */
-    public static SpendResult spendFeathers(LivingEntity entity, ResourceLocation source, int feathers) {
+    public static SpendResult spendFeathers(LivingEntity entity, Identifier source, int feathers) {
         return spend(entity, source, Stamina.ofFeathers(feathers), SpendOptions.DEFAULT);
     }
 
@@ -116,7 +116,7 @@ public final class FeathersAPI {
      * @param options rules for the simulated spend
      * @return {@code true} when the action is allowed
      */
-    public static boolean canSpend(LivingEntity entity, ResourceLocation source, int stamina, SpendOptions options) {
+    public static boolean canSpend(LivingEntity entity, Identifier source, int stamina, SpendOptions options) {
         return spend(entity, source, stamina, options.simulated()).allowed();
     }
 
@@ -128,7 +128,7 @@ public final class FeathersAPI {
      * @param stamina the base cost in stamina units
      * @return {@code true} when the action is allowed
      */
-    public static boolean canSpend(LivingEntity entity, ResourceLocation source, int stamina) {
+    public static boolean canSpend(LivingEntity entity, Identifier source, int stamina) {
         return canSpend(entity, source, stamina, SpendOptions.DEFAULT);
     }
 
@@ -145,7 +145,7 @@ public final class FeathersAPI {
      *         {@code EXHAUSTED}/{@code INSUFFICIENT} when a new drain can't afford its first tick, in which case it isn't
      *         started. On the client, a prediction for the local player. Each tick's cost is paid later, on the server tick
      */
-    public static SpendResult startDrain(LivingEntity entity, ResourceLocation source, double staminaPerTick, DrainOptions options) {
+    public static SpendResult startDrain(LivingEntity entity, Identifier source, double staminaPerTick, DrainOptions options) {
         return service().startDrain(entity, source, staminaPerTick, options);
     }
 
@@ -157,7 +157,7 @@ public final class FeathersAPI {
      * @param staminaPerTick the base cost per tick in stamina units
      * @return the result of the current tick's payment
      */
-    public static SpendResult startDrain(LivingEntity entity, ResourceLocation source, double staminaPerTick) {
+    public static SpendResult startDrain(LivingEntity entity, Identifier source, double staminaPerTick) {
         return startDrain(entity, source, staminaPerTick, DrainOptions.DEFAULT);
     }
 
@@ -167,7 +167,7 @@ public final class FeathersAPI {
      * @param entity the entity whose drain to stop
      * @param source the identifier used to start the drain
      */
-    public static void stopDrain(LivingEntity entity, ResourceLocation source) {
+    public static void stopDrain(LivingEntity entity, Identifier source) {
         service().stopDrain(entity, source);
     }
 
@@ -178,7 +178,7 @@ public final class FeathersAPI {
      * @param source the drain identifier
      * @return {@code true} while that drain is active
      */
-    public static boolean isDraining(LivingEntity entity, ResourceLocation source) {
+    public static boolean isDraining(LivingEntity entity, Identifier source) {
         return service().isDraining(entity, source);
     }
 
@@ -192,7 +192,7 @@ public final class FeathersAPI {
      * @param stamina the amount to offer in stamina units
      * @return the stamina actually used: strain paid back plus stamina gained
      */
-    public static int gain(LivingEntity entity, ResourceLocation source, int stamina) {
+    public static int gain(LivingEntity entity, Identifier source, int stamina) {
         return service().gain(entity, source, stamina);
     }
 
@@ -205,7 +205,7 @@ public final class FeathersAPI {
      * @param stamina the bonus amount in stamina units
      * @param ticks the duration in ticks. A negative value lasts until spent or removed
      */
-    public static void addBonusStamina(LivingEntity entity, ResourceLocation source, int stamina, int ticks) {
+    public static void addBonusStamina(LivingEntity entity, Identifier source, int stamina, int ticks) {
         service().addBonusStamina(entity, source, stamina, ticks);
     }
 
@@ -215,7 +215,7 @@ public final class FeathersAPI {
      * @param entity the entity whose bonus to remove
      * @param source the bonus identifier
      */
-    public static void removeBonusStamina(LivingEntity entity, ResourceLocation source) {
+    public static void removeBonusStamina(LivingEntity entity, Identifier source) {
         service().removeBonusStamina(entity, source);
     }
 
@@ -249,7 +249,7 @@ public final class FeathersAPI {
      * @param source a stable identifier for the pause
      * @param ticks negative for until {@link #unblockRegen}
      */
-    public static void blockRegen(LivingEntity entity, ResourceLocation source, int ticks) {
+    public static void blockRegen(LivingEntity entity, Identifier source, int ticks) {
         service().blockRegen(entity, source, ticks);
     }
 
@@ -259,7 +259,7 @@ public final class FeathersAPI {
      * @param entity the entity whose regeneration to resume
      * @param source the block identifier
      */
-    public static void unblockRegen(LivingEntity entity, ResourceLocation source) {
+    public static void unblockRegen(LivingEntity entity, Identifier source) {
         service().unblockRegen(entity, source);
     }
 
@@ -272,7 +272,7 @@ public final class FeathersAPI {
      * @param multiplier the strain recovery multiplier
      * @param ticks      the duration in ticks, or a negative value until removed
      */
-    public static void setRestBonus(LivingEntity entity, ResourceLocation source, double multiplier, int ticks) {
+    public static void setRestBonus(LivingEntity entity, Identifier source, double multiplier, int ticks) {
         service().setRestBonus(entity, source, multiplier, ticks);
     }
 
@@ -282,7 +282,7 @@ public final class FeathersAPI {
      * @param entity the entity whose bonus to remove
      * @param source the bonus identifier
      */
-    public static void removeRestBonus(LivingEntity entity, ResourceLocation source) {
+    public static void removeRestBonus(LivingEntity entity, Identifier source) {
         service().removeRestBonus(entity, source);
     }
 
@@ -336,7 +336,7 @@ public final class FeathersAPI {
      * @param priority its selection priority
      * @param provider the provider to register
      */
-    public static void registerClimateProvider(ResourceLocation id, int priority, ClimateProvider provider) {
+    public static void registerClimateProvider(Identifier id, int priority, ClimateProvider provider) {
         service().registerClimateProvider(id, priority, provider);
     }
 
@@ -346,7 +346,7 @@ public final class FeathersAPI {
      * @param id     a stable identifier for the factor
      * @param factor the factor to register
      */
-    public static void registerRegenFactor(ResourceLocation id, RegenFactor factor) {
+    public static void registerRegenFactor(Identifier id, RegenFactor factor) {
         service().registerRegenFactor(id, factor);
     }
 
@@ -356,7 +356,7 @@ public final class FeathersAPI {
      * @param id     a stable identifier for the source
      * @param source the weight source to register
      */
-    public static void registerWeightSource(ResourceLocation id, WeightSource source) {
+    public static void registerWeightSource(Identifier id, WeightSource source) {
         service().registerWeightSource(id, source);
     }
 
@@ -367,7 +367,7 @@ public final class FeathersAPI {
      * @param ordinal  its position in the modifier chain
      * @param modifier the modifier to register
      */
-    public static void registerStaminaModifier(ResourceLocation id, int ordinal, StaminaModifier modifier) {
+    public static void registerStaminaModifier(Identifier id, int ordinal, StaminaModifier modifier) {
         service().registerStaminaModifier(id, ordinal, modifier);
     }
 

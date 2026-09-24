@@ -21,7 +21,7 @@ public final class ToughAsNailsCompat {
 
     public static final boolean LOADED = ModList.get().isLoaded("toughasnails");
 
-    /** Below Cold Sweat, above Legendary Survival Overhaul, Serene Seasons and the vanilla climate. */
+    /** Above Serene Seasons and the vanilla climate. */
     public static final int CLIMATE_PRIORITY = 90;
 
     private ToughAsNailsCompat() {}

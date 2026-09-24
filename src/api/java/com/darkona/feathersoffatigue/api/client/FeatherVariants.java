@@ -1,7 +1,7 @@
 package com.darkona.feathersoffatigue.api.client;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -24,27 +24,27 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 public final class FeatherVariants {
 
     /** Feathers of Fatigue's sprite sheet. Row 0 holds the empty slot's fill (column 0). */
-    public static final ResourceLocation SHEET = id("textures/gui/icons.png");
+    public static final Identifier SHEET = id("textures/gui/icons.png");
     /** SHEET's width in pixels: 6 columns of 9x9 cells, padded to a multiple of 8. */
     public static final int SHEET_WIDTH = 56;
     /** SHEET's height in pixels: 8 rows of 9x9 cells. */
     public static final int SHEET_HEIGHT = 72;
 
     /** The plain striped feather: the player's colors, heat, endurance, mounts and armor pieces. */
-    public static final ResourceLocation FEATHER = id("feather");
+    public static final Identifier FEATHER = id("feather");
     /** Ice-like, lighter at the top: cold and momentum. */
-    public static final ResourceLocation CRYSTAL = id("crystal");
+    public static final Identifier CRYSTAL = id("crystal");
     /** The feather with a longer highlight and a fading trail: energized. */
-    public static final ResourceLocation GLINT = id("glint");
+    public static final Identifier GLINT = id("glint");
     /** A single deep stripe and a lighter edge: strain. */
-    public static final ResourceLocation STRAINED = id("strained");
+    public static final Identifier STRAINED = id("strained");
     /** No stripes, shaded along the edge: weight with no color of its own. */
-    public static final ResourceLocation PLAIN = id("plain");
+    public static final Identifier PLAIN = id("plain");
 
     /** Frost over the row, with icicles: cold. */
-    public static final ResourceLocation FROST = id("frost");
+    public static final Identifier FROST = id("frost");
     /** Flames over the row: heat. */
-    public static final ResourceLocation HEAT = id("heat");
+    public static final Identifier HEAT = id("heat");
 
     /**
      * Where a variant's or overlay's cells are: {@code row} counts 9-pixel cells from the top of {@code texture}, which
@@ -55,7 +55,7 @@ public final class FeatherVariants {
      * @param textureWidth  the texture width in pixels
      * @param textureHeight the texture height in pixels
      */
-    public record Sprites(ResourceLocation texture, int row, int textureWidth, int textureHeight) {
+    public record Sprites(Identifier texture, int row, int textureWidth, int textureHeight) {
 
         /**
          * Creates a sprite location for a texture laid out like {@link FeatherVariants#SHEET}.
@@ -63,13 +63,13 @@ public final class FeatherVariants {
          * @param texture the sprite sheet texture
          * @param row     the zero-based cell row
          */
-        public Sprites(ResourceLocation texture, int row) {
+        public Sprites(Identifier texture, int row) {
             this(texture, row, SHEET_WIDTH, SHEET_HEIGHT);
         }
     }
 
-    private static volatile Object2ObjectOpenHashMap<ResourceLocation, Sprites> variants = new Object2ObjectOpenHashMap<>();
-    private static volatile Object2ObjectOpenHashMap<ResourceLocation, Sprites> overlays = new Object2ObjectOpenHashMap<>();
+    private static volatile Object2ObjectOpenHashMap<Identifier, Sprites> variants = new Object2ObjectOpenHashMap<>();
+    private static volatile Object2ObjectOpenHashMap<Identifier, Sprites> overlays = new Object2ObjectOpenHashMap<>();
 
     private FeatherVariants() {}
 
@@ -80,7 +80,7 @@ public final class FeatherVariants {
      * @param texture the sprite sheet texture
      * @param row     the zero-based cell row
      */
-    public static void registerVariant(ResourceLocation id, ResourceLocation texture, int row) {
+    public static void registerVariant(Identifier id, Identifier texture, int row) {
         registerVariant(id, texture, row, SHEET_WIDTH, SHEET_HEIGHT);
     }
 
@@ -94,7 +94,7 @@ public final class FeatherVariants {
      * @param width   the texture width in pixels
      * @param height  the texture height in pixels
      */
-    public static synchronized void registerVariant(ResourceLocation id, ResourceLocation texture, int row, int width, int height) {
+    public static synchronized void registerVariant(Identifier id, Identifier texture, int row, int width, int height) {
         variants = with(variants, id, new Sprites(Objects.requireNonNull(texture), row, width, height), VARIANT_COLUMNS);
     }
 
@@ -105,7 +105,7 @@ public final class FeatherVariants {
      * @param texture the sprite sheet texture
      * @param row     the zero-based cell row
      */
-    public static void registerOverlay(ResourceLocation id, ResourceLocation texture, int row) {
+    public static void registerOverlay(Identifier id, Identifier texture, int row) {
         registerOverlay(id, texture, row, SHEET_WIDTH, SHEET_HEIGHT);
     }
 
@@ -119,7 +119,7 @@ public final class FeatherVariants {
      * @param width   the texture width in pixels
      * @param height  the texture height in pixels
      */
-    public static synchronized void registerOverlay(ResourceLocation id, ResourceLocation texture, int row, int width, int height) {
+    public static synchronized void registerOverlay(Identifier id, Identifier texture, int row, int width, int height) {
         overlays = with(overlays, id, new Sprites(Objects.requireNonNull(texture), row, width, height), OVERLAY_COLUMNS);
     }
 
@@ -129,7 +129,7 @@ public final class FeatherVariants {
      * @param id the variant identifier
      * @return the sprite location, or {@code null} for an unknown id
      */
-    public static @Nullable Sprites variant(ResourceLocation id) {
+    public static @Nullable Sprites variant(Identifier id) {
         return variants.get(id);
     }
 
@@ -139,7 +139,7 @@ public final class FeatherVariants {
      * @param id the overlay identifier
      * @return the sprite location, or {@code null} for an unknown id
      */
-    public static @Nullable Sprites overlay(ResourceLocation id) {
+    public static @Nullable Sprites overlay(Identifier id) {
         return overlays.get(id);
     }
 
@@ -147,7 +147,7 @@ public final class FeatherVariants {
     private static final int VARIANT_COLUMNS = 6;
     private static final int OVERLAY_COLUMNS = 2;
 
-    private static Object2ObjectOpenHashMap<ResourceLocation, Sprites> with(Object2ObjectOpenHashMap<ResourceLocation, Sprites> map, ResourceLocation id, Sprites sprites, int columns) {
+    private static Object2ObjectOpenHashMap<Identifier, Sprites> with(Object2ObjectOpenHashMap<Identifier, Sprites> map, Identifier id, Sprites sprites, int columns) {
         int width = sprites.textureWidth();
         int height = sprites.textureHeight();
         int row = sprites.row();
@@ -155,7 +155,7 @@ public final class FeatherVariants {
             throw new IllegalArgumentException("Texture size " + width + "x" + height + " isn't a multiple of 8");
         if (width < columns * CELL) throw new IllegalArgumentException("A " + width + " pixel wide texture has no room for " + columns + " cells");
         if (row < 0 || (row + 1) * CELL > height) throw new IllegalArgumentException("Row " + row + " is outside a " + width + "x" + height + " texture");
-        Object2ObjectOpenHashMap<ResourceLocation, Sprites> next = new Object2ObjectOpenHashMap<>(map);
+        Object2ObjectOpenHashMap<Identifier, Sprites> next = new Object2ObjectOpenHashMap<>(map);
         next.put(Objects.requireNonNull(id), sprites);
         return next;
     }

@@ -4,7 +4,6 @@ import com.darkona.feathersoffatigue.api.FeathersAPI;
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.registry.FeathersAttributes;
-import com.darkona.feathersoffatigue.api.registry.FeathersIds;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.core.FeathersAttachments;
@@ -12,23 +11,20 @@ import com.darkona.feathersoffatigue.mount.MountExertion;
 import com.darkona.feathersoffatigue.mount.MountTraits;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Cow;
-import net.minecraft.world.entity.animal.Pig;
-import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
@@ -37,14 +33,12 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
  * Mounts have feathers: a stamina trait of their own that foals inherit, jumps that cost by power, and an exhausted
  * mount slows down and cannot jump.
  */
-@GameTestHolder(FeathersIds.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class MountTests {
 
     private static Horse horse(GameTestHelper helper) {
         Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(1, 2, 1));
         horse.setTamed(true);
-        horse.equipSaddle(new ItemStack(Items.SADDLE), SoundSource.NEUTRAL);
+        horse.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
         return horse;
     }
 
@@ -179,7 +173,7 @@ public class MountTests {
 
     private static void checkSpawned(GameTestHelper helper, String mod, String type) {
         if (!ModList.get().isLoaded(mod)) return;
-        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(type));
+        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(type));
         if (helper.spawn(entityType, new BlockPos(1, 2, 1)) instanceof LivingEntity living) {
             helper.assertTrue(FeathersAPI.hasFeathers(living), type + " has feathers with " + mod);
         }

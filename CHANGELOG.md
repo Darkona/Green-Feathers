@@ -10,7 +10,6 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 
 - Green Feathers is now **Feathers of Fatigue**. Every id follows: the mod id and resource namespace are `feathers_of_fatigue` (attributes, effects, enchantments, tags, data maps, lang keys), the code lives in `com.darkona.feathersoffatigue` (the API in `com.darkona.feathersoffatigue.api`), and the jars are `feathers-of-fatigue` and `feathers-of-fatigue-api` (group `com.darkona.feathersoffatigue`).
 - Config files are `FeathersOfFatigue-Server.toml`, `FeathersOfFatigue-Compat.toml` and `FeathersOfFatigue-Client.toml`, in `serverconfig/feathers_of_fatigue/` and `config/feathers_of_fatigue/`. The `/feathers` command keeps its name.
-- Blue Droplets support follows its rename to Droplets of Thirst (mod id `droplets_of_thirst`): its compat section is now `[droplets_of_thirst]`.
 - Worlds and configs from earlier builds do not carry over: stored feathers, enchantments and items under the old ids are lost, and the old config files are ignored.
 
 ### Stamina
@@ -54,13 +53,13 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 - Every feather is drawn from grayscale sprites (body, half body, outline, shine, empty slot) tinted with a body and an outline color, instead of a hand-drawn set per color. Each state keeps its own shape: crystal feathers when cold or with Momentum, a glint when energized, its own stripe for strain.
 - Cold puts frost over the feathers, as in the first Green Feathers. The flames overlay is available to styles and resource packs.
 - The feathers move like hearts: a wave while Energized, a shake when only a few are left, a pulse (or a shake) while strained. Each is set in the client config (`[animations]`), and the low threshold too.
-- Resource packs can recolor any state, change its shape or overlay, or give it sprites of their own, with `assets/greenfeathers/feather_styles.json` (see the Resource Packs wiki page).
+- Resource packs can recolor any state, change its shape or overlay, or give it sprites of their own, with `assets/feathers_of_fatigue/feather_styles.json` (see the Resource Packs wiki page).
 - Armor tooltips show the item's weight.
 
 ### Compatibility
 
 - Cold Sweat, Tough As Nails, Legendary Survival Overhaul: their body temperature decides cold and heat; their thirst or hydration affects regeneration.
-- Blue Droplets, the maintained continuation of Thirst Was Taken: thirst slows regeneration, being well quenched speeds it up, and regenerating can cost thirst (optional). Players with thirst turned off are not affected.
+- Droplets of Thirst, the maintained continuation of Thirst Was Taken: thirst slows regeneration, being well quenched speeds it up, and regenerating can cost thirst (optional). Players with thirst turned off are not affected.
 - Thirst Was Taken: the same, for packs still on the original mod.
 - Serene Seasons: winter outdoors is cold, summer sun is hot.
 - Curios: the Feather Ring goes in a ring slot.
@@ -75,8 +74,8 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 ### For mod developers
 
 - A separate API jar: spend, drain and read feathers, add regeneration factors and weight sources, and listen to events.
-- Feather styles (`com.darkona.feathers.api.client`): register a `FeatherStyle` (body and border color, variant, overlay, optional sprites) and a `FeatherStyleProvider` that picks it for the player by condition, by priority. New shapes and overlays with `FeatherVariants`, from Green Feathers' 56x72 sheet layout or a texture of any size in multiples of 8. Green Feathers' own states use the same registry.
-- Feather animations: a `FeatherAnimationProvider` picks a wave, shake or pulse for the row (the player's or their mount's) by condition, by priority. Green Feathers' own triggers use the same path.
+- Feather styles (`com.darkona.feathersoffatigue.api.client`): register a `FeatherStyle` (body and border color, variant, overlay, optional sprites) and a `FeatherStyleProvider` that picks it for the player by condition, by priority. New shapes and overlays with `FeatherVariants`, from Feathers of Fatigue's 56x72 sheet layout or a texture of any size in multiples of 8. Feathers of Fatigue's own states use the same registry.
+- Feather animations: a `FeatherAnimationProvider` picks a wave, shake or pulse for the row (the player's or their mount's) by condition, by priority. Feathers of Fatigue's own triggers use the same path.
 - The old API of Elenai's Feathers (`com.elenai.feathers.api.FeathersHelper`) is gone: use `FeathersAPI` on the server or `ClientFeathers` on the client.
 
 ## Planned

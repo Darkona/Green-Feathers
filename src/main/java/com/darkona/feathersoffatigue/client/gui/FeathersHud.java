@@ -20,8 +20,8 @@ import fuzs.overflowingbars.common.client.gui.RowCountRenderer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -157,13 +157,13 @@ public final class FeathersHud {
 
     public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui || mc.gameMode == null || !mc.gameMode.canHurtPlayer() || !(mc.getCameraEntity() instanceof LocalPlayer player)) return;
+        if (mc.gui.hud.isHidden() || mc.gameMode == null || !mc.gameMode.canHurtPlayer() || !(mc.getCameraEntity() instanceof LocalPlayer player)) return;
         if (!DATA.hasFeathers() || DATA.maxStamina() <= 0) return;
 
-        Gui gui = mc.gui;
+        Hud hud = mc.gui.hud;
         boolean stack = FeathersClientConfig.AFFECTED_BY_RIGHT_HEIGHT.get();
         int x = graphics.guiWidth() / 2 + 91 - 9 + FeathersClientConfig.X_OFFSET.get();
-        int y = graphics.guiHeight() - (stack ? gui.rightHeight : 49) + FeathersClientConfig.Y_OFFSET.get();
+        int y = graphics.guiHeight() - (stack ? hud.rightHeight : 49) + FeathersClientConfig.Y_OFFSET.get();
 
         // Riding a mount that has feathers, only the mount's matter: they replace the rider's, in the mount's colors.
         FeathersView mount = DATA.mount();
@@ -172,7 +172,7 @@ public final class FeathersHud {
         FeathersView shown = riding ? mount : DATA;
         int bonusRows = bonusRows(shown);
         // Reserve space while faded out so the bars above remain stable.
-        if (stack) gui.rightHeight += ROW_HEIGHT * (1 + bonusRows);
+        if (stack) hud.rightHeight += ROW_HEIGHT * (1 + bonusRows);
 
         if (alpha > 0) {
             color = ARGB.white(alpha);

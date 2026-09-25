@@ -2,6 +2,24 @@
 
 Changes by feature, newest version first.
 
+## 26.2-2.0.0 (NeoForge), unreleased
+
+Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 26.1-2.0.0 below, except for what this section lists.
+
+### Compatibility
+
+- Naturalist is back: its ostriches, giraffes and elephants get feathers again, as on 1.21.1.
+- Tested with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
+
+### For mod developers
+
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.2-2.0.0`, with the same API as 26.1.
+
+### Not in this version
+
+- **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** still no build for Minecraft 26.2; their compats and config sections are left out, as on 26.1.
+- **Mob Wrangler:** no build for Minecraft 26.2.
+
 ## 26.1-2.0.0 (NeoForge), unreleased
 
 Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same features, config and API as 1.21.1-2.0.0 below, except for what this section lists.

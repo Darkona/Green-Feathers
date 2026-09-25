@@ -1,10 +1,11 @@
 # Minecraft Versions
 
-This wiki describes the newest version of Feathers of Fatigue, for **Minecraft 26.1 (NeoForge)**. The same mod is also made for older Minecraft versions, with the same features, config options and API wherever the game allows it. This page lists only what is different in each of them.
+This wiki describes the newest version of Feathers of Fatigue, for **Minecraft 26.2 (NeoForge)**. The same mod is also made for older Minecraft versions, with the same features, config options and API wherever the game allows it. This page lists only what is different in each of them.
 
 | Minecraft | Loader | Download | Differences |
 |---|---|---|---|
-| 26.1 | NeoForge 26.1.2.109 or later | Newest | None: this whole wiki |
+| 26.2 | NeoForge 26.2.0.88 or later | Newest | None: this whole wiki |
+| 26.1 | NeoForge 26.1.2.109 or later | Supported | [26.1](#261-neoforge-2612) |
 | 1.21.1 | NeoForge 21.1 | Supported | [1.21.1](#1211-neoforge-211) |
 | 1.20.1 | Forge 47 | Supported | [1.20.1](#1201-forge-47) |
 | 1.19.2 | Forge 43 | Supported | [1.19.2](#1192-forge-43) |
@@ -12,18 +13,26 @@ This wiki describes the newest version of Feathers of Fatigue, for **Minecraft 2
 
 Files and folders are the same in every version: `serverconfig/feathers_of_fatigue/FeathersOfFatigue-Server.toml` and `FeathersOfFatigue-Compat.toml` for the game rules (synced to clients), `config/feathers_of_fatigue/FeathersOfFatigue-Client.toml` for the HUD, `defaultconfigs/feathers_of_fatigue/` for modpack defaults.
 
-## 26.1 (NeoForge 26.1.2)
+## 26.2 (NeoForge 26.2)
 
 **Missing:**
 
-- **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** none has a build for Minecraft 26.1, so their compats and config sections are left out.
-- **Naturalist, Mob Wrangler:** no build for Minecraft 26.1, so their mounts don't exist.
+- **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** none has a build for Minecraft 26.x, so their compats and config sections are left out.
+- **Mob Wrangler:** no build for Minecraft 26.2, so its mounts don't exist.
+
+**Tested with:** Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its build for 26.2), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0, Naturalist 2.0.6.
+
+## 26.1 (NeoForge 26.1.2)
+
+**Missing:** everything missing in 26.2, and:
+
+- **Naturalist:** no build for Minecraft 26.1, so its mounts don't exist.
 
 **Tested with:** Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9, Overflowing Bars 26.1.0. Serene Seasons 26.1.2.0.7 crashes the client on its own; use 26.1.2.0.4 to 26.1.2.0.6.
 
 ## 1.21.1 (NeoForge 21.1)
 
-**Has, on top of 26.1:** Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul (with their sections in `FeathersOfFatigue-Compat.toml`, see [Configuration](Configuration#default-feathersoffatigue-compattoml)), and Naturalist and Mob Wrangler mounts.
+**Has, on top of 26.x:** Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul (with their sections in `FeathersOfFatigue-Compat.toml`, see [Configuration](Configuration#default-feathersoffatigue-compattoml)), and Naturalist and Mob Wrangler mounts.
 
 **Different:**
 

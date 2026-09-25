@@ -16,6 +16,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.pig.Pig;
@@ -36,7 +37,7 @@ import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
 public class MountTests {
 
     private static Horse horse(GameTestHelper helper) {
-        Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(1, 2, 1));
+        Horse horse = helper.spawn(EntityTypes.HORSE, new BlockPos(1, 2, 1));
         horse.setTamed(true);
         horse.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
         return horse;
@@ -62,7 +63,7 @@ public class MountTests {
         Horse stallion = horse(helper);
         mare.getAttribute(FeathersAttributes.MAX_FEATHERS).setBaseValue(30);
         stallion.getAttribute(FeathersAttributes.MAX_FEATHERS).setBaseValue(28);
-        Horse foal = helper.spawn(EntityType.HORSE, new BlockPos(1, 2, 1));
+        Horse foal = helper.spawn(EntityTypes.HORSE, new BlockPos(1, 2, 1));
 
         NeoForge.EVENT_BUS.post(new BabyEntitySpawnEvent(mare, stallion, foal));
         double trait = foal.getAttribute(FeathersAttributes.MAX_FEATHERS).getBaseValue();
@@ -131,7 +132,7 @@ public class MountTests {
         helper.assertTrue(MountExertion.isSlowedDown(horse), "an exhausted mount slows down again");
 
         // A creature that never had feathers is left alone: no feathers appear on it.
-        Cow cow = helper.spawn(EntityType.COW, new BlockPos(1, 2, 1));
+        Cow cow = helper.spawn(EntityTypes.COW, new BlockPos(1, 2, 1));
         MountExertion.release(cow);
         helper.assertFalse(cow.hasData(FeathersAttachments.FEATHERS), "a cow gets no feathers from the release");
         helper.succeed();
@@ -142,11 +143,11 @@ public class MountTests {
      */
     @GameTest(template = "empty")
     public static void dataMakesAnyCreatureAMount(GameTestHelper helper) {
-        Pig pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
+        Pig pig = helper.spawn(EntityTypes.PIG, new BlockPos(1, 2, 1));
         helper.assertTrue(FeathersAPI.hasFeathers(pig), "the data map makes a pig a mount");
         helper.assertValueEqual(FeathersAPI.get(pig).maxFeathers(), 40, "its stamina comes from its stats");
         helper.assertValueEqual(FeathersAPI.getRegenPerSecond(pig), 2.0, "and so does its regeneration");
-        helper.assertFalse(FeathersAPI.hasFeathers(helper.spawn(EntityType.COW, new BlockPos(1, 2, 1))), "cows stay out");
+        helper.assertFalse(FeathersAPI.hasFeathers(helper.spawn(EntityTypes.COW, new BlockPos(1, 2, 1))), "cows stay out");
         helper.succeed();
     }
 
@@ -155,8 +156,8 @@ public class MountTests {
      */
     @GameTest(template = "empty")
     public static void optedOutCreaturesHaveNoFeathers(GameTestHelper helper) {
-        helper.assertFalse(FeathersAPI.hasFeathers(helper.spawn(EntityType.DONKEY, new BlockPos(1, 2, 1))), "donkeys opted out");
-        helper.assertTrue(FeathersAPI.hasFeathers(helper.spawn(EntityType.MULE, new BlockPos(1, 2, 1))), "mules still tire");
+        helper.assertFalse(FeathersAPI.hasFeathers(helper.spawn(EntityTypes.DONKEY, new BlockPos(1, 2, 1))), "donkeys opted out");
+        helper.assertTrue(FeathersAPI.hasFeathers(helper.spawn(EntityTypes.MULE, new BlockPos(1, 2, 1))), "mules still tire");
         helper.succeed();
     }
 

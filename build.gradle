@@ -131,6 +131,7 @@ def compatRuntime = [
         sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         appleskin      : ["maven.modrinth:appleskin:${appleskin_version}"],
         jade           : ["maven.modrinth:jade:${jade_version}"],
+        naturalist     : ["maven.modrinth:naturalist:${naturalist_version}", "maven.modrinth:geckolib:${geckolib_version}"],
         overflowingbars: ["maven.modrinth:overflowing-bars:${overflowing_bars_version}", "maven.modrinth:puzzles-lib:${puzzles_lib_version}"],
 ]
 if (project.hasProperty('compat')) {

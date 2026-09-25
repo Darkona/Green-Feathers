@@ -2,7 +2,7 @@
 
 **Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
-Minecraft 26.1 · NeoForge · based on Elenai's Feathers. Also for 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge).
+Minecraft 26.2 · NeoForge · based on Elenai's Feathers. Also for 26.1 and 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge).
 
 ![Feathers above the food bar, with a golden row of Endurance feathers](wiki/images/hud.png)
 
@@ -36,7 +36,7 @@ Supported out of the box, each switchable in the config:
 | Jade | Shows a mount's stamina when you look at it |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
 
-Cold Sweat, Legendary Survival Overhaul and Thirst Was Taken have no build for Minecraft 26.1 yet; Feathers of Fatigue supports them on 1.21.1 and older. The [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page lists what each version has.
+Cold Sweat, Legendary Survival Overhaul and Thirst Was Taken have no build for Minecraft 26.x yet; Feathers of Fatigue supports them on 1.21.1 and older. The [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page lists what each version has.
 
 ## Documentation
 

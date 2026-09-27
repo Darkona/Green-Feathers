@@ -2,7 +2,8 @@ package com.darkona.feathersoffatigue.gametest;
 
 // The SurvivalCompatTests of the compats in src/disabled, as they are on Minecraft 1.21.1. Moved back into
 // SurvivalCompatTests (with their imports and the scenario classes next to this file) when one of them is enabled
-// again; sereneSeasonsWinterIsCold then counts its body-temperature mod again.
+// again; sereneSeasonsWinterIsCold then runs again only without a body-temperature mod (they outrank the seasons, by
+// design): `boolean bodyTemperatureMod = ToughAsNailsCompat.LOADED || ...`.
 final class DisabledSurvivalCompatTests {
 
     @GameTest(template = "empty")
@@ -39,6 +40,24 @@ final class DisabledSurvivalCompatTests {
             assertScorching(helper, player, "LSO heat stroke");
             LegendarySurvivalScenario.parched(player);
             helper.assertTrue(regenAfterFactors(player) < 0.05, "parched: regeneration nearly stops, was " + FeathersAPI.getRegenPerSecond(player));
+        });
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void toughAsNailsTemperatureAndThirst(GameTestHelper helper) {
+        if (ToughAsNailsCompat.LOADED) withCompat(() -> {
+            ServerPlayer player = player(helper);
+            if (ToughAsNailsScenario.temperatureEnabled()) {
+                ToughAsNailsScenario.icy(player);
+                assertCold(helper, player, "Tough As Nails icy");
+                ToughAsNailsScenario.heatstroke(player);
+                assertScorching(helper, player, "Tough As Nails hyperthermia");
+            }
+            if (ToughAsNailsScenario.thirstEnabled()) {
+                ToughAsNailsScenario.parched(player);
+                helper.assertTrue(regenAfterFactors(player) < 0.05, "parched: regeneration nearly stops, was " + FeathersAPI.getRegenPerSecond(player));
+            }
         });
         helper.succeed();
     }

@@ -234,37 +234,7 @@ Targets can be mounts too.
 	# Range: 0.0 ~ 20.0
 	thirst_per_regenerated_feather = 0.0
 
-#Tough As Nails: its temperature drives Cold, Heat and Fatigue; its thirst drives regeneration.
-[tough_as_nails]
-	#Use Tough As Nails when it is installed.
-	enabled = true
-	#Use its temperature (when its temperature is on).
-	temperature = true
-	#COLD applies the Cold effect; off: only ICY does.
-	cold_level_applies_cold = true
-	#WARM applies Heat too; off: only HOT does.
-	warm_level_applies_heat = false
-	#Hyperthermia progress (0 to 1) at which the heat is severe and Fatigue applies.
-	# Default: 0.5
-	# Range: 0.0 ~ 1.0
-	severe_hyperthermia = 0.5
-	#Use its thirst (when its thirst is on).
-	thirst = true
-	#Feathers per second lost per missing thirst point (20 = full).
-	# Default: 0.02
-	# Range: 0.0 ~ 20.0
-	regen_reduction_per_thirst_point = 0.02
-	#Feathers per second gained per point of hydration.
-	# Default: 0.02
-	# Range: 0.0 ~ 20.0
-	regen_bonus_per_hydration_point = 0.02
-	#Thirst exhaustion per regenerated feather (4.0 = one thirst point). 0 = free.
-	# Default: 0.0
-	# Range: 0.0 ~ 40.0
-	thirst_exhaustion_per_regenerated_feather = 0.0
-
-#Serene Seasons: winter outdoors is cold, a summer day in the sun is hot. Ignored while a body-temperature
-#mod (Tough As Nails) is in charge: it already counts seasons.
+#Serene Seasons: winter outdoors is cold, a summer day in the sun is hot.
 [serene_seasons]
 	#Use Serene Seasons when it is installed.
 	enabled = true
@@ -282,7 +252,7 @@ Targets can be mounts too.
 	summer_heat_from_temperature = 0.8
 ```
 
-Minecraft 1.21.1 and older also support Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul, which have no build for 26.x. Their sections come before `[droplets_of_thirst]` and `[serene_seasons]` there:
+Older versions support more mods, with a section each: Tough As Nails on 26.2 and older, Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on 1.21.1 and older (see [Minecraft Versions](Minecraft-Versions)). Cold Sweat and Thirst Was Taken come before `[droplets_of_thirst]`, the other two before `[serene_seasons]`, which there is ignored while a body-temperature mod is in charge:
 
 ```toml
 #Cold Sweat: body temperature decides Cold, Heat and Fatigue instead of biomes.
@@ -323,6 +293,35 @@ Minecraft 1.21.1 and older also support Cold Sweat, Thirst Was Taken and Legenda
 	# Default: 0.0
 	# Range: 0.0 ~ 20.0
 	thirst_per_regenerated_feather = 0.0
+
+#Tough As Nails: its temperature drives Cold, Heat and Fatigue; its thirst drives regeneration.
+[tough_as_nails]
+	#Use Tough As Nails when it is installed.
+	enabled = true
+	#Use its temperature (when its temperature is on).
+	temperature = true
+	#COLD applies the Cold effect; off: only ICY does.
+	cold_level_applies_cold = true
+	#WARM applies Heat too; off: only HOT does.
+	warm_level_applies_heat = false
+	#Hyperthermia progress (0 to 1) at which the heat is severe and Fatigue applies.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	severe_hyperthermia = 0.5
+	#Use its thirst (when its thirst is on).
+	thirst = true
+	#Feathers per second lost per missing thirst point (20 = full).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_reduction_per_thirst_point = 0.02
+	#Feathers per second gained per point of hydration.
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_bonus_per_hydration_point = 0.02
+	#Thirst exhaustion per regenerated feather (4.0 = one thirst point). 0 = free.
+	# Default: 0.0
+	# Range: 0.0 ~ 40.0
+	thirst_exhaustion_per_regenerated_feather = 0.0
 
 #Legendary Survival Overhaul: body temperature drives Cold, Heat and Fatigue; hydration drives regeneration.
 [legendary_survival_overhaul]

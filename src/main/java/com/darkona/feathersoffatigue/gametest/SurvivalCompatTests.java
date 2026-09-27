@@ -6,11 +6,9 @@ import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.compatibility.dropletsofthirst.DropletsOfThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.sereneseasons.SereneSeasonsCompat;
-import com.darkona.feathersoffatigue.compatibility.toughasnails.ToughAsNailsCompat;
 import com.darkona.feathersoffatigue.config.FeathersCompatConfig;
 import com.darkona.feathersoffatigue.gametest.scenario.DropletsOfThirstScenario;
 import com.darkona.feathersoffatigue.gametest.scenario.SereneSeasonsScenario;
-import com.darkona.feathersoffatigue.gametest.scenario.ToughAsNailsScenario;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -81,30 +79,8 @@ public class SurvivalCompatTests {
     }
 
     @GameTest(template = "empty")
-    public static void toughAsNailsTemperatureAndThirst(GameTestHelper helper) {
-        if (ToughAsNailsCompat.LOADED) withCompat(() -> {
-            ServerPlayer player = player(helper);
-            if (ToughAsNailsScenario.temperatureEnabled()) {
-                ToughAsNailsScenario.icy(player);
-                assertCold(helper, player, "Tough As Nails icy");
-                ToughAsNailsScenario.heatstroke(player);
-                assertScorching(helper, player, "Tough As Nails hyperthermia");
-            }
-            if (ToughAsNailsScenario.thirstEnabled()) {
-                ToughAsNailsScenario.parched(player);
-                helper.assertTrue(regenAfterFactors(player) < 0.05, "parched: regeneration nearly stops, was " + FeathersAPI.getRegenPerSecond(player));
-            }
-        });
-        helper.succeed();
-    }
-
-    /**
-     * Only meaningful without a body-temperature mod: those outrank the seasons, by design.
-     */
-    @GameTest(template = "empty")
     public static void sereneSeasonsWinterIsCold(GameTestHelper helper) {
-        boolean bodyTemperatureMod = ToughAsNailsCompat.LOADED;
-        if (SereneSeasonsCompat.LOADED && !bodyTemperatureMod) withCompat(() -> {
+        if (SereneSeasonsCompat.LOADED) withCompat(() -> {
             ServerPlayer player = player(helper);
             // Well above the test area, under open sky: winter only chills those outdoors.
             player.snapTo(helper.absoluteVec(new Vec3(0, 100, 0)));

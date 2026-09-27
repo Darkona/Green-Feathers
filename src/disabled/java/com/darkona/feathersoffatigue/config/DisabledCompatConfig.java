@@ -2,8 +2,9 @@ package com.darkona.feathersoffatigue.config;
 
 // The FeathersCompatConfig fields and sections of the compats in src/disabled, as they are on Minecraft 1.21.1. Moved
 // back into FeathersCompatConfig when one of them is enabled again: the fields with the others, each section in the
-// order of the 1.21.1 file (Cold Sweat and Thirst Was Taken before Droplets of Thirst, Legendary Survival Overhaul
-// before Serene Seasons).
+// order of the 1.21.1 file (Cold Sweat and Thirst Was Taken before Droplets of Thirst, then Tough As Nails and Legendary
+// Survival Overhaul before Serene Seasons). With a body-temperature mod back, the Serene Seasons section says again
+// that it is ignored while one is in charge.
 final class DisabledCompatConfig {
 
     /* Cold Sweat */
@@ -19,6 +20,17 @@ final class DisabledCompatConfig {
     public static final DoubleValue THIRST_REGEN_REDUCTION;
     public static final DoubleValue QUENCH_REGEN_BONUS;
     public static final DoubleValue THIRST_PER_FEATHER;
+
+    /* Tough As Nails */
+    public static final BooleanValue TAN;
+    public static final BooleanValue TAN_TEMPERATURE;
+    public static final BooleanValue TAN_COLD_IS_COLD;
+    public static final BooleanValue TAN_WARM_IS_HOT;
+    public static final DoubleValue TAN_SEVERE_HYPERTHERMIA;
+    public static final BooleanValue TAN_THIRST;
+    public static final DoubleValue TAN_THIRST_REDUCTION;
+    public static final DoubleValue TAN_HYDRATION_BONUS;
+    public static final DoubleValue TAN_THIRST_EXHAUSTION;
 
     /* Legendary Survival Overhaul */
     public static final BooleanValue LSO;
@@ -55,6 +67,27 @@ final class DisabledCompatConfig {
                 .defineInRange("regen_bonus_per_quench_point", 0.02, 0.0, 20.0);
         THIRST_PER_FEATHER = builder.comment("Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.")
                 .defineInRange("thirst_per_regenerated_feather", 0.0, 0.0, 20.0);
+        builder.pop();
+
+        builder.comment("Tough As Nails: its temperature drives Cold, Heat and Fatigue; its thirst drives regeneration.").push("tough_as_nails");
+        TAN = builder.comment("Use Tough As Nails when it is installed.")
+                .define("enabled", true);
+        TAN_TEMPERATURE = builder.comment("Use its temperature (when its temperature is on).")
+                .define("temperature", true);
+        TAN_COLD_IS_COLD = builder.comment("COLD applies the Cold effect; off: only ICY does.")
+                .define("cold_level_applies_cold", true);
+        TAN_WARM_IS_HOT = builder.comment("WARM applies Heat too; off: only HOT does.")
+                .define("warm_level_applies_heat", false);
+        TAN_SEVERE_HYPERTHERMIA = builder.comment("Hyperthermia progress (0 to 1) at which the heat is severe and Fatigue applies.")
+                .defineInRange("severe_hyperthermia", 0.5, 0.0, 1.0);
+        TAN_THIRST = builder.comment("Use its thirst (when its thirst is on).")
+                .define("thirst", true);
+        TAN_THIRST_REDUCTION = builder.comment("Feathers per second lost per missing thirst point (20 = full).")
+                .defineInRange("regen_reduction_per_thirst_point", 0.02, 0.0, 20.0);
+        TAN_HYDRATION_BONUS = builder.comment("Feathers per second gained per point of hydration.")
+                .defineInRange("regen_bonus_per_hydration_point", 0.02, 0.0, 20.0);
+        TAN_THIRST_EXHAUSTION = builder.comment("Thirst exhaustion per regenerated feather (4.0 = one thirst point). 0 = free.")
+                .defineInRange("thirst_exhaustion_per_regenerated_feather", 0.0, 0.0, 40.0);
         builder.pop();
 
         builder.comment("Legendary Survival Overhaul: body temperature drives Cold, Heat and Fatigue; hydration drives regeneration.")

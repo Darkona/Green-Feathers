@@ -113,7 +113,6 @@ dependencies {
     // Optional compat: every use sits behind a ModList check. Mods without a build for this Minecraft version are in
     // src/disabled (see its README).
     compileOnly "com.darkona.dropletsofthirst:droplets-of-thirst-api:${droplets_of_thirst_version}"
-    compileOnly "maven.modrinth:tough-as-nails:${tough_as_nails_version}"
     compileOnly "maven.modrinth:serene-seasons:${serene_seasons_version}"
     compileOnly "maven.modrinth:overflowing-bars:${overflowing_bars_version}"
     compileOnly "maven.modrinth:puzzles-lib:${puzzles_lib_version}"
@@ -124,10 +123,9 @@ dependencies {
 
 // Compat mods on the dev runtime, for boot checks and GameTests with them loaded:
 //   ./gradlew runGameTestServer -Pcompat=dropletsofthirst,overflowingbars
-//   ./gradlew runGameTestServer -Pcompat=toughasnails,sereneseasons
+//   ./gradlew runGameTestServer -Pcompat=sereneseasons,naturalist
 def compatRuntime = [
         dropletsofthirst: ["com.darkona.dropletsofthirst:droplets-of-thirst:${droplets_of_thirst_version}"],
-        toughasnails   : ["maven.modrinth:tough-as-nails:${tough_as_nails_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         sereneseasons  : ["maven.modrinth:serene-seasons:${serene_seasons_version}", "maven.modrinth:glitchcore:${glitchcore_version}"],
         appleskin      : ["maven.modrinth:appleskin:${appleskin_version}"],
         jade           : ["maven.modrinth:jade:${jade_version}"],
@@ -158,7 +156,6 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             mod_authors            : mod_authors,
             mod_description        : mod_description,
             droplets_of_thirst_range: droplets_of_thirst_range,
-            tough_as_nails_range   : tough_as_nails_range,
             serene_seasons_range   : serene_seasons_range,
             overflowing_bars_range : overflowing_bars_range,
             curios_range           : curios_range,

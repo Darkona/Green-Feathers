@@ -6,10 +6,18 @@ import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.registry.FeathersMobEffects;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
+import com.darkona.feathersoffatigue.registry.ModPotions;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.BrewingInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
@@ -127,6 +135,17 @@ public class EffectsTests {
 
         player.addEffect(new MobEffectInstance(FeathersMobEffects.ENDURANCE, 1200, 1));
         helper.assertValueEqual(f.bonusStamina(), Stamina.ofFeathers(13), "Endurance II adds its eight extra feathers");
+        helper.succeed();
+    }
+
+    /** The brewing recipes are data: a feather in an awkward splash potion brews a splash Potion of Endurance. */
+    @GameTest(template = "empty")
+    public static void enduranceBrewsFromData(GameTestHelper helper) {
+        BrewingInput input = new BrewingInput(PotionContents.createItemStack(Items.SPLASH_POTION, Potions.AWKWARD), new ItemStack(Items.FEATHER));
+        ItemStack brewed = helper.getLevel().getServer().getRecipeManager().getRecipeFor(RecipeType.BREWING, input, helper.getLevel())
+                .map(recipe -> recipe.value().assemble(input)).orElse(ItemStack.EMPTY);
+        helper.assertTrue(brewed.is(Items.SPLASH_POTION) && brewed.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(ModPotions.ENDURANCE_POTION),
+                "awkward splash potion and a feather brew a splash Potion of Endurance, got " + brewed);
         helper.succeed();
     }
 }

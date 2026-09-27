@@ -1,4 +1,4 @@
-# Optional dependencies of the disabled compats, as they are for Minecraft 1.21.1 (ranges from its gradle.properties).
+# Optional dependencies of the disabled compats, as they are for Minecraft 1.21.1 (ranges from its gradle.properties), and for Tough As Nails as on 26.2.
 # Not read by the game.
 
 [[dependencies.${mod_id}]]
@@ -19,5 +19,12 @@ side = "BOTH"
 modId = "legendarysurvivaloverhaul"
 type = "optional"
 versionRange = "[2.4.7.2,3)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "toughasnails"
+type = "optional"
+versionRange = "[21.11.0.8,22)"
 ordering = "NONE"
 side = "BOTH"

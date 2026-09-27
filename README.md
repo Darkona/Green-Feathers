@@ -2,7 +2,7 @@
 
 **Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
-Minecraft 26.2 · NeoForge · based on Elenai's Feathers. Also for 26.1 and 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge).
+Minecraft 26.3 · NeoForge · based on Elenai's Feathers. Also for 26.2, 26.1 and 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge).
 
 ![Feathers above the food bar, with a golden row of Endurance feathers](wiki/images/hud.png)
 
@@ -29,14 +29,13 @@ Supported out of the box, each switchable in the config:
 
 | Mod | What it does with feathers |
 |---|---|
-| Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
 | Droplets of Thirst | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
 | Serene Seasons | Winter outdoors is cold, summer sun is hot |
 | Curios | The Feather Ring goes in a ring slot |
 | Jade | Shows a mount's stamina when you look at it |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
 
-Cold Sweat, Legendary Survival Overhaul and Thirst Was Taken have no build for Minecraft 26.x yet; Feathers of Fatigue supports them on 1.21.1 and older. The [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page lists what each version has.
+Tough As Nails (on 26.2 and older), Cold Sweat, Legendary Survival Overhaul and Thirst Was Taken (on 1.21.1 and older) are supported in the versions they have a build for. The [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page lists what each version has.
 
 ## Documentation
 

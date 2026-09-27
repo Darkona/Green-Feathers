@@ -1,6 +1,6 @@
 # Disabled compats
 
-Compats with mods that have no NeoForge build for this Minecraft version: Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul. Their code is kept here as it is for Minecraft 1.21.1, so it is not lost.
+Compats with mods that have no NeoForge build for this Minecraft version: Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul (none for 26.x), and Tough As Nails (none for 26.3). Their code is kept here as it is for Minecraft 1.21.1, and for Tough As Nails as on 26.2, so it is not lost.
 
 Nothing under `src/disabled` is compiled or packaged: it is not a Gradle source set. The parts that lived in shared files are here too:
 

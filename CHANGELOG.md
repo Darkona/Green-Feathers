@@ -2,6 +2,28 @@
 
 Changes by feature, newest version first.
 
+## 26.3-2.0.0 (NeoForge), unreleased
+
+Feathers of Fatigue for Minecraft 26.3, on NeoForge 26.3.0.36-beta. Same as 26.2-2.0.0 below, except for what this section lists.
+
+### Potions
+
+- The brewing recipes are data now, as Minecraft 26.3 does brewing: `data/feathers_of_fatigue/recipe/brewing/`, one `minecraft:brewing` recipe per mix and container (potion, splash, lingering) and per container change (gunpowder, dragon's breath), like vanilla's. The mixes are the same; a datapack can now change or remove them.
+
+### Compatibility
+
+- Tested with Droplets of Thirst 26.3-1.0.0, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
+- NeoForge 26.3 is still in beta, and 26.3.0.37-beta renames the config types: mods built for one side of that change do not load on the other. This build, like Droplets of Thirst 26.3-1.0.0, is for 26.3.0.36-beta only, and so are the compat versions above (Puzzles Lib 26.3.9 needs a newer NeoForge).
+
+### For mod developers
+
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-2.0.0`, with the same API as 26.1.
+
+### Not in this version
+
+- **Tough As Nails:** no build for Minecraft 26.3; its compat and config section are left out. Droplets of Thirst covers thirst, Serene Seasons the seasons' cold and heat.
+- **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul, Mob Wrangler:** still no build, as on 26.2.
+
 ## 26.2-2.0.0 (NeoForge), unreleased
 
 Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 26.1-2.0.0 below, except for what this section lists.
@@ -122,4 +144,5 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 
 ## Planned
 
-- Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on Minecraft 26.x, once they publish a build for it.
+- Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on Minecraft 26.x, and Tough As Nails on 26.3, once they publish a build for it.
+- A build for the NeoForge 26.3 releases after 26.3.0.36-beta, once Droplets of Thirst and the compats follow.

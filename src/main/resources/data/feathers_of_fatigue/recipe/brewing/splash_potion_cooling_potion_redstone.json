@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:brewing",
+  "input": {
+    "item": "minecraft:splash_potion",
+    "potion_contents": {
+      "potions": "feathers_of_fatigue:cooling_potion"
+    }
+  },
+  "reagent": {
+    "item": "minecraft:redstone"
+  },
+  "output": {
+    "id": "minecraft:splash_potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "feathers_of_fatigue:long_cooling_potion"
+      }
+    }
+  }
+}

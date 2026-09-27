@@ -7,7 +7,6 @@ import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.compatibility.dropletsofthirst.DropletsOfThirstCompat;
 import com.darkona.feathersoffatigue.compatibility.curios.CuriosCompat;
 import com.darkona.feathersoffatigue.compatibility.sereneseasons.SereneSeasonsCompat;
-import com.darkona.feathersoffatigue.compatibility.toughasnails.ToughAsNailsCompat;
 import com.darkona.feathersoffatigue.config.FeathersClientConfig;
 import com.darkona.feathersoffatigue.config.FeathersCompatConfig;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
@@ -65,7 +64,6 @@ public final class Feathers {
         HungerRegen.registerBuiltIn();
         BuiltInFeatherStyles.register();
         DropletsOfThirstCompat.init();
-        ToughAsNailsCompat.init();
         SereneSeasonsCompat.init();
     }
 

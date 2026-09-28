@@ -1,189 +1,262 @@
 package com.darkona.feathers.config;
 
-import com.google.common.collect.Lists;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec.DoubleValue;
+import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class FeathersCommonConfig {
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+public final class FeathersCommonConfig {
 
+    public static final ModConfigSpec SPEC;
 
-    public static final ForgeConfigSpec SPEC;
+    /* General */
+    public static final IntValue MAX_FEATHERS;
+    public static final DoubleValue REGEN_FEATHERS_PER_SECOND;
+    public static final BooleanValue SLEEPING_ALWAYS_RESTORES_FEATHERS;
+    public static final IntValue DEFAULT_USAGE_COOLDOWN;
+    public static final IntValue MAX_COOLDOWN;
+    public static final BooleanValue REGEN_USES_HUNGER;
+    public static final DoubleValue HUNGER_PER_FEATHER;
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG_MODE;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> EXTENDED_LOGGING;
+    /* Exhaustion and Strain */
+    public static final BooleanValue ENABLE_STRAIN;
+    public static final IntValue MAX_STRAIN;
+    public static final BooleanValue ENABLE_EXHAUSTION;
+    public static final DoubleValue EXHAUSTION_RECOVERY;
 
-    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_FEATHERS;
-    public static final ForgeConfigSpec.ConfigValue<Double> REGEN_FEATHERS_PER_SECOND;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> SLEEPING_ALWAYS_RESTORES_FEATHERS;
-    public static final ForgeConfigSpec.ConfigValue<Integer> DEFAULT_USAGE_COOLDOWN;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> REGEN_USES_HUNGER;
-    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_COOLDOWN;
+    /* Effects */
+    public static final BooleanValue ENABLE_COLD;
+    public static final DoubleValue COLD_TEMPERATURE;
+    public static final BooleanValue ENABLE_HEAT;
+    public static final DoubleValue HOT_TEMPERATURE;
+    public static final BooleanValue ENABLE_FATIGUE;
+    public static final BooleanValue FATIGUE_FROM_NETHER;
+    public static final BooleanValue FATIGUE_FROM_BURNING;
+    public static final IntValue EFFECT_LINGER;
+    public static final BooleanValue ENABLE_ENDURANCE;
+    public static final BooleanValue ENABLE_MOMENTUM;
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> COLD_TEMPERATURE;
+    /* Resting */
+    public static final BooleanValue ENABLE_REST;
+    public static final IntValue REST_STILL_TICKS;
+    public static final DoubleValue REST_STILL_MULTIPLIER;
+    public static final DoubleValue REST_CROUCHING_MULTIPLIER;
+    public static final DoubleValue REST_SITTING_MULTIPLIER;
+    public static final BooleanValue REST_BOOSTS_REGEN;
 
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_HEAT;
-    public static final ForgeConfigSpec.ConfigValue<Double> HOT_TEMPERATURE;
+    /* Armor weights */
+    public static final BooleanValue ENABLE_ARMOR_WEIGHTS;
+    public static final ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
+    public static final DoubleValue UNLISTED_ARMOR_WEIGHT_PER_DEFENSE;
+    public static final DoubleValue LIGHTWEIGHT_REDUCTION_PER_LEVEL;
 
-    public static final ForgeConfigSpec.ConfigValue<Integer> EFFECT_LINGER;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ENDURANCE;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STRAIN;
-    public static final ForgeConfigSpec.ConfigValue<Integer> MAX_STRAIN;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_MOMENTUM;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_FATIGUE;
+    /* Basic exertion */
+    public static final BooleanValue ENABLE_BASIC_EXERTION;
+    public static final DoubleValue SPRINT_FEATHERS_PER_SECOND;
+    public static final DoubleValue JUMP_FEATHERS;
 
-
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ARMOR_WEIGHTS;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ARMOR_WEIGHTS;
-
-    public static final ForgeConfigSpec.ConfigValue<Boolean> LIGHTWEIGHT_ON_TABLE;
-
-    public static List<String> armorWeightBuilder = new ArrayList<>();
+    /* Debugging */
+    public static final BooleanValue DEBUG_MODE;
 
     static {
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
-        BUILDER.push("General");
+        builder.push("general");
 
-        MAX_FEATHERS = BUILDER.comment("Maximum Feathers the player can have. Every two feathers is a full icon, just like hearts." +
-                                      "By default, 20 feathers means a full row of ten feathers." +
-                                      "Value type: Integer (Numbers without decimals. You can't have a fractional amount of feathers!)")
-                              .defineInRange("Max Feathers", 20, 0, 40);
+        MAX_FEATHERS = builder
+                .comment("Feathers a player has. Two feathers make one icon, like hearts: 20 is a full row.",
+                        "This is the base of the greenfeathers:max_feathers attribute; effects and items modify it.")
+                .defineInRange("max_feathers", 20, 0, 1000);
 
-        REGEN_FEATHERS_PER_SECOND = BUILDER
-                .comment("How many feathers the player will regenerate every second. A value of 1 means one feather will be regenerated every second." +
-                        "By default, this will be modified by the Cold Effect which lowers regeneration speed, and the Energized Effect which increases it." +
-                        "Value type: Double (Numbers with decimals).")
-                .defineInRange("base_feather_per_second_regen", 0.4, -40.0, 40.0);
+        REGEN_FEATHERS_PER_SECOND = builder
+                .comment("Feathers regenerated per second. Base of the greenfeathers:feathers_per_second attribute;",
+                        "Cold halves it, Energized doubles it. Any value works, however small: fractions carry over.")
+                .defineInRange("regen_feathers_per_second", 0.4, -40.0, 40.0);
 
-        SLEEPING_ALWAYS_RESTORES_FEATHERS = BUILDER
-                .comment("Whether sleeping always restores feathers to the maximum amount." +
-                        "Value type: Boolean.")
+        SLEEPING_ALWAYS_RESTORES_FEATHERS = builder
+                .comment("Waking up restores all feathers and clears Strain and exhaustion.")
                 .define("sleeping_restores_all_feathers", true);
-        DEFAULT_USAGE_COOLDOWN = BUILDER
-                .comment("How many ticks need to pass after using feathers for them to start regenerating again." +
-                        "Value type: Integer.")
-                .define("default_usage_cooldown", 30);
 
-        REGEN_USES_HUNGER = BUILDER
-                .comment("Whether feather regeneration uses hunger. If enabled, the player will need to have a certain amount of hunger to regenerate feathers." +
-                        "Value type: Boolean.")
+        DEFAULT_USAGE_COOLDOWN = builder
+                .comment("Ticks without regeneration after spending feathers, for spends that don't set their own.")
+                .defineInRange("default_usage_cooldown_ticks", 30, 0, 1200);
+
+        MAX_COOLDOWN = builder
+                .comment("Cooldowns from consecutive spends add up to at most this many seconds.")
+                .defineInRange("max_cooldown_seconds", 5, 0, 600);
+
+        REGEN_USES_HUNGER = builder
+                .comment("Regenerating feathers costs food, like healing: no regeneration at 6 hunger points or less.")
                 .define("regen_uses_hunger", false);
 
-        MAX_COOLDOWN = BUILDER
-                .comment("Maximum cooldown the player can have. This is the maximum amount of time in seconds the player has to wait before feathers start regenerating again." +
-                        "Value type: Integer.")
-                .define("max_cooldown", 5);
+        HUNGER_PER_FEATHER = builder
+                .comment("Food exhaustion per regenerated feather when regen_uses_hunger is on. 4.0 exhaustion = one hunger point.")
+                .defineInRange("hunger_exhaustion_per_feather", 0.3, 0.0, 40.0);
 
-        BUILDER.pop();
+        builder.pop();
 
-        BUILDER.push("Effects");
+        builder.push("exhaustion_and_strain");
 
-        ENABLE_COLD = BUILDER
-                .comment("Enable the Cold Effect. This effect halves the regeneration speed at Level I and completely negate it at Level II when its active." +
-                        "While the player is in a too cold environment, or experiencing freezing, the effect will be applied." +
-                        "Value type: Boolean (Valid values are true and false.)")
+        ENABLE_STRAIN = builder
+                .comment("Strain: when feathers run out, keep exerting by overspending into red 'negative' feathers, up to",
+                        "max_strained_feathers. Regeneration pays the Strain back first, slowly; resting speeds it up.",
+                        "Mods can still ask for a spend that never strains.")
+                .define("strain_enabled", true);
+
+        MAX_STRAIN = builder
+                .comment("How far into Strain a player can go, in feathers. Base of the greenfeathers:max_strain attribute.")
+                .defineInRange("max_strained_feathers", 6, 1, 1000);
+
+        ENABLE_EXHAUSTION = builder
+                .comment("Exhaustion: once a player has nothing left to spend (no feathers, and no Strain room when Strain is",
+                        "on), they are exhausted and can't exert again until they recover exhaustion_recovery of the bar.",
+                        "Off: they can spend again as soon as anything regenerates.")
+                .define("exhaustion_enabled", true);
+
+        EXHAUSTION_RECOVERY = builder
+                .comment("Share of the maximum feathers to regain, with no Strain left, before exhaustion ends.")
+                .defineInRange("exhaustion_recovery", 0.3, 0.0, 1.0);
+
+        builder.pop();
+
+        builder.push("effects");
+
+        ENABLE_COLD = builder
+                .comment("Cold effect: halves regeneration (level II stops it). Applied in cold, snowy or freezing places.")
                 .define("effect_cold_enabled", true);
 
-        COLD_TEMPERATURE = BUILDER
-                .comment("Temperature at which the Cold Effect is applied." +
-                        "Cold biomes begin at temperature 0.05 and below, down to -0.7" +
-                        "Value type: Double (Numbers with decimals.)")
-                .define("cold_temperature", -0.3);
+        COLD_TEMPERATURE = builder
+                .comment("Biome temperature below which rain or snow applies Cold. Cold biomes go from 0.05 down to -0.7.")
+                .defineInRange("cold_temperature", -0.3, -2.0, 2.0);
 
-        ENABLE_HEAT = BUILDER
-                .comment("Enable the Heat Effect. This effect doubles the feather usage when its active." +
-                        "While the player is in a too hot environment, or burning, or in lava, the effect will be applied." +
-                        "Fire resistance will negate this effect." +
-                        "Value type: Boolean.")
+        ENABLE_HEAT = builder
+                .comment("Heat effect: doubles costs. First heat tier: a hot biome under the sun, or Cold Sweat's hot_threshold.",
+                        "Fire Resistance and the Cooling effect prevent it.")
                 .define("effect_hot_enabled", true);
 
-        HOT_TEMPERATURE = BUILDER
-                .comment("Temperature at which the Heat Effect is applied." +
-                        "The hottest biomes are at temperature 0.95 (Jungle) and above. up to 2.0" +
-                        "Value type: Double (Numbers with decimals.)")
-                .define("hot_temperature", 1.8);
+        HOT_TEMPERATURE = builder
+                .comment("Biome temperature from which being under the sun applies Heat. The hottest biomes reach 2.0.")
+                .defineInRange("hot_temperature", 1.8, -2.0, 4.0);
 
-        EFFECT_LINGER = BUILDER
-                .comment("How long do the Cold and the Heat Effect linger after the player is no longer under the circumstances that provoke them." +
-                        "This number is in ticks, one second equals 20 ticks. Set to 0 to disable lingering effects." +
-                        "Value type: Integer.")
-                .define("effect_cold_lingering_ticks", 60);
+        ENABLE_FATIGUE = builder
+                .comment("Fatigue effect: 4 fewer max feathers per level. Second heat tier, on top of Heat: the Nether, burning,",
+                        "lava, or Cold Sweat's severe_hot_threshold. Other mods may apply it too. Fire Resistance and Cooling prevent it.")
+                .define("effect_fatigue_enabled", true);
 
-        ENABLE_ENDURANCE = BUILDER
-                .comment("Enable the Endurance Effect. This effect gives temporal golden feathers that can be consumed on top of normal feathers." +
-                        "Once all the extra feathers are consumed the effect ends." +
-                        "Value type: Boolean.")
+        FATIGUE_FROM_NETHER = builder
+                .comment("Being in the Nether counts as severe heat.")
+                .define("fatigue_from_nether", true);
+
+        FATIGUE_FROM_BURNING = builder
+                .comment("Being on fire or in lava counts as severe heat.")
+                .define("fatigue_from_burning", true);
+
+        EFFECT_LINGER = builder
+                .comment("Ticks that Cold, Heat and Fatigue last after leaving what caused them. 0 disables lingering.")
+                .defineInRange("effect_lingering_ticks", 60, 0, 12000);
+
+        ENABLE_ENDURANCE = builder
+                .comment("Endurance effect: golden feathers spent before regular ones; the effect ends when they run out.")
                 .define("effect_endurance_enabled", true);
 
-        ENABLE_STRAIN = BUILDER
-                .comment("Enable the Strain Effect. This setting enables the player to overspend feathers beyond the normal amount. " +
-                        "When that happens the player will start to accumulate Strained Feathers and the effect will be applied" +
-                        "While strained, the feather regeneration is slowed greatly." +
-                        "Value type: Boolean.")
-                .define("effect_strain_enabled", true);
-
-        MAX_STRAIN = BUILDER
-                .comment("Maximum strained feathers the player can have." +
-                        "Value type: Integer.")
-                .defineInRange("max_strained_feathers", 6, 2, 20);
-
-        ENABLE_MOMENTUM = BUILDER
-                .comment("Enable the Momentum Effect. This effect halves the feather usage while it's active." +
-                        "Value type: Boolean.")
+        ENABLE_MOMENTUM = builder
+                .comment("Momentum effect: halves costs.")
                 .define("effect_momentum_enabled", true);
 
-        ENABLE_FATIGUE = BUILDER
-                .comment("Enable the Fatigue Effect. This effect lowers the maximum feathers while it's active." +
-                        "Value type: Boolean.")
-                .define("effect_fatigue_enabled", true);
-        BUILDER.pop();
+        builder.pop();
 
-        BUILDER.push("Armor weights");
-        /*
-         * Add all current armor types on config creation
-         */
+        builder.push("resting");
 
+        ENABLE_REST = builder
+                .comment("Resting speeds up paying back Strain: standing still, crouching still, or sitting (riding a boat,",
+                        "a mount, or a seat from another mod). Mods can add rest bonuses through the API; the best one applies.")
+                .define("rest_enabled", true);
 
-        ENABLE_ARMOR_WEIGHTS = BUILDER
-                .comment("If enabled, armor items have weight, this reduces the amount of feathers you can use based on how heavy your armor is.")
-                .define("Enable Armor Weights", false);
+        REST_STILL_TICKS = builder
+                .comment("Ticks without moving before standing still counts as resting. 20 ticks = 1 second.")
+                .defineInRange("rest_still_ticks", 40, 1, 1200);
 
-        LIGHTWEIGHT_ON_TABLE = BUILDER
-                .comment("Whether the Lightweight enchantment can be applied in an enchantment table, or if it is treasure only.")
-                .define("Enable Lightweight Enchantment in Table", true);
+        REST_STILL_MULTIPLIER = builder
+                .comment("Strain recovery multiplier while standing still.")
+                .defineInRange("rest_still_multiplier", 1.5, 1.0, 20.0);
 
-        ForgeRegistries.ITEMS.forEach(i -> {
-            if (i.asItem() instanceof ArmorItem armor) {
-                int def = armor.getDefense();
-                FeathersCommonConfig.armorWeightBuilder.add(i.getDescriptionId() + ":" + def);
-            }
-        });
+        REST_CROUCHING_MULTIPLIER = builder
+                .comment("Strain recovery multiplier while crouching still.")
+                .defineInRange("rest_crouching_multiplier", 2.5, 1.0, 20.0);
 
-        ARMOR_WEIGHTS = BUILDER
-                .comment("How many half feathers each item weighs.")
-                .defineList("Armor Weights Override", Lists.newArrayList(armorWeightBuilder), o -> o instanceof String);
+        REST_SITTING_MULTIPLIER = builder
+                .comment("Strain recovery multiplier while sitting.")
+                .defineInRange("rest_sitting_multiplier", 2.0, 1.0, 20.0);
 
-        BUILDER.pop();
+        REST_BOOSTS_REGEN = builder
+                .comment("Resting also speeds up normal regeneration, not only Strain recovery.")
+                .define("rest_boosts_regen", false);
 
-        BUILDER.push("Debugging");
+        builder.pop();
 
+        builder.push("armor_weights");
 
-        DEBUG_MODE = BUILDER
-                .comment("Whether debug mode is enabled. This will print debug messages to the console. Useful only for developers or to submit issues. " +
-                        "Will vomit a log of spam to the logs so don't enable this unless you know what you're doing.")
-                .define("Debug Mode", false);
+        ENABLE_ARMOR_WEIGHTS = builder
+                .comment("Worn armor has weight: each point makes one feather unusable (shown grey on the HUD).")
+                .define("armor_weights_enabled", false);
 
-        EXTENDED_LOGGING = BUILDER
-                .comment("Whether extended logging is enabled. This will print more detailed logs to the console. Useful for debugging issues." +
-                        "Value type: Boolean.")
-                .define("Extended Logging", false);
+        ARMOR_WEIGHTS = builder
+                .comment("Weight rules, as 'target=weight'. The most specific matching rule wins:",
+                        "  minecraft:iron_chestplate=3      one item",
+                        "  #mymod:heavy_armor=6            every item in an item tag",
+                        "  (the greenfeathers:armor_weight data map, which mods and datapacks can ship, comes here)",
+                        "  @minecraft:iron/chestplate=3    one piece of an armor material (helmet, chestplate, leggings, boots)",
+                        "  @minecraft:iron=2               every piece of an armor material",
+                        "Armor that matches nothing weighs its defense points times unlisted_armor_weight_per_defense.")
+                .defineListAllowEmpty("armor_weights", List.of(
+                        "@minecraft:leather=1",
+                        "@minecraft:chainmail=1",
+                        "@minecraft:turtle=1",
+                        "@minecraft:gold=2",
+                        "@minecraft:iron=2",
+                        "@minecraft:diamond=3",
+                        "@minecraft:netherite=4"), () -> "", o -> o instanceof String);
 
-        BUILDER.pop();
-        SPEC = BUILDER.build();
+        UNLISTED_ARMOR_WEIGHT_PER_DEFENSE = builder
+                .comment("Weight of armor no rule or data map covers, per point of defense. 0 makes it weightless.")
+                .defineInRange("unlisted_armor_weight_per_defense", 0.5, 0.0, 10.0);
+
+        LIGHTWEIGHT_REDUCTION_PER_LEVEL = builder
+                .comment("Share of a piece's weight each level of Lightweight removes: 0.25 leaves 25% at level III.")
+                .defineInRange("lightweight_reduction_per_level", 0.25, 0.0, 1.0);
+
+        builder.pop();
+
+        builder.push("basic_exertion");
+
+        ENABLE_BASIC_EXERTION = builder
+                .comment("Sprinting and jumping cost feathers, so Green Feathers does something on its own.",
+                        "Always off when Actions of Stamina is installed: it takes over player actions.")
+                .define("basic_exertion_enabled", true);
+
+        SPRINT_FEATHERS_PER_SECOND = builder
+                .comment("Feathers per second while sprinting. Regeneration pauses while sprinting.")
+                .defineInRange("sprint_feathers_per_second", 1.0, 0.0, 40.0);
+
+        JUMP_FEATHERS = builder
+                .comment("Feathers per jump.")
+                .defineInRange("jump_feathers", 0.5, 0.0, 40.0);
+
+        builder.pop();
+
+        builder.push("debugging");
+
+        DEBUG_MODE = builder
+                .comment("Shows a debug overlay with the feathers state and what spent them, and logs spends.")
+                .define("debug_mode", false);
+
+        builder.pop();
+
+        SPEC = builder.build();
     }
+
+    private FeathersCommonConfig() {}
 }

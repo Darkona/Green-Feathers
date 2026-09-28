@@ -1,10 +1,12 @@
 package com.darkona.feathers.client.gui;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
-public class Icons {
+/**
+ * Where each feather icon sits in icons.png: one column per color, rows background, half, full.
+ */
+final class Icons {
+
+    private Icons() {}
 
     static final Set NORMAL = new Set(GuiIcon.featherIcon(0, 0),
             GuiIcon.featherIcon(0, 1),
@@ -27,9 +29,6 @@ public class Icons {
     static final Set MOMENTUM = new Set(GuiIcon.featherIcon(0, 0),
             GuiIcon.featherIcon(6, 1),
             GuiIcon.featherIcon(6, 2));
-    static final Set REGEN = new Set(GuiIcon.featherIcon(0, 0),
-            GuiIcon.featherIcon(7, 1),
-            GuiIcon.featherIcon(7, 2));
     static final Set STRAINED = new Set(GuiIcon.featherIcon(0, 0),
             GuiIcon.featherIcon(9, 1),
             GuiIcon.featherIcon(9, 2));
@@ -40,8 +39,6 @@ public class Icons {
             GuiIcon.featherIcon(3, 4),
             GuiIcon.featherIcon(3, 3));
     static final GuiIcon REGEN_OVERLAY = GuiIcon.featherIcon(0, 3);
-    static final GuiIcon COLD_OVERLAY = GuiIcon.featherIcon(1, 3);
-    static final GuiIcon HOT_OVERLAY = GuiIcon.featherIcon(2, 3);
 
     record Set(GuiIcon background, GuiIcon half, GuiIcon full) {
     }

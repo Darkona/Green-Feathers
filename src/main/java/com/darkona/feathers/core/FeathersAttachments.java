@@ -1,0 +1,27 @@
+package com.darkona.feathers.core;
+
+import com.darkona.feathers.api.registry.FeathersIds;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+public final class FeathersAttachments {
+
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, FeathersIds.MOD_ID);
+
+    /**
+     * Not copied on death: a respawned player starts with full feathers. NeoForge copies it on every other clone,
+     * such as returning from the End.
+     */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<FeathersData>> FEATHERS =
+            ATTACHMENT_TYPES.register("feathers", () -> AttachmentType.serializable(FeathersData::new).build());
+
+    public static void register(IEventBus modEventBus) {
+        ATTACHMENT_TYPES.register(modEventBus);
+    }
+
+    private FeathersAttachments() {}
+}

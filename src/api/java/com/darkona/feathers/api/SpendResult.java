@@ -1,0 +1,25 @@
+package com.darkona.feathers.api;
+
+import com.darkona.feathers.api.event.SpendEvent;
+/**
+ * Outcome of a spend or of a drain tick.
+ */
+public enum SpendResult {
+    /** Paid (or, when simulating, would be paid). */
+    OK,
+    /** Not enough feathers, even counting bonus feathers and Strain where allowed. Nothing was spent. */
+    INSUFFICIENT,
+    /** The entity is exhausted and must recover before exerting itself again. Nothing was spent. */
+    EXHAUSTED,
+    /** A {@link SpendEvent.Pre} listener cancelled it. Nothing was spent. */
+    CANCELLED,
+    /** The entity doesn't use feathers (creative or spectator players, unsupported entities): allow the action. */
+    EXEMPT;
+
+    /**
+     * Whether the action that asked may go ahead.
+     */
+    public boolean allowed() {
+        return this == OK || this == EXEMPT;
+    }
+}

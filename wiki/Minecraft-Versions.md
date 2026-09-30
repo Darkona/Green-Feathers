@@ -7,6 +7,7 @@ This wiki describes the newest version of Feathers of Fatigue, for **Minecraft 2
 | 26.3 | NeoForge 26.3.0.36-beta | Newest | None: this whole wiki |
 | 26.2 | NeoForge 26.2.0.88 or later | Supported | [26.2](#262-neoforge-262) |
 | 26.1 | NeoForge 26.1.2.109 or later | Supported | [26.1](#261-neoforge-2612) |
+| 1.21.11 | NeoForge 21.11.42 or later | Supported | [1.21.11](#12111-neoforge-2111) |
 | 1.21.1 | NeoForge 21.1 | Supported | [1.21.1](#1211-neoforge-211) |
 | 1.20.1 | Forge 47 | Supported | [1.20.1](#1201-forge-47) |
 | 1.19.2 | Forge 43 | Supported | [1.19.2](#1192-forge-43) |
@@ -45,6 +46,16 @@ Needs NeoForge 26.3.0.36-beta exactly: NeoForge 26.3 is in beta, and 26.3.0.37-b
 - **Naturalist:** no build for Minecraft 26.1, so its mounts don't exist.
 
 **Tested with:** Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9, Overflowing Bars 26.1.0. Serene Seasons 26.1.2.0.7 crashes the client on its own; use 26.1.2.0.4 to 26.1.2.0.6.
+
+## 1.21.11 (NeoForge 21.11)
+
+**Has, on top of 26.3:** Tough As Nails (with its `[tough_as_nails]` section in `FeathersOfFatigue-Compat.toml`).
+
+**Missing:** Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul, Naturalist and Mob Wrangler: none has a NeoForge build for Minecraft 1.21.11, so their compats and config sections are left out and their mounts don't exist.
+
+**Different:** the potions brew from mixes in code, as on 26.2 and older. Armor, its material rules and copper armor work as on 26.x, and the API uses `Identifier`.
+
+**Tested with:** Droplets of Thirst 1.21.11-1.0.0, Tough As Nails 21.11.0.4, Serene Seasons 21.11.0.5 with GlitchCore 21.11.0.4, Curios 14.0.0, Jade 21.1.7, AppleSkin 3.0.8, Overflowing Bars 21.11.0 with Puzzles Lib 21.11.13.
 
 ## 1.21.1 (NeoForge 21.1)
 

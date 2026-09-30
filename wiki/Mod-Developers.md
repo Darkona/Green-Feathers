@@ -87,7 +87,7 @@ On the NeoForge event bus: `SpendEvent.Pre` (cancel or change a spend) and `Spen
 
 ## Older Minecraft versions
 
-The API (`feathers-of-fatigue-api`) is the same in every version, at `<minecraft>-2.0.0` (`1.21.1-2.0.0`, `1.20.1-2.0.0`...). On 1.21.1 and older, ids are Minecraft's `ResourceLocation` where 26.x has `Identifier`. Forge needs a few more changes on 1.20.1 and older:
+The API (`feathers-of-fatigue-api`) is the same in every version, at `<minecraft>-2.0.0` (`1.21.1-2.0.0`, `1.20.1-2.0.0`...). On 1.21.1 and older, ids are Minecraft's `ResourceLocation` where 26.x and 1.21.11 have `Identifier`. Forge needs a few more changes on 1.20.1 and older:
 
 - Attributes, effects and enchantments are `RegistryObject`s (`FeathersAttributes.MAX_FEATHERS.get()`), not `DeferredHolder`s.
 - Events go on `MinecraftForge.EVENT_BUS`. `SpendEvent.Post#getSpendResult` replaces `getResult`, which Forge's `Event` already has.

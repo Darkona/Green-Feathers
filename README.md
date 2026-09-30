@@ -1,6 +1,6 @@
 # Feathers of Fatigue
 
-**Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
+Feathers of Fatigue adds stamina to Minecraft, as a row of feathers above your food bar. Sprinting, jumping and whatever other mods choose cost feathers. When they run out, you can push on for a while, at a price.
 
 Minecraft 26.3 · NeoForge · based on Elenai's Feathers. Also for 26.2, 26.1 and 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge).
 
@@ -8,34 +8,34 @@ Minecraft 26.3 · NeoForge · based on Elenai's Feathers. Also for 26.2, 26.1 an
 
 ## How it plays
 
-- **Feathers come back on their own**, a little every second, after a short pause once you've spent some.
-- **Push past empty.** When you run out you can keep going into red *strain* feathers. Regeneration pays strain back before anything else, slowly, so overdoing it leaves you drained for a while.
-- **Rest to recover.** Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back faster. Sleep restores everything.
-- **Exhaustion.** Spend absolutely everything and you're exhausted: no exerting yourself until you've caught your breath.
-- **Weather and climate matter.** Cold weather slows your recovery. Heat makes everything cost double, and the Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
-- **Heavy armor weighs you down** (optional). Every piece holds back some feathers you can't use, shown in that piece's own color, head to feet. Netherite is heavy; the *Lightweight* enchantment and the *Feather Ring* help.
-- **Mounts tire too** (optional). Horses, donkeys, mules and camels have their own feathers, shown instead of yours while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount slows down and can't jump. Horse armor weighs a little too. Like speed and health, each animal is born with its own stamina, and foals take after their parents.
-- **Potions:** Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions), Cooling.
+- **Regeneration**: feathers come back on their own, a little every second. After you spend some, they wait a short time first.
+- **Strain**: when you run out, you can keep going into red *strain* feathers. Regeneration pays strain back first, and slowly. If you overdo it, you stay drained for a while.
+- **Rest**: standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back faster. Sleep restores everything.
+- **Exhaustion**: if you spend absolutely everything, you are exhausted. You cannot exert yourself again until you catch your breath.
+- **Weather and climate**: cold weather slows your recovery. Heat makes everything cost double. The Nether, fire and lava also cut your maximum feathers. Fire Resistance or a Potion of Cooling keeps you fresh.
+- **Heavy armor** (optional): every piece holds back some feathers that you cannot use, drawn in the color of that piece, head to feet. Netherite is heavy. The *Lightweight* enchantment and the *Feather Ring* help.
+- **Mounts** (optional): horses, donkeys, mules and camels have their own feathers. While you ride, their feathers replace yours, in the colors of the animal. Galloping and jumping tire them slowly. An exhausted mount slows down and cannot jump. Horse armor also weighs a little. Each animal is born with its own stamina, like speed and health, and foals take after their parents.
+- **Potions**: Endurance (golden bonus feathers), Energy (faster recovery), Momentum (cheaper actions) and Cooling.
 
 ## Plays well with others
 
-It stacks neatly with the other bars on the right: food, air bubbles, thirst.
+The feathers stack neatly with the other bars on the right: food, air bubbles, thirst.
 
 | ![With Thirst Was Taken, Cold Sweat and AppleSkin](wiki/images/compat-thirst.png) | ![Riding a camel](wiki/images/mount-camel.png) |
 |---|---|
 | With Thirst Was Taken, Cold Sweat and AppleSkin | Riding a camel: its feathers, in its colors |
 
-Supported out of the box, each switchable in the config:
+These mods work out of the box. Each one has its own switch in the config:
 
 | Mod | What it does with feathers |
 |---|---|
-| Droplets of Thirst | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
-| Serene Seasons | Winter outdoors is cold, summer sun is hot |
+| Droplets of Thirst | Thirst slows recovery, and being well quenched speeds it up. Regeneration can cost thirst |
+| Serene Seasons | Winter outdoors is cold, and the summer sun is hot |
 | Curios | The Feather Ring goes in a ring slot |
-| Jade | Shows a mount's stamina when you look at it |
-| AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
+| Jade | Shows the stamina of a mount when you look at it |
+| AppleSkin, Overflowing Bars | Sit nicely next to the feathers |
 
-Tough As Nails (on 26.2 and older), Cold Sweat, Legendary Survival Overhaul and Thirst Was Taken (on 1.21.1 and older) are supported in the versions they have a build for. The [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page lists what each version has.
+Tough As Nails (on 26.2 and older), Cold Sweat, Legendary Survival Overhaul and Thirst Was Taken (on 1.21.1 and older) work on the versions they have a build for. The [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page lists what each version has.
 
 ## Documentation
 

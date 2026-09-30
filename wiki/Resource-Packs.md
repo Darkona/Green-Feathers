@@ -1,6 +1,6 @@
 # Resource Packs
 
-Every feather on the HUD is drawn from grayscale sprites tinted with two colors: one for the body and one for the outline. Each state picks a feather shape (a variant) and, for cold, an overlay drawn over the whole row. A resource pack can change the colors, the shape and the overlay of every state with one JSON file, or give a state sprites of its own.
+Every feather on the HUD is drawn from grayscale sprites, tinted with two colors: one for the body and one for the outline. Each state picks a feather shape (a variant). For cold, it also picks an overlay, drawn over the whole row. With one JSON file, a resource pack can change the colors, the shape and the overlay of every state. It can also give a state sprites of its own.
 
 ## Recoloring
 
@@ -16,15 +16,15 @@ Add `assets/feathers_of_fatigue/feather_styles.json` to your pack:
 }
 ```
 
-Each entry changes only the fields it names; the rest keep Feathers of Fatigue's values. If several packs have the file, the higher pack wins field by field. The file is read again on F3+T.
+Each entry changes only the fields that it names. The other fields keep the values of Feathers of Fatigue. If several packs have the file, the higher pack wins, field by field. F3+T reads the file again.
 
 | Field | What it is |
 |---|---|
-| `body` | The feather's color. Colors are `#RRGGBB`, or `#AARRGGBB` for see-through ones. |
-| `border` | The outline's color. Alpha `00` draws no outline. |
+| `body` | The color of the feather. Colors are `#RRGGBB`, or `#AARRGGBB` for see-through colors. |
+| `border` | The color of the outline. Alpha `00` draws no outline. |
 | `variant` | The feather shape, see below. |
 | `overlay` | Drawn over the whole row, see below. `none` removes it. |
-| `overlay_color`, `overlay_accent` | The overlay's two colors. |
+| `overlay_color`, `overlay_accent` | The two colors of the overlay. |
 | `sprites` | A texture of your own, see below. |
 
 | Style | What it colors | Body | Border | Variant | Overlay |
@@ -42,7 +42,7 @@ Each entry changes only the fields it names; the rest keep Feathers of Fatigue's
 | `feathers_of_fatigue:empty` | The empty slots | `#282828` | `#000000` | feather | |
 | `feathers_of_fatigue:exhausted` | The empty slots while exhausted | `#281616` | `#000000` | feather | |
 
-Rows beyond the first use deeper shades of the body color. The empty slots use their variant's outline and the fill in row 0. Armor pieces and mounts take the colors of their own textures, outlined in the complementary color, in the plain feather; they have no style to change. Styles added by other mods can be changed the same way, by their ids.
+Rows after the first use deeper shades of the body color. The empty slots use the outline of their variant and the fill in row 0. Armor pieces and mounts use the plain feather, in the colors of their own textures, with an outline in the complementary color. They have no style to change. You can change styles from other mods the same way, by their ids.
 
 ## Variants and overlays
 
@@ -56,14 +56,18 @@ Rows beyond the first use deeper shades of the body color. The empty slots use t
 
 | Overlay | Looks like | Used by |
 |---|---|---|
-| `feathers_of_fatigue:frost` | Frost with icicles; accent: the white rim | Cold |
-| `feathers_of_fatigue:heat` | Flames; accent: the red tongues | Not used by default; available to styles and packs |
+| `feathers_of_fatigue:frost` | Frost with icicles. Accent: the white rim | Cold |
+| `feathers_of_fatigue:heat` | Flames. Accent: the red tongues | Not used by default. Available to styles and packs |
 
-Other mods can add variants and overlays of their own; name them by their ids.
+Other mods can add variants and overlays of their own. Name them by their ids.
 
 ## The sprite sheet
 
-`feathers_of_fatigue:textures/gui/icons.png` is 56x72: 6 columns and 8 rows of 9x9 cells from the top-left corner, and 2 transparent columns on the right so that both sizes are multiples of 8. Bodies and overlays are grayscale, where the shade is kept as value; outlines and the empty fill are white; shines are white with their own alpha and are drawn as they are, over the body.
+`feathers_of_fatigue:textures/gui/icons.png` is 56x72. It has 6 columns and 8 rows of 9x9 cells from the top-left corner. Two transparent columns on the right make both sizes multiples of 8.
+
+- Bodies and overlays are grayscale, with the shade kept as value.
+- Outlines and the empty fill are white.
+- Shines are white with their own alpha. They are drawn as they are, over the body.
 
 | Row (y) | Cells, left to right (x = 0, 9, 18, 27, 36, 45) |
 |---|---|
@@ -76,7 +80,7 @@ Other mods can add variants and overlays of their own; name them by their ids.
 | 6 (54) | frost: primary, accent |
 | 7 (63) | heat: primary, accent |
 
-Replace `icons.png` to change every feather at once; keep it 56x72. To change one state only, point its `sprites` at a texture of your own with the same layout and size (56x72): the style's variant and overlay rows are then read from it.
+To change every feather at once, replace `icons.png`, and keep it 56x72. To change only one state, point its `sprites` at a texture of your own with the same layout and size (56x72). The variant and overlay rows of the style then come from that texture.
 
 ```json
 {
@@ -86,4 +90,4 @@ Replace `icons.png` to change every feather at once; keep it 56x72. To change on
 }
 ```
 
-The colors multiply the sprites, so draw in grayscale to keep the tint, or in full color with a white body and border to have them drawn as they are.
+The colors multiply the sprites. Draw in grayscale to keep the tint. To show your colors as they are, draw in full color and set a white body and border.

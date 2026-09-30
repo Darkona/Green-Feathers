@@ -153,7 +153,7 @@ public final class FeathersTicker {
     public static void onTagsUpdated(TagsUpdatedEvent event) {
         ArmorWeights.invalidate();
         FeathersServiceImpl.invalidateMountTypes();
-        if (!(event instanceof TagsUpdatedEvent.ServerDataLoad)) return;
+        if (event.getUpdateCause() != TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) return;
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) server.getPlayerList().getPlayers().forEach(FeathersServiceImpl.INSTANCE::recalculateWeight);
     }

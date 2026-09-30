@@ -2,6 +2,23 @@
 
 Changes by feature, newest version first.
 
+## 1.21.11-2.0.0 (NeoForge), unreleased
+
+Feathers of Fatigue for Minecraft 1.21.11, on NeoForge 21.11.42 or later. It is built from 26.1-2.0.0 below and has the same features, config and API, with the armor rules of 26.1 (armor recognized by its `minecraft:equippable` component, copper armor weighing 1). Only what this section lists is different.
+
+### Compatibility
+
+- Tested with Droplets of Thirst 1.21.11-1.0.0, Tough As Nails 21.11.0.4, Serene Seasons 21.11.0.5 with GlitchCore 21.11.0.4, Curios 14.0.0, Jade 21.1.7, AppleSkin 3.0.8 and Overflowing Bars 21.11.0 with Puzzles Lib 21.11.13.
+
+### For mod developers
+
+- The API is the one of 26.1, with `Identifier` in every signature. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:1.21.11-2.0.0`.
+
+### Not in this version
+
+- **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** none of them has a NeoForge build for Minecraft 1.21.11. Their compats and config sections are left out; Droplets of Thirst and Tough As Nails cover thirst, and Tough As Nails temperature.
+- **Naturalist, Mob Wrangler:** no NeoForge build for Minecraft 1.21.11, so their mounts are not there to get feathers. The data map entries for them stay, and apply when the mods come.
+
 ## 26.1-2.0.0 (NeoForge), unreleased
 
 Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same features, config and API as 1.21.1-2.0.0 below, except for what this section lists.

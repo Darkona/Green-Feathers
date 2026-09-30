@@ -16,12 +16,12 @@ import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import com.darkona.feathersoffatigue.style.FeatherStylePack;
 import com.darkona.feathersoffatigue.weight.ArmorWeights;
 import com.darkona.feathersoffatigue.weight.WeightSplit;
-import fuzs.overflowingbars.common.client.gui.RowCountRenderer;
+import fuzs.overflowingbars.client.gui.RowCountRenderer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -155,7 +155,7 @@ public final class FeathersHud {
         }
     }
 
-    public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode == null || !mc.gameMode.canHurtPlayer() || !(mc.getCameraEntity() instanceof LocalPlayer player)) return;
         if (!DATA.hasFeathers() || DATA.maxStamina() <= 0) return;
@@ -201,7 +201,7 @@ public final class FeathersHud {
      * One row of feathers in {@code look} (its overlay only when {@code overlay}). {@code wearer} colors the armor weight
      * by piece. A null wearer leaves the weight gray.
      */
-    private static void drawRow(GuiGraphicsExtractor graphics, FeathersView view, Look look, boolean overlay, LivingEntity wearer, int x, int y) {
+    private static void drawRow(GuiGraphics graphics, FeathersView view, Look look, boolean overlay, LivingEntity wearer, int x, int y) {
         int maxFeathers = view.maxFeathers();
         int feathers = view.feathers();
         int body = look.body;
@@ -236,7 +236,7 @@ public final class FeathersHud {
         if (layers > 1) drawRowCount(graphics, x, y, layers);
     }
 
-    private static void drawBonus(GuiGraphicsExtractor graphics, FeathersView view, int x, int y, int rows) {
+    private static void drawBonus(GuiGraphics graphics, FeathersView view, int x, int y, int rows) {
         int bonusFeathers = Stamina.toFeathersCeil(view.bonusStamina());
         for (int row = 0; row < rows; row++) {
             int inRow = Math.min(FEATHERS_PER_ROW, bonusFeathers - row * FEATHERS_PER_ROW);
@@ -250,7 +250,7 @@ public final class FeathersHud {
      * Armor weight from the right, head to feet: each piece's share in that piece's colors (leather in its dye), and
      * weight from other sources in gray.
      */
-    private static void drawWeight(GuiGraphicsExtractor graphics, FeathersView view, LivingEntity wearer, int x, int y) {
+    private static void drawWeight(GuiGraphics graphics, FeathersView view, LivingEntity wearer, int x, int y) {
         int weight = Math.min(FEATHERS_PER_ROW, view.weight());
         if (weight <= 0) return;
         if (wearer == null || !(view instanceof SyncedFeathers synced)) {
@@ -292,7 +292,7 @@ public final class FeathersHud {
     /** Shares from here on are colored weight sources. */
     private static final int SOURCE = ArmorWeights.PARTS;
 
-    private static void drawPart(GuiGraphicsExtractor graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer, WeightSplit split) {
+    private static void drawPart(GuiGraphics graphics, int x, int y, int index, boolean half, int part, LivingEntity wearer, WeightSplit split) {
         if (part >= SOURCE) {
             int tint = split.tint(part - SOURCE);
             drawTinted(graphics, x, y, index, half, tint >= 0 ? FeatherColors.ofColor(tint) : FeatherColors.of(BuiltInRegistries.ITEM.byId(-tint - 1)));
@@ -307,18 +307,18 @@ public final class FeathersHud {
     }
 
     /** One plain feather in a FeatherColors pair: its body color, outlined in the complementary one. */
-    private static void drawTinted(GuiGraphicsExtractor graphics, int x, int y, int index, boolean half, long tint) {
+    private static void drawTinted(GuiGraphics graphics, int x, int y, int index, boolean half, long tint) {
         drawIcons(graphics, x, y, index, index + 1, half, OPAQUE | FeatherColors.body(tint), OPAQUE | FeatherColors.outline(tint), TINTED);
     }
 
-    private static void drawFeathers(GuiGraphicsExtractor graphics, int x, int y, int count, Look look) {
+    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, Look look) {
         drawFeathers(graphics, x, y, count, look.body, look.border, look);
     }
 
     /**
      * {@code count} feathers from the right, two per icon; an odd count ends in a half icon.
      */
-    private static void drawFeathers(GuiGraphicsExtractor graphics, int x, int y, int count, int body, int border, Look sprites) {
+    private static void drawFeathers(GuiGraphics graphics, int x, int y, int count, int body, int border, Look sprites) {
         if (count <= 0) return;
         drawIcons(graphics, x, y, 0, (count + 1) / 2, (count & 1) == 1, body, border, sprites);
     }
@@ -328,7 +328,7 @@ public final class FeathersHud {
      * {@code halfLast}: all bodies in one color, all shines, then all borders in the other, so the color changes three
      * times per run instead of per icon. A border with alpha 0 is not drawn.
      */
-    private static void drawIcons(GuiGraphicsExtractor graphics, int x, int y, int from, int to, boolean halfLast, int body, int border, Look sprites) {
+    private static void drawIcons(GuiGraphics graphics, int x, int y, int from, int to, boolean halfLast, int body, int border, Look sprites) {
         Identifier sheet = sprites.sheet;
         int width = sprites.sheetWidth;
         int height = sprites.sheetHeight;
@@ -346,7 +346,7 @@ public final class FeathersHud {
     }
 
     /** Empty slots: the fill in the style's body color, the outline (its variant's) in its border color. */
-    private static void drawSlots(GuiGraphicsExtractor graphics, int x, int y, int icons, Look look) {
+    private static void drawSlots(GuiGraphics graphics, int x, int y, int icons, Look look) {
         setColor(graphics, look.body);
         for (int i = 0; i < icons; i++) draw(graphics, look.slotSheet, look.slotWidth, look.slotHeight, x, y, i, EMPTY_U, 0);
         if ((look.border >>> 24) != 0) {
@@ -357,7 +357,7 @@ public final class FeathersHud {
     }
 
     /** The style's overlay over {@code icons} slots: primary, then accent. */
-    private static void drawOverlay(GuiGraphicsExtractor graphics, int x, int y, int icons, Look look) {
+    private static void drawOverlay(GuiGraphics graphics, int x, int y, int icons, Look look) {
         int v = look.overlayRow * SIZE;
         setColor(graphics, look.overlayColor);
         for (int i = 0; i < icons; i++) draw(graphics, look.overlaySheet, look.overlayWidth, look.overlayHeight, x, y, i, OVERLAY_U, v);
@@ -367,7 +367,7 @@ public final class FeathersHud {
     }
 
     /** The color the next icons are drawn in: an ARGB color, its alpha times the fade. */
-    private static void setColor(GuiGraphicsExtractor graphics, int argb) {
+    private static void setColor(GuiGraphics graphics, int argb) {
         color = ARGB.multiplyAlpha(argb, alpha);
     }
 
@@ -382,7 +382,7 @@ public final class FeathersHud {
         return ARGB.color(ARGB.alpha(argb), r, g, b);
     }
 
-    private static void draw(GuiGraphicsExtractor graphics, Identifier sheet, int width, int height, int x, int y, int index, int u, int v) {
+    private static void draw(GuiGraphics graphics, Identifier sheet, int width, int height, int x, int y, int index, int u, int v) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, sheet, x - index * 8, y + offset(index), u, v, SIZE, SIZE, width, height, color);
     }
 
@@ -411,7 +411,7 @@ public final class FeathersHud {
         for (int i = 0; i < ROW_COUNTS.length; i++) ROW_COUNTS[i] = "x" + i;
     }
 
-    private static void drawRowCount(GuiGraphicsExtractor graphics, int x, int y, int layers) {
+    private static void drawRowCount(GuiGraphics graphics, int x, int y, int layers) {
         if (overflowingBars) {
             try {
                 // Its count is value / maxRowCount: rows of one each, so the layer count comes out as is.
@@ -422,7 +422,7 @@ public final class FeathersHud {
                 Feathers.LOGGER.warn("Overflowing Bars' row count renderer isn't compatible, using the built-in one", e);
             }
         }
-        graphics.text(Minecraft.getInstance().font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, ARGB.white(alpha));
+        graphics.drawString(Minecraft.getInstance().font, layers < ROW_COUNTS.length ? ROW_COUNTS[layers] : "x" + layers, x + 11, y + 1, ARGB.white(alpha));
     }
 
     /**
@@ -450,20 +450,20 @@ public final class FeathersHud {
         return style != null ? style : FALLBACK;
     }
 
-    private static void drawDebug(GuiGraphicsExtractor graphics, Font font, LocalPlayer player) {
+    private static void drawDebug(GuiGraphics graphics, Font font, LocalPlayer player) {
         int line = 2;
-        graphics.text(font, "Feathers %d/%d  stamina %d/%d  bonus %d  weight %d".formatted(DATA.feathers(), DATA.maxFeathers(),
+        graphics.drawString(font, "Feathers %d/%d  stamina %d/%d  bonus %d  weight %d".formatted(DATA.feathers(), DATA.maxFeathers(),
                 DATA.stamina(), DATA.maxStamina(), DATA.bonusStamina(), DATA.weight()), 2, line, 0xFFFFFFFF);
         line += 10;
-        graphics.text(font, "Strain %d/%d  regen delay %d  exhausted %s  rest %s".formatted(DATA.strain(), DATA.maxStrain(),
+        graphics.drawString(font, "Strain %d/%d  regen delay %d  exhausted %s  rest %s".formatted(DATA.strain(), DATA.maxStrain(),
                 DATA.regenDelay(), DATA.exhausted(), DATA.restState()), 2, line, 0xFFFF8080);
         line += 10;
-        graphics.text(font, "Regen %.2f f/s  usage x%.2f".formatted(FeathersAPI.getRegenPerSecond(player),
+        graphics.drawString(font, "Regen %.2f f/s  usage x%.2f".formatted(FeathersAPI.getRegenPerSecond(player),
                 FeathersAPI.getUsageMultiplier(player)), 2, line, 0xFFDDDD00);
         line += 10;
         Identifier source = DATA.lastSpendSource();
         if (source != null) {
-            graphics.text(font, "Spent %d on %s".formatted(DATA.lastSpendCost(), source), 2, line, 0xFF80FF80);
+            graphics.drawString(font, "Spent %d on %s".formatted(DATA.lastSpendCost(), source), 2, line, 0xFF80FF80);
         }
     }
 }

@@ -8,11 +8,11 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
@@ -183,9 +183,9 @@ public final class FeatherColors {
         try {
             ItemStackRenderState state = new ItemStackRenderState();
             Minecraft.getInstance().getItemModelResolver().updateForTopItem(state, stack, ItemDisplayContext.GUI, null, null, 0);
-            Material.Baked material = state.pickParticleMaterial(RandomSource.create(0L));
-            if (material == null) return LEATHER;
-            return dominant(material.sprite().contents().getOriginalImage());
+            TextureAtlasSprite sprite = state.pickParticleIcon(RandomSource.create(0L));
+            if (sprite == null) return LEATHER;
+            return dominant(sprite.contents().getOriginalImage());
         } catch (RuntimeException e) {
             return LEATHER;
         }

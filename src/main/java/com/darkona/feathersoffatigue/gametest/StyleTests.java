@@ -34,8 +34,8 @@ public class StyleTests {
     static {
         FeatherStyles.registerStyle(LOW, FeatherStyle.opaque(0x112233, 0x000000));
         FeatherStyles.registerStyle(HIGH, FeatherStyle.opaque(0x445566, 0xFFFFFF));
-        FeatherStyles.registerStyleProvider(id("test_style_low"), 500, (player, feathers) -> player.entityTags().contains(MARK) ? LOW : null);
-        FeatherStyles.registerStyleProvider(id("test_style_high"), 1000, (player, feathers) -> player.entityTags().contains(HIGH_MARK) ? HIGH : null);
+        FeatherStyles.registerStyleProvider(id("test_style_low"), 500, (player, feathers) -> player.getTags().contains(MARK) ? LOW : null);
+        FeatherStyles.registerStyleProvider(id("test_style_high"), 1000, (player, feathers) -> player.getTags().contains(HIGH_MARK) ? HIGH : null);
     }
 
     @GameTest(template = "empty")

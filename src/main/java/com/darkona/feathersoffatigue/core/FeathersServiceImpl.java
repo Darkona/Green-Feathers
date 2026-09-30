@@ -103,8 +103,8 @@ public final class FeathersServiceImpl implements FeathersService {
     private static volatile byte[] mountTypes = new byte[0];
 
     private static boolean computeMount(LivingEntity entity) {
-        if (entity.is(FeathersIds.NO_FEATHERS)) return false;
-        boolean mount = entity instanceof AbstractHorse || entity.is(FeathersIds.MOUNTS)
+        if (entity.getType().is(FeathersIds.NO_FEATHERS)) return false;
+        boolean mount = entity instanceof AbstractHorse || entity.getType().is(FeathersIds.MOUNTS)
                 || BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entity.getType())
                 .getData(FeathersDataMaps.MOUNT_STATS) != null;
         return mount && entity.getAttribute(FeathersAttributes.MAX_FEATHERS) != null;

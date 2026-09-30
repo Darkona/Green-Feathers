@@ -32,12 +32,12 @@ public class ExtensionTests {
         FeathersAPI.registerStaminaModifier(id("test_free_actions"), 100, new StaminaModifier() {
             @Override
             public int modifyCost(LivingEntity entity, FeathersView feathers, Identifier source, int cost) {
-                return entity.entityTags().contains(MARK) && source.equals(FREE) ? 0 : cost;
+                return entity.getTags().contains(MARK) && source.equals(FREE) ? 0 : cost;
             }
         });
-        FeathersAPI.registerClimateProvider(id("test_climate"), 1000, entity -> entity.entityTags().contains(COLD_MARK) ? Climate.COLD : null);
-        FeathersAPI.registerRegenFactor(id("test_regen"), (entity, feathers) -> entity.entityTags().contains(MARK) ? 1.0 : 0.0);
-        FeathersAPI.registerWeightSource(id("test_backpack"), entity -> entity.entityTags().contains(MARK) ? 3.0 : 0.0);
+        FeathersAPI.registerClimateProvider(id("test_climate"), 1000, entity -> entity.getTags().contains(COLD_MARK) ? Climate.COLD : null);
+        FeathersAPI.registerRegenFactor(id("test_regen"), (entity, feathers) -> entity.getTags().contains(MARK) ? 1.0 : 0.0);
+        FeathersAPI.registerWeightSource(id("test_backpack"), entity -> entity.getTags().contains(MARK) ? 3.0 : 0.0);
     }
 
     private static ServerPlayer marked(GameTestHelper helper) {

@@ -61,15 +61,19 @@ final class TestSupport {
      * and rain on a cold biome chills.
      */
     static void clearNoon(ServerLevel level) {
-        level.getServer().setWeatherParameters(24000, 0, false, false);
+        level.setWeatherParameters(24000, 0, false, false);
         level.setRainLevel(0);
         level.setThunderLevel(0);
         setDayTime(level, 6000);
     }
 
-    /** Moves the level's clock to {@code ticks} and updates the sky darkness that day and night are read from. */
+    /**
+     * Moves the level's time of day to {@code ticks} and updates the sky darkness that day and night are read from. The
+     * sky light is cached for the tick, so the cache is dropped first or the darkness keeps the old time.
+     */
     static void setDayTime(ServerLevel level, long ticks) {
-        level.dimensionType().defaultClock().ifPresent(clock -> level.clockManager().setTotalTicks(clock, ticks));
+        level.setDayTime(ticks);
+        level.environmentAttributes().invalidateTickCache();
         level.updateSkyBrightness();
     }
 

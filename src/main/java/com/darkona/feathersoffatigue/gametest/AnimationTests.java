@@ -28,8 +28,8 @@ public class AnimationTests {
     private static final FeatherAnimation SLOW_WAVE = new FeatherAnimation(FeatherAnimation.Kind.WAVE, 0.5f, 3f);
 
     static {
-        FeatherAnimations.registerProvider(id("test_animation_low"), 100, (entity, feathers) -> entity.entityTags().contains(MARK) ? SLOW_WAVE : null);
-        FeatherAnimations.registerProvider(id("test_animation_high"), 200, (entity, feathers) -> entity.entityTags().contains(HIGH_MARK) ? FeatherAnimation.PULSE : null);
+        FeatherAnimations.registerProvider(id("test_animation_low"), 100, (entity, feathers) -> entity.getTags().contains(MARK) ? SLOW_WAVE : null);
+        FeatherAnimations.registerProvider(id("test_animation_high"), 200, (entity, feathers) -> entity.getTags().contains(HIGH_MARK) ? FeatherAnimation.PULSE : null);
     }
 
     @GameTest(template = "empty")

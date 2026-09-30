@@ -154,7 +154,7 @@ public final class ArmorWeights {
             if (stack.is(rule.tag())) return rule.weight();
         }
 
-        Integer mapped = stack.typeHolder().getData(FeathersDataMaps.ARMOR_WEIGHT);
+        Integer mapped = stack.getItemHolder().getData(FeathersDataMaps.ARMOR_WEIGHT);
         if (mapped != null) return mapped;
 
         Equippable armor = armor(stack);

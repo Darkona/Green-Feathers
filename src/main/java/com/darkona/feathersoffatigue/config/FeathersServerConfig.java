@@ -263,7 +263,7 @@ public final class FeathersServerConfig {
 
         ENABLE_BASIC_EXERTION = builder
                 .comment("Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.",
-                        "Always off when Actions of Stamina is installed: it takes over player actions.")
+                        "Always off when another mod takes over player actions through the API.")
                 .define("basic_exertion_enabled", true);
 
         SPRINT_FEATHERS_PER_SECOND = builder

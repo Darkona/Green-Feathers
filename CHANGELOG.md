@@ -2,6 +2,15 @@
 
 Changes by feature, newest version first.
 
+## 26.1.2-1.0.2 (NeoForge), 2026-10-01
+
+Same as 26.1.2-1.0.1 below, except for what this section lists.
+
+### For mod developers
+
+- Another mod can take over player actions through the API: `FeathersAPI.takeOverPlayerActions(modId)`, called during mod construction or common setup, turns the basic exertion (the sprint and jump costs) off, so a player never pays twice for the same action. `FeathersAPI.arePlayerActionsTakenOver()` and `FeathersAPI.getPlayerActionOwners()` read it. The comment of `basic_exertion_enabled` says so.
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1.2-1.0.2`.
+
 ## 26.1.2-1.0.1 (NeoForge), 2026-10-01
 
 The Minecraft 26.1.2 build is now labeled 26.1.2, the Minecraft version it runs on. Same features, config and API as 26.1-1.0.0 below.

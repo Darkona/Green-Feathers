@@ -8,7 +8,6 @@ import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -17,7 +16,7 @@ import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 
 /**
  * Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own. Built only on the public API,
- * as another mod would. Off when Actions of Stamina is installed: it owns player actions.
+ * as another mod would. Off when another mod takes over player actions ({@link FeathersAPI#takeOverPlayerActions}).
  */
 @EventBusSubscriber(modid = FeathersIds.MOD_ID)
 public final class BasicExertion {
@@ -25,12 +24,10 @@ public final class BasicExertion {
     public static final Identifier SPRINT = id("sprint");
     public static final Identifier JUMP = id("jump");
 
-    private static final boolean ACTIONS_OF_STAMINA = ModList.get().isLoaded("actionsofstamina");
-
     private BasicExertion() {}
 
     public static boolean isActive() {
-        return !ACTIONS_OF_STAMINA && FeathersServerConfig.ENABLE_BASIC_EXERTION.get();
+        return !FeathersAPI.arePlayerActionsTakenOver() && FeathersServerConfig.ENABLE_BASIC_EXERTION.get();
     }
 
     @SubscribeEvent

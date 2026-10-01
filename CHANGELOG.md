@@ -11,6 +11,11 @@ Same as 26.1.2-1.0.1 below, except for what this section lists.
 - Another mod can take over player actions through the API: `FeathersAPI.takeOverPlayerActions(modId)`, called during mod construction or common setup, turns the basic exertion (the sprint and jump costs) off, so a player never pays twice for the same action. `FeathersAPI.arePlayerActionsTakenOver()` and `FeathersAPI.getPlayerActionOwners()` read it. The comment of `basic_exertion_enabled` says so.
 - The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1.2-1.0.2`.
 
+### Compatibility
+
+- Requires NeoForge 26.1.2.109 or newer (it was 26.1.2.112), like Droplets of Thirst 26.1.2-1.0.2: KubeJS 8.0.6 only loads on NeoForge 26.1.2.109. Tested on NeoForge 26.1.2.109 and 26.1.2.112.
+- Built against Droplets of Thirst 26.1.2-1.0.2, and still accepts Droplets of Thirst 26.1.2-1.0.0 up to 26.1.2-2.
+
 ## 26.1.2-1.0.1 (NeoForge), 2026-10-01
 
 The Minecraft 26.1.2 build is now labeled 26.1.2, the Minecraft version it runs on. Same features, config and API as 26.1-1.0.0 below.

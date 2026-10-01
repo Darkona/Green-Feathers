@@ -18,7 +18,7 @@ Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 
 ### Compatibility
 
 - Naturalist is back: its ostriches, giraffes and elephants get feathers again, as on 1.21.1.
-- Tested with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
+- Works with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
 
 ### For mod developers
 
@@ -48,7 +48,7 @@ Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.112 or later. Same 
 
 ### Compatibility
 
-- Tested with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
+- Works with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
 - Serene Seasons 26.1.2.0.7 crashes the client on its own as soon as a world renders; use 26.1.2.0.4 to 26.1.2.0.6.
 
 ### For mod developers

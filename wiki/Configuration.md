@@ -2,31 +2,31 @@
 
 Feathers of Fatigue has three config files in `config/feathers_of_fatigue/`:
 
-| File | Kind | What's in it |
+| File | Kind | Contents |
 |---|---|---|
 | `FeathersOfFatigue-Server.toml` | Server | Feathers, regeneration, strain, exhaustion, effects, resting, armor weights, basic exertion, mounts |
-| `FeathersOfFatigue-Compat.toml` | Server | One section per supported mod, each with its own switch |
+| `FeathersOfFatigue-Compat.toml` | Server | One section for each supported mod, each with its own switch |
 | `FeathersOfFatigue-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
 
-Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each player's own.
+The server configs belong to the server. It sends its own to every player who joins, so everyone plays by the same rules, whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. Each player has their own client config.
 
 Changes to the server configs apply while the game runs.
 
 ## Commands
 
-Operators (permission level 2) can inspect and adjust feathers:
+Operators (permission level 2) can examine and change feathers:
 
 | Command | What it does |
 |---|---|
-| `/feathers info <targets>` | Shows their feathers, strain, weight and state |
-| `/feathers set <targets> <amount>` | Sets their feathers; above zero it also clears their strain |
+| `/feathers info <targets>` | Shows the feathers, strain, weight and state of the targets |
+| `/feathers set <targets> <amount>` | Sets their feathers. Above zero, it also clears their strain |
 | `/feathers reset <targets>` | Full feathers, no strain, not exhausted |
 | `/feathers max <targets> <amount>` | Sets their base maximum feathers (kept across rejoins and deaths, like any attribute base) |
 | `/feathers regen <targets> <amount>` | Sets their base regeneration, in feathers per second (kept across rejoins and deaths) |
-| `/feathers spend <targets> <amount>` | Spends feathers as if an action had |
+| `/feathers spend <targets> <amount>` | Spends feathers, as an action does |
 | `/feathers debug <targets> [seconds]` | Lists what spent their feathers recently, by source |
 
-Targets can be mounts too.
+Targets can also be mounts.
 
 ## Default `FeathersOfFatigue-Server.toml`
 
@@ -162,6 +162,7 @@ Targets can be mounts too.
 
 [basic_exertion]
 	#Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.
+	#Always off when another mod takes over player actions through the API.
 	basic_exertion_enabled = true
 	#Feathers per second while sprinting. Regeneration pauses while sprinting.
 	# Default: 1.0
@@ -233,37 +234,7 @@ Targets can be mounts too.
 	# Range: 0.0 ~ 20.0
 	thirst_per_regenerated_feather = 0.0
 
-#Tough As Nails: its temperature drives Cold, Heat and Fatigue; its thirst drives regeneration.
-[tough_as_nails]
-	#Use Tough As Nails when it is installed.
-	enabled = true
-	#Use its temperature (when its temperature is on).
-	temperature = true
-	#COLD applies the Cold effect; off: only ICY does.
-	cold_level_applies_cold = true
-	#WARM applies Heat too; off: only HOT does.
-	warm_level_applies_heat = false
-	#Hyperthermia progress (0 to 1) at which the heat is severe and Fatigue applies.
-	# Default: 0.5
-	# Range: 0.0 ~ 1.0
-	severe_hyperthermia = 0.5
-	#Use its thirst (when its thirst is on).
-	thirst = true
-	#Feathers per second lost per missing thirst point (20 = full).
-	# Default: 0.02
-	# Range: 0.0 ~ 20.0
-	regen_reduction_per_thirst_point = 0.02
-	#Feathers per second gained per point of hydration.
-	# Default: 0.02
-	# Range: 0.0 ~ 20.0
-	regen_bonus_per_hydration_point = 0.02
-	#Thirst exhaustion per regenerated feather (4.0 = one thirst point). 0 = free.
-	# Default: 0.0
-	# Range: 0.0 ~ 40.0
-	thirst_exhaustion_per_regenerated_feather = 0.0
-
-#Serene Seasons: winter outdoors is cold, a summer day in the sun is hot. Ignored while a body-temperature
-#mod (Tough As Nails) is in charge: it already counts seasons.
+#Serene Seasons: winter outdoors is cold, a summer day in the sun is hot.
 [serene_seasons]
 	#Use Serene Seasons when it is installed.
 	enabled = true
@@ -281,7 +252,7 @@ Targets can be mounts too.
 	summer_heat_from_temperature = 0.8
 ```
 
-Minecraft 1.21.1 and older also support Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul, which have no build for 1.21.11 or 26.x. Their sections come before `[droplets_of_thirst]` and `[serene_seasons]` there:
+Older versions support more mods, each with a section: Tough As Nails on 26.2 and older, and Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on 1.21.1 and older (see [Minecraft Versions](Minecraft-Versions)). The Cold Sweat and Thirst Was Taken sections come before `[droplets_of_thirst]`. The other two come before `[serene_seasons]`. On those versions, Feathers of Fatigue ignores `[serene_seasons]` while a body-temperature mod is in charge:
 
 ```toml
 #Cold Sweat: body temperature decides Cold, Heat and Fatigue instead of biomes.
@@ -322,6 +293,35 @@ Minecraft 1.21.1 and older also support Cold Sweat, Thirst Was Taken and Legenda
 	# Default: 0.0
 	# Range: 0.0 ~ 20.0
 	thirst_per_regenerated_feather = 0.0
+
+#Tough As Nails: its temperature drives Cold, Heat and Fatigue; its thirst drives regeneration.
+[tough_as_nails]
+	#Use Tough As Nails when it is installed.
+	enabled = true
+	#Use its temperature (when its temperature is on).
+	temperature = true
+	#COLD applies the Cold effect; off: only ICY does.
+	cold_level_applies_cold = true
+	#WARM applies Heat too; off: only HOT does.
+	warm_level_applies_heat = false
+	#Hyperthermia progress (0 to 1) at which the heat is severe and Fatigue applies.
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	severe_hyperthermia = 0.5
+	#Use its thirst (when its thirst is on).
+	thirst = true
+	#Feathers per second lost per missing thirst point (20 = full).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_reduction_per_thirst_point = 0.02
+	#Feathers per second gained per point of hydration.
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_bonus_per_hydration_point = 0.02
+	#Thirst exhaustion per regenerated feather (4.0 = one thirst point). 0 = free.
+	# Default: 0.0
+	# Range: 0.0 ~ 40.0
+	thirst_exhaustion_per_regenerated_feather = 0.0
 
 #Legendary Survival Overhaul: body temperature drives Cold, Heat and Fatigue; hydration drives regeneration.
 [legendary_survival_overhaul]

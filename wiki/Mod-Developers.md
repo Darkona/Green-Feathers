@@ -3,7 +3,7 @@
 Other mods can spend feathers through the Feathers of Fatigue API. Compile against the API jar and treat it as optional:
 
 ```groovy
-compileOnly "com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-1.0.0-beta.1"
+compileOnly "com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-1.0.0-beta.2"
 ```
 
 Guard every call with `ModList.get().isLoaded("feathers_of_fatigue")`. Keep the calls in a class that loads only when the mod is there. Your mod then works with and without Feathers of Fatigue.
@@ -43,6 +43,16 @@ On the client, a spend predicts the result from the synced feathers. It uses the
 | `blockRegen` / `unblockRegen` | Pause regeneration |
 | `FeatherStyles.registerStyleProvider` | Recolor the feathers of the player by condition (client HUD) |
 | `FeatherAnimations.registerProvider` | Animate the feather row by condition (client HUD) |
+
+### Taking over player actions
+
+Feathers of Fatigue has a basic exertion: sprinting and jumping cost feathers, so the mod does something on its own. If your mod charges player actions itself, sprinting and jumping included, tell Feathers of Fatigue during mod construction or common setup. The basic exertion then turns off, and a player never pays twice for the same action:
+
+```java
+FeathersAPI.takeOverPlayerActions(MyMod.MOD_ID);
+```
+
+The call cannot be undone. `FeathersAPI.arePlayerActionsTakenOver()` tells if a mod did it, and `FeathersAPI.getPlayerActionOwners()` lists which ones. Feathers of Fatigue 1.0.1 added this method (26.1.2-1.0.2 on 26.1.2, 26.3-1.0.0-beta.2 on 26.3): if you call it, ask for that version or newer.
 
 ### Weight sources
 
@@ -101,7 +111,7 @@ These events are on the NeoForge event bus: `SpendEvent.Pre` (cancel or change a
 
 ## Older Minecraft versions
 
-The API (`feathers-of-fatigue-api`) is the same in every version, with the version of the mod jar: `1.21.1-1.0.0`, `1.20.1-1.0.0`, `26.1.2-1.0.1`... [Minecraft Versions](Minecraft-Versions) lists them all. On 1.21.1 and older, ids are the Minecraft `ResourceLocation`, where 26.x and 1.21.11 have `Identifier`. On 1.20.1 and older, Forge needs a few more changes:
+The API (`feathers-of-fatigue-api`) is the same in every version, with the version of the mod jar: `1.21.1-1.0.1`, `1.20.1-1.0.1`, `26.1.2-1.0.2`... [Minecraft Versions](Minecraft-Versions) lists them all. On 1.21.1 and older, ids are the Minecraft `ResourceLocation`, where 26.x and 1.21.11 have `Identifier`. On 1.20.1 and older, Forge needs a few more changes:
 
 - Attributes, effects and enchantments are `RegistryObject`s (`FeathersAttributes.MAX_FEATHERS.get()`), not `DeferredHolder`s.
 - Events go on `MinecraftForge.EVENT_BUS`. `SpendEvent.Post#getSpendResult` replaces `getResult`, because the Forge `Event` already has a `getResult`.

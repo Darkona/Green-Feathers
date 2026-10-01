@@ -2,7 +2,7 @@
 
 **Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
 
-Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers
+Minecraft 1.20.1 · Forge 47.4.10 or later · based on Elenai's Feathers. Also for 26.3, 26.2, 26.1.2, 1.21.11 and 1.21.1 (NeoForge) and 1.19.2 and 1.18.2 (Forge): the [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page of the wiki lists what differs.
 
 ![Feathers above the food bar, with a golden row of Endurance feathers](images/hud.png)
 
@@ -14,4 +14,4 @@ Minecraft 1.21.1 · NeoForge · based on Elenai's Feathers
 - [Modpack Makers](Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
 - [Mod Developers](Mod-Developers): spending feathers and hooking into them from your own mod.
 
-On its own, Feathers of Fatigue makes sprinting and jumping cost feathers. Install [Actions of Stamina](https://github.com/Darkona/actions-of-stamina) for attacks, elytra, swimming, shields and movement mods like ParCool, Paragliders and Better Combat.
+On its own, Feathers of Fatigue makes sprinting and jumping cost feathers. Other mods can spend feathers for their own actions through the [API](Mod-Developers).

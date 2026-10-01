@@ -162,7 +162,6 @@ Targets can be mounts too.
 
 [basic_exertion]
 	#Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.
-	#Always off when Actions of Stamina is installed: it takes over player actions.
 	basic_exertion_enabled = true
 	#Feathers per second while sprinting. Regeneration pauses while sprinting.
 	# Default: 1.0
@@ -247,6 +246,24 @@ Targets can be mounts too.
 	# Range: 0.0 ~ 20.0
 	regen_reduction_per_thirst_point = 0.02
 	#Feathers per second gained per point of quench (thirst saturation).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_bonus_per_quench_point = 0.02
+	#Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.
+	# Default: 0.0
+	# Range: 0.0 ~ 20.0
+	thirst_per_regenerated_feather = 0.0
+
+#Droplets of Thirst (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.
+#Ignored for players whose thirst is off.
+[droplets_of_thirst]
+	#Use Droplets of Thirst when it is installed.
+	enabled = true
+	#Feathers per second lost per missing thirst point (20 points = full).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_reduction_per_thirst_point = 0.02
+	#Feathers per second gained per point of quenched (thirst saturation).
 	# Default: 0.02
 	# Range: 0.0 ~ 20.0
 	regen_bonus_per_quench_point = 0.02

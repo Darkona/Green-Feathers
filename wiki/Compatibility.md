@@ -15,13 +15,12 @@ Supported out of the box, each with its own switch in `FeathersOfFatigue-Compat.
 | Cold Sweat | Your body temperature decides when you're cold or overheating |
 | Tough As Nails | Its temperature decides cold and heat; its thirst slows or speeds up recovery |
 | Legendary Survival Overhaul | The same, from its temperature and hydration |
-| Thirst Was Taken | Being thirsty slows recovery, being well quenched speeds it up |
+| Droplets of Thirst | Being thirsty slows recovery, being well quenched speeds it up; regenerating can cost thirst |
+| Thirst Was Taken | The same as Droplets of Thirst, for worlds still on the original mod (Droplets of Thirst is its maintained continuation) |
 | Serene Seasons | Winter outdoors is cold, summer sun is hot |
 | Curios | The Feather Ring goes in a ring slot |
 | Jade | Shows a mount's stamina when you look at it |
 | AppleSkin, Overflowing Bars | Sit nicely alongside the feathers |
-
-Mods that change what the player does (ParCool, Paragliders, Better Combat, Combat Roll, Epic Fight, Wall-Jump TXF, Gliders) are covered by [Actions of Stamina](https://github.com/Darkona/actions-of-stamina), which spends feathers for them.
 
 ## Versions
 
@@ -32,6 +31,7 @@ Feathers of Fatigue calls into these mods directly, so it accepts the versions i
 | Cold Sweat | 2.4.3.2 up to 3 |
 | Tough As Nails | 9.2.0.171 up to 10 |
 | Legendary Survival Overhaul | 1.20.1-2.4.7 up to 1.20.1-3 |
+| Droplets of Thirst | 1.20.1-1.0.0 up to 1.20.1-2 |
 | Thirst Was Taken | 1.20.1-1.4.0 up to 1.20.1-2 |
 | Serene Seasons | 9.1.0.3 up to 10 |
 | Curios | 5.14.1 up to 6 |

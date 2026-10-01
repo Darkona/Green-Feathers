@@ -54,4 +54,4 @@ FeathersAPI.registerWeightSource(MY_BACKPACK, new WeightSource() {
 
 ## Events
 
-On the NeoForge event bus: `SpendEvent.Pre` (cancel or change a spend) and `SpendEvent.Post`, `GainEvent`, `DrainEvent`, `ExhaustionEvent`, `StrainEvent`, `RegenEvent`, and `ArmorWeightEvent` (change the total weight).
+On the Forge event bus (`MinecraftForge.EVENT_BUS`): `SpendEvent.Pre` (cancel or change a spend) and `SpendEvent.Post` (its result is `getSpendResult`, because the Forge `Event` already has a `getResult`), `GainEvent`, `DrainEvent`, `ExhaustionEvent`, `StrainEvent`, `RegenEvent`, and `ArmorWeightEvent` (change the total weight).

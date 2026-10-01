@@ -2,31 +2,31 @@
 
 Feathers of Fatigue has three config files in `config/feathers_of_fatigue/`:
 
-| File | Kind | What's in it |
+| File | Kind | Contents |
 |---|---|---|
 | `FeathersOfFatigue-Server.toml` | Server | Feathers, regeneration, strain, exhaustion, effects, resting, armor weights, basic exertion, mounts |
-| `FeathersOfFatigue-Compat.toml` | Server | One section per supported mod, each with its own switch |
+| `FeathersOfFatigue-Compat.toml` | Server | One section for each supported mod, each with its own switch |
 | `FeathersOfFatigue-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
 
-Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each player's own.
+The server configs belong to the server. It sends its own to every player who joins, so everyone plays by the same rules, whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. Each player has their own client config.
 
 Changes to the server configs apply while the game runs.
 
 ## Commands
 
-Operators (permission level 2) can inspect and adjust feathers:
+Operators (permission level 2) can examine and change feathers:
 
 | Command | What it does |
 |---|---|
-| `/feathers info <targets>` | Shows their feathers, strain, weight and state |
-| `/feathers set <targets> <amount>` | Sets their feathers; above zero it also clears their strain |
+| `/feathers info <targets>` | Shows the feathers, strain, weight and state of the targets |
+| `/feathers set <targets> <amount>` | Sets their feathers. Above zero, it also clears their strain |
 | `/feathers reset <targets>` | Full feathers, no strain, not exhausted |
 | `/feathers max <targets> <amount>` | Sets their base maximum feathers (kept across rejoins and deaths, like any attribute base) |
 | `/feathers regen <targets> <amount>` | Sets their base regeneration, in feathers per second (kept across rejoins and deaths) |
-| `/feathers spend <targets> <amount>` | Spends feathers as if an action had |
+| `/feathers spend <targets> <amount>` | Spends feathers, as an action does |
 | `/feathers debug <targets> [seconds]` | Lists what spent their feathers recently, by source |
 
-Targets can be mounts too.
+Targets can also be mounts.
 
 ## Default `FeathersOfFatigue-Server.toml`
 
@@ -162,7 +162,6 @@ Targets can be mounts too.
 
 [basic_exertion]
 	#Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.
-	#Always off when Actions of Stamina is installed: it takes over player actions.
 	basic_exertion_enabled = true
 	#Feathers per second while sprinting. Regeneration pauses while sprinting.
 	# Default: 1.0
@@ -252,7 +251,7 @@ Targets can be mounts too.
 	summer_heat_from_temperature = 0.8
 ```
 
-Older versions support more mods, with a section each: Tough As Nails on 26.2 and older, Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on 1.21.1 and older (see [Minecraft Versions](Minecraft-Versions)). Cold Sweat and Thirst Was Taken come before `[droplets_of_thirst]`, the other two before `[serene_seasons]`, which there is ignored while a body-temperature mod is in charge:
+Older versions support more mods, each with a section: Tough As Nails on 26.2 and older, and Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on 1.21.1 and older (see [Minecraft Versions](Minecraft-Versions)). The Cold Sweat and Thirst Was Taken sections come before `[droplets_of_thirst]`. The other two come before `[serene_seasons]`. On those versions, Feathers of Fatigue ignores `[serene_seasons]` while a body-temperature mod is in charge:
 
 ```toml
 #Cold Sweat: body temperature decides Cold, Heat and Fatigue instead of biomes.

@@ -2,6 +2,15 @@
 
 Changes by feature, newest version first.
 
+## 1.19.2-1.0.1 (Forge 43), 2026-10-01
+
+Same as 1.19.2-1.0.0 below, except for what this section lists.
+
+### For mod developers
+
+- Another mod can take over player actions through the API: `FeathersAPI.takeOverPlayerActions(modId)`, called during mod construction or common setup, turns the basic exertion (the sprint and jump costs) off, so a player never pays twice for the same action. `FeathersAPI.arePlayerActionsTakenOver()` and `FeathersAPI.getPlayerActionOwners()` read it. The comment of `basic_exertion_enabled` says so.
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:1.19.2-1.0.1`.
+
 ## 1.19.2-1.0.0 (Forge 43), 2026-10-01
 
 The Green Feathers rewrite of 1.21.1, ported to Forge 1.19.2 (through the 1.20.1 port) with the same features, config options and API. It replaces the 1.3.0 code of this branch, and its API. Needs Forge 43.5.2 or later.

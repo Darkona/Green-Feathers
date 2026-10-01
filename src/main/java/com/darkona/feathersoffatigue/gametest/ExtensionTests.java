@@ -6,6 +6,7 @@ import com.darkona.feathersoffatigue.api.StaminaModifier;
 import com.darkona.feathersoffatigue.api.FeathersView;
 import com.darkona.feathersoffatigue.api.Stamina;
 import com.darkona.feathersoffatigue.api.registry.FeathersIds;
+import com.darkona.feathersoffatigue.basic.BasicExertion;
 import com.darkona.feathersoffatigue.climate.ClimateEffects;
 import com.darkona.feathersoffatigue.config.FeathersServerConfig;
 import net.minecraft.gametest.framework.GameTest;
@@ -18,6 +19,8 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 import static com.darkona.feathersoffatigue.api.registry.FeathersIds.id;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.assertValueEqual;
+import static com.darkona.feathersoffatigue.gametest.TestSupport.assertTrue;
+import static com.darkona.feathersoffatigue.gametest.TestSupport.assertFalse;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.player;
 import static com.darkona.feathersoffatigue.gametest.TestSupport.tick;
 
@@ -91,6 +94,27 @@ public class ExtensionTests {
         } finally {
             FeathersServerConfig.ENABLE_ARMOR_WEIGHTS.set(before);
         }
+        helper.succeed();
+    }
+
+    /**
+     * A mod that charges player actions itself turns the basic exertion off. The take-over is global and permanent, so
+     * this is the only test that jumps: basic exertion stays off for the rest of the run.
+     */
+    @GameTest(template = "empty")
+    public static void takingOverPlayerActionsStopsBasicExertion(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        assertTrue(helper, BasicExertion.isActive(), "basic exertion on before the take-over");
+        player.jumpFromGround();
+        int afterJump = FeathersAPI.get(player).stamina();
+        assertTrue(helper, afterJump < Stamina.ofFeathers(20), "a jump costs feathers");
+
+        FeathersAPI.takeOverPlayerActions("feathers_of_fatigue_test");
+        assertTrue(helper, FeathersAPI.arePlayerActionsTakenOver(), "player actions taken over");
+        assertTrue(helper, FeathersAPI.getPlayerActionOwners().contains("feathers_of_fatigue_test"), "the owner is listed");
+        assertFalse(helper, BasicExertion.isActive(), "basic exertion off after the take-over");
+        player.jumpFromGround();
+        assertValueEqual(helper, FeathersAPI.get(player).stamina(), afterJump, "a jump is free after the take-over");
         helper.succeed();
     }
 }

@@ -2,31 +2,31 @@
 
 Feathers of Fatigue has three config files in `config/feathers_of_fatigue/`:
 
-| File | Kind | What's in it |
+| File | Kind | Contents |
 |---|---|---|
 | `FeathersOfFatigue-Server.toml` | Server | Feathers, regeneration, strain, exhaustion, effects, resting, armor weights, basic exertion, mounts |
-| `FeathersOfFatigue-Compat.toml` | Server | One section per supported mod, each with its own switch |
+| `FeathersOfFatigue-Compat.toml` | Server | One section for each supported mod, each with its own switch |
 | `FeathersOfFatigue-Client.toml` | Client | The HUD: position, feather color, animations, tooltips |
 
-Server configs belong to the server: it sends its own to every player who joins, so everyone plays by the same rules whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. The client config is each player's own.
+The server configs belong to the server. It sends its own to every player who joins, so everyone plays by the same rules, whatever their own files say. Modpacks ship their defaults in `defaultconfigs/`. Each player has their own client config.
 
 Changes to the server configs apply while the game runs.
 
 ## Commands
 
-Operators (permission level 2) can inspect and adjust feathers:
+Operators (permission level 2) can examine and change feathers:
 
 | Command | What it does |
 |---|---|
-| `/feathers info <targets>` | Shows their feathers, strain, weight and state |
-| `/feathers set <targets> <amount>` | Sets their feathers; above zero it also clears their strain |
+| `/feathers info <targets>` | Shows the feathers, strain, weight and state of the targets |
+| `/feathers set <targets> <amount>` | Sets their feathers. Above zero, it also clears their strain |
 | `/feathers reset <targets>` | Full feathers, no strain, not exhausted |
 | `/feathers max <targets> <amount>` | Sets their base maximum feathers (kept across rejoins and deaths, like any attribute base) |
 | `/feathers regen <targets> <amount>` | Sets their base regeneration, in feathers per second (kept across rejoins and deaths) |
-| `/feathers spend <targets> <amount>` | Spends feathers as if an action had |
+| `/feathers spend <targets> <amount>` | Spends feathers, as an action does |
 | `/feathers debug <targets> [seconds]` | Lists what spent their feathers recently, by source |
 
-Targets can be mounts too.
+Targets can also be mounts.
 
 ## Default `FeathersOfFatigue-Server.toml`
 
@@ -94,7 +94,7 @@ Targets can be mounts too.
 	# Default: -0.3
 	# Range: -2.0 ~ 2.0
 	cold_temperature = -0.3
-	#Heat effect: doubles costs. First heat tier: a hot biome under the sun, or Cold Sweat's hot_threshold.
+	#Heat effect: doubles costs. First heat tier: a hot biome under the sun, or a temperature mod's heat.
 	#Fire Resistance and the Cooling effect prevent it.
 	effect_hot_enabled = true
 	#Biome temperature from which being under the sun applies Heat. The hottest biomes reach 2.0.
@@ -102,7 +102,7 @@ Targets can be mounts too.
 	# Range: -2.0 ~ 4.0
 	hot_temperature = 1.8
 	#Fatigue effect: 4 fewer max feathers per level. Second heat tier, on top of Heat: the Nether, burning,
-	#lava, or Cold Sweat's severe_hot_threshold. Other mods may apply it too. Fire Resistance and Cooling prevent it.
+	#lava, or a temperature mod's severe heat. Other mods may apply it too. Fire Resistance and Cooling prevent it.
 	effect_fatigue_enabled = true
 	#Being in the Nether counts as severe heat.
 	fatigue_from_nether = true
@@ -150,7 +150,7 @@ Targets can be mounts too.
 	#  @minecraft:iron/chestplate=3    one piece of an armor material (helmet, chestplate, leggings, boots, body for horse armor)
 	#  @minecraft:iron=2               every piece of an armor material
 	#Armor that matches nothing weighs its defense points times unlisted_armor_weight_per_defense.
-	armor_weights = ["@minecraft:leather=1", "@minecraft:chainmail=1", "@minecraft:turtle=1", "@minecraft:gold=2", "@minecraft:iron=2", "@minecraft:diamond=3", "@minecraft:netherite=4", "@minecraft:leather/body=1", "@minecraft:gold/body=1", "@minecraft:iron/body=2", "@minecraft:diamond/body=2"]
+	armor_weights = ["@minecraft:leather=1", "@minecraft:chainmail=1", "@minecraft:turtle_scute=1", "@minecraft:copper=1", "@minecraft:gold=2", "@minecraft:iron=2", "@minecraft:diamond=3", "@minecraft:netherite=4", "@minecraft:leather/body=1", "@minecraft:copper/body=1", "@minecraft:gold/body=1", "@minecraft:iron/body=2", "@minecraft:diamond/body=2"]
 	#Weight of armor no rule or data map covers, per point of defense. 0 makes it weightless.
 	# Default: 0.5
 	# Range: 0.0 ~ 10.0
@@ -162,6 +162,7 @@ Targets can be mounts too.
 
 [basic_exertion]
 	#Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.
+	#Always off when another mod takes over player actions through the API.
 	basic_exertion_enabled = true
 	#Feathers per second while sprinting. Regeneration pauses while sprinting.
 	# Default: 1.0
@@ -215,6 +216,45 @@ Targets can be mounts too.
 ## Default `FeathersOfFatigue-Compat.toml`
 
 ```toml
+#Droplets of Thirst (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.
+#Ignored for players whose thirst is off.
+[droplets_of_thirst]
+	#Use Droplets of Thirst when it is installed.
+	enabled = true
+	#Feathers per second lost per missing thirst point (20 points = full).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_reduction_per_thirst_point = 0.02
+	#Feathers per second gained per point of quenched (thirst saturation).
+	# Default: 0.02
+	# Range: 0.0 ~ 20.0
+	regen_bonus_per_quench_point = 0.02
+	#Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.
+	# Default: 0.0
+	# Range: 0.0 ~ 20.0
+	thirst_per_regenerated_feather = 0.0
+
+#Serene Seasons: winter outdoors is cold, a summer day in the sun is hot.
+[serene_seasons]
+	#Use Serene Seasons when it is installed.
+	enabled = true
+	#Being outdoors in winter applies Cold.
+	winter_cold = true
+	#Only in biomes cooler than this (deserts and jungles stay warm). Plains are 0.8.
+	# Default: 1.0
+	# Range: -2.0 ~ 4.0
+	winter_cold_below_temperature = 1.0
+	#A summer day under the sun applies Heat in warm biomes.
+	summer_heat = true
+	#Biome temperature from which summer sun applies Heat (lower than the normal hot_temperature).
+	# Default: 0.8
+	# Range: -2.0 ~ 4.0
+	summer_heat_from_temperature = 0.8
+```
+
+Older versions support more mods, each with a section: Tough As Nails on 26.2 and older, and Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on 1.21.1 and older (see [Minecraft Versions](Minecraft-Versions)). The Cold Sweat and Thirst Was Taken sections come before `[droplets_of_thirst]`. The other two come before `[serene_seasons]`. On those versions, Feathers of Fatigue ignores `[serene_seasons]` while a body-temperature mod is in charge:
+
+```toml
 #Cold Sweat: body temperature decides Cold, Heat and Fatigue instead of biomes.
 [cold_sweat]
 	#Use Cold Sweat when it is installed.
@@ -246,24 +286,6 @@ Targets can be mounts too.
 	# Range: 0.0 ~ 20.0
 	regen_reduction_per_thirst_point = 0.02
 	#Feathers per second gained per point of quench (thirst saturation).
-	# Default: 0.02
-	# Range: 0.0 ~ 20.0
-	regen_bonus_per_quench_point = 0.02
-	#Thirst points each regenerated feather costs. 0 = regenerating costs no thirst.
-	# Default: 0.0
-	# Range: 0.0 ~ 20.0
-	thirst_per_regenerated_feather = 0.0
-
-#Droplets of Thirst (the continuation of Thirst Was Taken): thirst slows regeneration, being quenched speeds it up.
-#Ignored for players whose thirst is off.
-[droplets_of_thirst]
-	#Use Droplets of Thirst when it is installed.
-	enabled = true
-	#Feathers per second lost per missing thirst point (20 points = full).
-	# Default: 0.02
-	# Range: 0.0 ~ 20.0
-	regen_reduction_per_thirst_point = 0.02
-	#Feathers per second gained per point of quenched (thirst saturation).
 	# Default: 0.02
 	# Range: 0.0 ~ 20.0
 	regen_bonus_per_quench_point = 0.02
@@ -321,24 +343,6 @@ Targets can be mounts too.
 	# Default: 0.0
 	# Range: 0.0 ~ 40.0
 	thirst_exhaustion_per_regenerated_feather = 0.0
-
-#Serene Seasons: winter outdoors is cold, a summer day in the sun is hot. Ignored while a body-temperature
-#mod (Cold Sweat, Tough As Nails, Legendary Survival Overhaul) is in charge: they already count seasons.
-[serene_seasons]
-	#Use Serene Seasons when it is installed.
-	enabled = true
-	#Being outdoors in winter applies Cold.
-	winter_cold = true
-	#Only in biomes cooler than this (deserts and jungles stay warm). Plains are 0.8.
-	# Default: 1.0
-	# Range: -2.0 ~ 4.0
-	winter_cold_below_temperature = 1.0
-	#A summer day under the sun applies Heat in warm biomes.
-	summer_heat = true
-	#Biome temperature from which summer sun applies Heat (lower than the normal hot_temperature).
-	# Default: 0.8
-	# Range: -2.0 ~ 4.0
-	summer_heat_from_temperature = 0.8
 ```
 
 ## Default `FeathersOfFatigue-Client.toml`

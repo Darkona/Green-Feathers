@@ -2,19 +2,19 @@
 
 This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and each change has its date.
 
-Version 2.0.0 is built for each Minecraft version as `<minecraft>-2.0.0`, for example `1.21.1-2.0.0` or `26.3-2.0.0`. It is not released yet. An entry that names a Minecraft version applies only to that version, or to the versions it names.
+Version 1.0.0-beta.1 is built for each Minecraft version as `<minecraft>-1.0.0`, for example `1.21.1-1.0.0` or `26.3-1.0.0-beta.1`. It is not released yet. An entry that names a Minecraft version applies only to that version, or to the versions it names.
 
 Planned: Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on Minecraft 26.x, and Tough As Nails on 26.3, when they publish a build for it. Also a build for the NeoForge 26.3 releases after 26.3.0.36-beta, when Droplets of Thirst and the compats follow.
 
-## [2.0.0] - 2026-09-27
+## [1.0.0-beta.1] - 2026-09-27
 
 ### Added
-- 2026-09-27: Minecraft 26.3 build (26.3-2.0.0), on NeoForge 26.3.0.36-beta, the same as 26.2-2.0.0 except for the 26.3 entries in this file.
-- 2026-09-27: On 26.3, tested with Droplets of Thirst 26.3-1.0.0, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
-- 2026-09-25: Minecraft 26.2 build (26.2-2.0.0), on NeoForge 26.2.0.88 or later, the same as 26.1-2.0.0 except for the 26.2 entries in this file.
+- 2026-09-27: Minecraft 26.3 build (26.3-1.0.0-beta.1), on NeoForge 26.3.0.36-beta, the same as 26.2-1.0.0 except for the 26.3 entries in this file.
+- 2026-09-27: On 26.3, tested with Droplets of Thirst 26.3-1.0.0-beta.1, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
+- 2026-09-25: Minecraft 26.2 build (26.2-1.0.0), on NeoForge 26.2.0.88 or later, the same as 26.1-1.0.0 except for the 26.2 entries in this file.
 - 2026-09-25: On 26.2 and newer, Naturalist is back: its ostriches, giraffes and elephants get feathers again, as on 1.21.1.
 - 2026-09-25: On 26.2, tested with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
-- 2026-09-24: Minecraft 26.1.2 build (26.1-2.0.0), on NeoForge 26.1.2.109 or later, with the same features, config and API as 1.21.1-2.0.0 except for the 26.1 entries in this file.
+- 2026-09-24: Minecraft 26.1.2 build (26.1-1.0.0), on NeoForge 26.1.2.109 or later, with the same features, config and API as 1.21.1-1.0.0 except for the 26.1 entries in this file.
 - 2026-09-24: On 26.1 and newer, copper armor and copper horse armor weigh 1 by default (`@minecraft:copper=1`, `@minecraft:copper/body=1`).
 - 2026-09-24: On 26.1, tested with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
 - 2026-07-26: Each supported mod declares the versions it accepts. A version outside them stops the game at load with a message, instead of a crash in play.
@@ -59,13 +59,13 @@ Planned: Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on Minecra
 
 ### Changed
 - 2026-09-27: On 26.3, the brewing recipes are data, as Minecraft 26.3 does brewing: `data/feathers_of_fatigue/recipe/brewing/`, one `minecraft:brewing` recipe per mix and container (potion, splash, lingering) and per container change (gunpowder, dragon's breath), like the vanilla ones. The mixes are the same, and a datapack can now change or remove them.
-- 2026-09-27: On 26.3, this build is for NeoForge 26.3.0.36-beta only, like Droplets of Thirst 26.3-1.0.0 and the compat versions it was tested with (Puzzles Lib 26.3.9 needs a newer NeoForge). NeoForge 26.3 is still in beta, and 26.3.0.37-beta renames the config types, so mods built for one side of that change do not load on the other.
-- 2026-09-27: On 26.3, the API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-2.0.0`, with the same API as 26.1.
-- 2026-09-25: On 26.2, the API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.2-2.0.0`, with the same API as 26.1.
+- 2026-09-27: On 26.3, this build is for NeoForge 26.3.0.36-beta only, like Droplets of Thirst 26.3-1.0.0-beta.1 and the compat versions it was tested with (Puzzles Lib 26.3.9 needs a newer NeoForge). NeoForge 26.3 is still in beta, and 26.3.0.37-beta renames the config types, so mods built for one side of that change do not load on the other.
+- 2026-09-27: On 26.3, the API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-1.0.0-beta.1`, with the same API as 26.1.
+- 2026-09-25: On 26.2, the API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.2-1.0.0`, with the same API as 26.1.
 - 2026-09-24: On 26.1 and newer, armor is recognized by its equipment (the `minecraft:equippable` component with an equipment model, worn in an armor slot or on the body of a mount), as Minecraft 26.1 defines armor, instead of by its item class. Armor from other mods counts if it has the same definition.
 - 2026-09-24: On 26.1 and newer, material rules (`@minecraft:iron`, `@minecraft:iron/chestplate`) name the equipment model, which for vanilla armor is its material. The turtle shell is `@minecraft:turtle_scute` (it was `@minecraft:turtle`), and the default list follows.
 - 2026-09-24: On 26.1, use Serene Seasons 26.1.2.0.4 to 26.1.2.0.6. Serene Seasons 26.1.2.0.7 crashes the client on its own as soon as a world renders.
-- 2026-09-24: On 26.1 and newer, the API is the same, with the Minecraft renames: `ResourceLocation` is now `Identifier` in every signature. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1-2.0.0`.
+- 2026-09-24: On 26.1 and newer, the API is the same, with the Minecraft renames: `ResourceLocation` is now `Identifier` in every signature. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1-1.0.0`.
 - 2026-09-06: Green Feathers is now **Feathers of Fatigue**. Every id follows: the mod id and resource namespace are `feathers_of_fatigue` (attributes, effects, enchantments, tags, data maps, lang keys), the code is in `com.darkona.feathersoffatigue` (the API in `com.darkona.feathersoffatigue.api`), and the jars are `feathers-of-fatigue` and `feathers-of-fatigue-api` (group `com.darkona.feathersoffatigue`).
 - 2026-09-06: The config files are `FeathersOfFatigue-Server.toml`, `FeathersOfFatigue-Compat.toml` and `FeathersOfFatigue-Client.toml`, in `serverconfig/feathers_of_fatigue/` and `config/feathers_of_fatigue/`. The `/feathers` command keeps its name.
 

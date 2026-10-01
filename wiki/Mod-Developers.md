@@ -3,7 +3,7 @@
 Other mods can spend feathers through the Feathers of Fatigue API. Compile against the API jar and treat it as optional:
 
 ```groovy
-compileOnly "com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-2.0.0"
+compileOnly "com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-1.0.0-beta.1"
 ```
 
 Guard every call with `ModList.get().isLoaded("feathers_of_fatigue")`. Keep the calls in a class that loads only when the mod is there. Your mod then works with and without Feathers of Fatigue.
@@ -101,7 +101,7 @@ These events are on the NeoForge event bus: `SpendEvent.Pre` (cancel or change a
 
 ## Older Minecraft versions
 
-The API (`feathers-of-fatigue-api`) is the same in every version, at `<minecraft>-2.0.0` (`1.21.1-2.0.0`, `1.20.1-2.0.0`...). On 1.21.1 and older, ids are the Minecraft `ResourceLocation`, where 26.x and 1.21.11 have `Identifier`. On 1.20.1 and older, Forge needs a few more changes:
+The API (`feathers-of-fatigue-api`) is the same in every version, at `<minecraft>-1.0.0` (`1.21.1-1.0.0`, `1.20.1-1.0.0`...). On 1.21.1 and older, ids are the Minecraft `ResourceLocation`, where 26.x and 1.21.11 have `Identifier`. On 1.20.1 and older, Forge needs a few more changes:
 
 - Attributes, effects and enchantments are `RegistryObject`s (`FeathersAttributes.MAX_FEATHERS.get()`), not `DeferredHolder`s.
 - Events go on `MinecraftForge.EVENT_BUS`. `SpendEvent.Post#getSpendResult` replaces `getResult`, because the Forge `Event` already has a `getResult`.

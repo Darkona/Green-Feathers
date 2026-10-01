@@ -2,16 +2,16 @@
 
 Changes by feature, newest version first.
 
-## 26.1.2-1.0.1 (NeoForge)
+## 26.1.2-1.0.1 (NeoForge), 2026-10-01
 
 The Minecraft 26.1.2 build is now labeled 26.1.2, the Minecraft version it runs on. Same features, config and API as 26.1-1.0.0 below.
 
 - Built against Droplets of Thirst 26.1.2-1.0.1, and accepts Droplets of Thirst 26.1.2-1.0.0 up to 26.1.2-2.
 - The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1.2-1.0.1`.
 
-## 26.1-1.0.0 (NeoForge)
+## 26.1-1.0.0 (NeoForge), 2026-10-01
 
-Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same features, config and API as 1.21.1-1.0.0 below, except for what this section lists.
+Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.112 or later. Same features, config and API as 1.21.1-1.0.0 below, except for what this section lists.
 
 ### Armor weight
 
@@ -33,9 +33,9 @@ Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same 
 - **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** none of them has a build for Minecraft 26.1. Their compats and config sections are left out; Droplets of Thirst and Tough As Nails cover thirst, and Tough As Nails temperature.
 - **Naturalist, Mob Wrangler:** no build for Minecraft 26.1, so their mounts are not there to get feathers. The data map entries for them stay, and apply when the mods come.
 
-## 1.21.1-1.0.0 (NeoForge), unreleased
+## 1.21.1-1.0.0 (NeoForge), 2026-10-01
 
-A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
+A rewrite of Green Feathers for NeoForge 1.21.1 (21.1.252 or later), with a new API.
 
 ### Renamed to Feathers of Fatigue
 

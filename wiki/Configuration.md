@@ -162,7 +162,6 @@ Targets can be mounts too.
 
 [basic_exertion]
 	#Sprinting and jumping cost feathers, so Feathers of Fatigue does something on its own.
-	#Always off when Actions of Stamina is installed: it takes over player actions.
 	basic_exertion_enabled = true
 	#Feathers per second while sprinting. Regeneration pauses while sprinting.
 	# Default: 1.0
@@ -282,7 +281,7 @@ Targets can be mounts too.
 	summer_heat_from_temperature = 0.8
 ```
 
-Minecraft 1.21.1 and older also support Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul, which have no build for 26.x. Their sections come before `[droplets_of_thirst]` and `[serene_seasons]` there:
+Minecraft 1.21.1 and older also support Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul, which have no build for 1.21.11 or 26.x. Their sections come before `[droplets_of_thirst]` and `[serene_seasons]` there:
 
 ```toml
 #Cold Sweat: body temperature decides Cold, Heat and Fatigue instead of biomes.

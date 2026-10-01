@@ -1,17 +1,17 @@
 # Feathers of Fatigue
 
-**Stamina for Minecraft, as a row of feathers above your food bar.** Sprinting, jumping, and whatever other mods decide cost feathers. Run out and you can push on for a while, at a price.
+Feathers of Fatigue adds stamina to Minecraft, as a row of feathers above your food bar. Sprinting, jumping and whatever other mods choose cost feathers. When they run out, you can push on for a while, at a price.
 
-Minecraft 1.20.1 · Forge 47.4.10 or later · based on Elenai's Feathers. Also for 26.3, 26.2, 26.1.2, 1.21.11 and 1.21.1 (NeoForge) and 1.19.2 and 1.18.2 (Forge): the [Minecraft Versions](https://github.com/Darkona/feathers-of-fatigue/wiki/Minecraft-Versions) page of the wiki lists what differs.
+Minecraft 26.3 · NeoForge · based on Elenai's Feathers. Also for 26.2, 26.1.2, 1.21.11 and 1.21.1 (NeoForge) and 1.20.1, 1.19.2 and 1.18.2 (Forge). [Minecraft Versions](Minecraft-Versions) lists what is different.
 
 ![Feathers above the food bar, with a golden row of Endurance feathers](images/hud.png)
 
 ## Pages
 
 - [How It Plays](How-It-Plays): feathers, strain, exhaustion, resting, climate, armor weight, mounts, potions.
-- [Compatibility](Compatibility): the mods Feathers of Fatigue works with out of the box.
+- [Compatibility](Compatibility): the mods that Feathers of Fatigue works with out of the box.
 - [Configuration](Configuration): every config file and option, and the `/feathers` command.
 - [Modpack Makers](Modpack-Makers): mounts, armor weights and opt-outs with datapacks.
-- [Mod Developers](Mod-Developers): spending feathers and hooking into them from your own mod.
-
-On its own, Feathers of Fatigue makes sprinting and jumping cost feathers. Other mods can spend feathers for their own actions through the [API](Mod-Developers).
+- [Mod Developers](Mod-Developers): how to spend feathers and connect to them from your own mod.
+- [Resource Packs](Resource-Packs): how to recolor the feathers, or draw your own.
+- [Minecraft Versions](Minecraft-Versions): what is different on each Minecraft version.

@@ -2,11 +2,11 @@
 
 ## Feathers
 
-Feathers sit above the food bar, two per icon, like hearts. A full row is 20 feathers; more than that is drawn as layers over the same row, each a shade deeper (or lighter) than the one below, with a count next to it.
+Feathers sit above the food bar, two per icon, like hearts. A full row is 20 feathers. More feathers are drawn as layers over the same row, each a shade deeper (or lighter) than the one below, with a count next to it.
 
-Feathers come back on their own, a little every second, after a short pause once you've spent some. Spending several times in a row lengthens the pause, up to a limit.
+Feathers come back on their own, a little every second. After you spend some, there is a short pause before they start to come back. Several spends in a row make the pause longer, up to a limit.
 
-The color is yours to pick in the client config: green, blue (like Elenai's original) or white (chicken feathers).
+You pick the color in the client config: green, blue (like Elenai's original) or white (chicken feathers).
 
 | ![Green color](images/color-green.png) | ![Blue color](images/color-blue.png) | ![White color](images/color-white.png) |
 |---|---|---|
@@ -18,25 +18,25 @@ The color is yours to pick in the client config: green, blue (like Elenai's orig
 
 ## Strain
 
-When you run out you can keep going into red *strain* feathers, up to a limit (6 by default). Regeneration pays strain back before anything else, slowly, so overdoing it leaves you drained for a while.
+When you run out, you can keep going into red *strain* feathers, up to a limit (6 by default). Regeneration pays strain back before anything else, and slowly. If you overdo it, you stay drained for a while.
 
 ![Two red strain feathers](images/strain.png)
 
 ## Exhaustion
 
-Spend absolutely everything (no feathers and no strain room left) and you're exhausted: no exerting yourself until you've regained part of your bar (30% by default) with no strain left.
+If you spend absolutely everything (no feathers and no strain room left), you are exhausted. You cannot exert yourself again until you regain part of your bar (30% by default) with no strain left.
 
 ![Exhausted: the bar is spent and the strain is full](images/exhausted.png)
 
 ## Resting
 
-Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back faster. Sleeping through the night restores everything, also when a sleep mod skips the night for you. Leaving the bed before morning restores nothing.
+Standing still, crouching or sitting down (a boat, a horse, or most seats from furniture mods) pays strain back faster. Sleeping through the night restores everything, also when a sleep mod skips the night for you. If you leave the bed before morning, sleep restores nothing.
 
 ## Food (optional)
 
-A well-fed body recovers faster: with a full food bar and saturation left, feathers come back quicker (`saturation_regen_bonus` in the server config). Go hungry, 6 hunger points (3 drumsticks) or less, and they come back slower (`hunger_regen_penalty`). Both are off by default. Only players eat; mounts are unaffected.
+A well-fed body recovers faster. With a full food bar and saturation left, feathers come back quicker (`saturation_regen_bonus` in the server config). At 6 hunger points (3 drumsticks) or less, they come back slower (`hunger_regen_penalty`). Both are off by default. Only players eat, so mounts are not affected.
 
-With `regen_uses_hunger` on, regenerating costs food like healing does, and stops altogether once you're that hungry.
+With `regen_uses_hunger` on, regeneration costs food like healing does. At that hunger level, it stops completely.
 
 ## Weather and climate
 
@@ -45,7 +45,7 @@ With `regen_uses_hunger` on, regenerating costs food like healing does, and stop
 - **The Nether, fire and lava** also cut your maximum feathers (fatigue).
 - **Fire Resistance** or a **Potion of Cooling** keeps you fresh.
 
-With a temperature or seasons mod installed, that mod decides when you're cold or hot (see [Compatibility](Compatibility)).
+With a temperature or seasons mod installed, that mod decides when you are cold or hot (see [Compatibility](Compatibility)).
 
 | ![Hot](images/hot.png) | ![Cold](images/cold.png) | ![Hot and fatigued](images/fatigued.png) |
 |---|---|---|
@@ -53,13 +53,13 @@ With a temperature or seasons mod installed, that mod decides when you're cold o
 
 ## Armor weight (optional)
 
-Every armor piece holds back some feathers you can't use. They are drawn from the right, head to feet, each in its piece's own color (leather in its dye). Netherite is heavy.
+Every armor piece holds back some feathers that you cannot use. They are drawn from the right, head to feet, each in the color of its piece (leather in its dye). Netherite is heavy.
 
 - The **Lightweight** enchantment takes 25% off a piece per level.
-- The **Feather Ring** (a Curios ring, or held in the off hand without Curios) halves the weight.
-- Other mods can add weight of their own, such as a backpack, drawn after the boots in its own colors.
+- The **Feather Ring** halves the weight. It goes in a Curios ring slot, or in the off hand without Curios.
+- Other mods can add weight of their own, such as a backpack. It is drawn after the boots, in its own colors.
 
-Turn it on with `armor_weights_enabled` in the server config.
+To turn it on, set `armor_weights_enabled` in the server config.
 
 ![An iron helmet, a diamond chestplate, gold leggings and red leather boots](images/armor.png)
 
@@ -67,9 +67,9 @@ Turn it on with `armor_weights_enabled` in the server config.
 
 ## Mounts (optional)
 
-Horses, donkeys, mules and camels have their own feathers, shown instead of yours while you ride, in the colors of the animal you're on. Galloping and jumping tire them slowly; an exhausted mount slows down and can't jump. A jump the mount can't pay for doesn't happen.
+Horses, donkeys, mules and camels have their own feathers. While you ride, their feathers replace yours, in the colors of the animal. Galloping and jumping tire them slowly. An exhausted mount slows down and cannot jump. If the mount cannot pay for a jump, the jump does not happen.
 
-Like speed and health, each animal is born with its own stamina (14 to 30 feathers by default), and foals take after their parents. Horse armor weighs a little: leather and gold 1 feather, iron and diamond 2.
+Each animal is born with its own stamina (14 to 30 feathers by default), like speed and health, and foals take after their parents. Horse armor weighs a little: leather, copper and gold 1 feather, iron and diamond 2.
 
 Modpacks can give feathers to other creatures (see [Modpack Makers](Modpack-Makers)).
 
@@ -83,7 +83,7 @@ Modpacks can give feathers to other creatures (see [Modpack Makers](Modpack-Make
 
 | Potion | Effect |
 |---|---|
-| Endurance | A row of golden bonus feathers on top of your own; drinking it again extends what is left instead of refilling it |
+| Endurance | A row of golden bonus feathers on top of your own. Another drink extends what is left instead of refilling it |
 | Energy | Faster recovery |
 | Momentum | Cheaper actions |
 | Cooling | Protects from heat |

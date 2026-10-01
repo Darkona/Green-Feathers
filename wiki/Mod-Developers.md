@@ -101,7 +101,7 @@ These events are on the NeoForge event bus: `SpendEvent.Pre` (cancel or change a
 
 ## Older Minecraft versions
 
-The API (`feathers-of-fatigue-api`) is the same in every version, at `<minecraft>-1.0.0` (`1.21.1-1.0.0`, `1.20.1-1.0.0`...). On 1.21.1 and older, ids are the Minecraft `ResourceLocation`, where 26.x and 1.21.11 have `Identifier`. On 1.20.1 and older, Forge needs a few more changes:
+The API (`feathers-of-fatigue-api`) is the same in every version, with the version of the mod jar: `1.21.1-1.0.0`, `1.20.1-1.0.0`, `26.1.2-1.0.1`... [Minecraft Versions](Minecraft-Versions) lists them all. On 1.21.1 and older, ids are the Minecraft `ResourceLocation`, where 26.x and 1.21.11 have `Identifier`. On 1.20.1 and older, Forge needs a few more changes:
 
 - Attributes, effects and enchantments are `RegistryObject`s (`FeathersAttributes.MAX_FEATHERS.get()`), not `DeferredHolder`s.
 - Events go on `MinecraftForge.EVENT_BUS`. `SpendEvent.Post#getSpendResult` replaces `getResult`, because the Forge `Event` already has a `getResult`.

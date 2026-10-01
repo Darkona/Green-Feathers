@@ -2,19 +2,26 @@
 
 This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and each change has its date.
 
-Version 1.0.0-beta.1 is built for each Minecraft version as `<minecraft>-1.0.0`, for example `1.21.1-1.0.0` or `26.3-1.0.0-beta.1`. It is not released yet. An entry that names a Minecraft version applies only to that version, or to the versions it names.
+Version 1.0.0 was released on 2026-10-01 for each Minecraft version as `<minecraft>-1.0.0`, for example `1.21.1-1.0.0`. On Minecraft 26.3 it is a beta, `26.3-1.0.0-beta.1`, because NeoForge 26.3 is still in beta. An entry that names a Minecraft version applies only to that version, or to the versions it names.
 
 Planned: Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on Minecraft 26.x, and Tough As Nails on 26.3, when they publish a build for it. Also a build for the NeoForge 26.3 releases after 26.3.0.36-beta, when Droplets of Thirst and the compats follow.
 
-## [1.0.0-beta.1] - 2026-09-27
+## [1.0.1] - 2026-10-01
+
+### Changed
+- 2026-10-01: On 26.1.2, the build is labeled with the Minecraft version it runs on: 26.1.2-1.0.1 is 26.1-1.0.0 under its new name, with the same features, config and API. It is built against Droplets of Thirst 26.1.2-1.0.1 and accepts Droplets of Thirst 26.1.2-1.0.0 up to 26.1.2-2. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1.2-1.0.1`.
+
+## [1.0.0] - 2026-10-01
 
 ### Added
+- 2026-09-30: Minecraft 1.21.11 build (1.21.11-1.0.0), on NeoForge 21.11.45 or later, built from 26.1-1.0.0 with the same features, config and API: armor is recognized by its equipment, copper armor weighs 1, and the API has `Identifier` in every signature. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:1.21.11-1.0.0`.
+- 2026-09-30: On 1.21.11, tested with Droplets of Thirst 1.21.11-1.0.0, Tough As Nails 21.11.0.4, Serene Seasons 21.11.0.5 with GlitchCore 21.11.0.4, Curios 14.0.0, Jade 21.1.7, AppleSkin 3.0.8 and Overflowing Bars 21.11.0 with Puzzles Lib 21.11.13. Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul, Naturalist and Mob Wrangler have no NeoForge build for 1.21.11, so their compats are left out, as on 26.1.
 - 2026-09-27: Minecraft 26.3 build (26.3-1.0.0-beta.1), on NeoForge 26.3.0.36-beta, the same as 26.2-1.0.0 except for the 26.3 entries in this file.
 - 2026-09-27: On 26.3, tested with Droplets of Thirst 26.3-1.0.0-beta.1, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
 - 2026-09-25: Minecraft 26.2 build (26.2-1.0.0), on NeoForge 26.2.0.88 or later, the same as 26.1-1.0.0 except for the 26.2 entries in this file.
 - 2026-09-25: On 26.2 and newer, Naturalist is back: its ostriches, giraffes and elephants get feathers again, as on 1.21.1.
 - 2026-09-25: On 26.2, tested with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
-- 2026-09-24: Minecraft 26.1.2 build (26.1-1.0.0), on NeoForge 26.1.2.109 or later, with the same features, config and API as 1.21.1-1.0.0 except for the 26.1 entries in this file.
+- 2026-09-24: Minecraft 26.1.2 build (26.1-1.0.0), on NeoForge 26.1.2.112 or later, with the same features, config and API as 1.21.1-1.0.0 except for the 26.1 entries in this file.
 - 2026-09-24: On 26.1 and newer, copper armor and copper horse armor weigh 1 by default (`@minecraft:copper=1`, `@minecraft:copper/body=1`).
 - 2026-09-24: On 26.1, tested with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
 - 2026-07-26: Each supported mod declares the versions it accepts. A version outside them stops the game at load with a message, instead of a crash in play.

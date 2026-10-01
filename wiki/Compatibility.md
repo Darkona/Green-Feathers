@@ -27,7 +27,7 @@ Older Minecraft versions also support these:
 | Legendary Survival Overhaul (1.21.1 and older, not 1.19.2) | The same as Tough As Nails, from its temperature and hydration |
 | Thirst Was Taken (1.21.1 and older) | The same as Droplets of Thirst, for worlds still on the original mod (Droplets of Thirst is its maintained continuation) |
 
-These mods have no build for the newer versions yet. [Minecraft Versions](Minecraft-Versions) lists what each version supports and was tested with.
+These mods have no build for the newer versions. [Minecraft Versions](Minecraft-Versions) lists what each version supports and was tested with.
 
 ## Versions
 
@@ -35,10 +35,10 @@ Feathers of Fatigue calls these mods directly. For this reason it accepts the ve
 
 | Mod | Accepted versions (26.3) |
 |---|---|
-| Droplets of Thirst | 26.3-1.0.0 up to 26.3-2 |
+| Droplets of Thirst | 26.3-1.0.0-beta.1 up to 26.3-2 |
 | Serene Seasons | 26.1.2.0.7 up to 26.1.3 (its builds for 26.x keep 26.1 numbers) |
 | Curios | 17.0.0-beta.2 up to 18 |
 | Jade | 26.3.1 up to 26.4 |
 | Overflowing Bars | 26.3.0 up to 26.4 |
 
-Droplets of Thirst has the same rule on every Minecraft version: from `<minecraft>-1.0.0` up to `<minecraft>-2`, where `<minecraft>` is the version that Feathers of Fatigue is made for. On 1.21.1, that is `1.21.1-1.0.0` up to `1.21.1-2`.
+Droplets of Thirst has the same rule on every Minecraft version: from `<minecraft>-1.0.0` up to `<minecraft>-2`, where `<minecraft>` is the version that Feathers of Fatigue is made for. On 1.21.1, that is `1.21.1-1.0.0` up to `1.21.1-2`. On 26.3, where Droplets of Thirst is a beta too, it starts at `26.3-1.0.0-beta.1`.

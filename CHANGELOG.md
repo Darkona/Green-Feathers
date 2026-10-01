@@ -2,7 +2,14 @@
 
 Changes by feature, newest version first.
 
-## 26.1-1.0.0 (NeoForge), unreleased
+## 26.1.2-1.0.1 (NeoForge)
+
+The Minecraft 26.1.2 build is now labeled 26.1.2, the Minecraft version it runs on. Same features, config and API as 26.1-1.0.0 below.
+
+- Built against Droplets of Thirst 26.1.2-1.0.1, and accepts Droplets of Thirst 26.1.2-1.0.0 up to 26.1.2-2.
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1.2-1.0.1`.
+
+## 26.1-1.0.0 (NeoForge)
 
 Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same features, config and API as 1.21.1-1.0.0 below, except for what this section lists.
 

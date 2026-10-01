@@ -33,10 +33,10 @@ Those three have no build for Minecraft 26.x yet. [Minecraft Versions](Minecraft
 
 Feathers of Fatigue calls into these mods directly, so it accepts the versions it was tested with, up to the next major version. With a version outside that range, the game stops at load and names the mod and the range, instead of crashing later in the middle of play.
 
-| Mod | Accepted versions (26.1) |
+| Mod | Accepted versions (26.1.2) |
 |---|---|
 | Tough As Nails | 21.11.0.6 up to 22 |
-| Droplets of Thirst | 26.1-1.0.0 up to 26.1-2 |
+| Droplets of Thirst | 26.1.2-1.0.0 up to 26.1.2-2 |
 | Serene Seasons | 26.1.2.0.4 up to 26.1.3 |
 | Curios | 15.0.0 up to 16 |
 | Jade | 26.1.11 up to 26.2 |

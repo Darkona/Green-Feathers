@@ -21,7 +21,7 @@ Feathers of Fatigue for Minecraft 26.3, on NeoForge 26.3.0.36-beta. Same as 26.2
 
 ### Compatibility
 
-- Tested with Droplets of Thirst 26.3-1.0.0-beta.1, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
+- Works with Droplets of Thirst 26.3-1.0.0-beta.1, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
 - NeoForge 26.3 is still in beta, and 26.3.0.37-beta renames the config types: mods built for one side of that change do not load on the other. This build, like Droplets of Thirst 26.3-1.0.0-beta.1, is for 26.3.0.36-beta only, and so are the compat versions above (Puzzles Lib 26.3.9 needs a newer NeoForge).
 
 ### For mod developers
@@ -40,7 +40,7 @@ Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 
 ### Compatibility
 
 - Naturalist is back: its ostriches, giraffes and elephants get feathers again, as on 1.21.1.
-- Tested with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
+- Works with Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its newest build for 26.2, despite the number), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0 and Naturalist 2.0.6.
 
 ### For mod developers
 
@@ -70,7 +70,7 @@ Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.112 or later. Same 
 
 ### Compatibility
 
-- Tested with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
+- Works with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
 - Serene Seasons 26.1.2.0.7 crashes the client on its own as soon as a world renders; use 26.1.2.0.4 to 26.1.2.0.6.
 
 ### For mod developers

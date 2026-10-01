@@ -17,7 +17,7 @@ Feathers of Fatigue for Minecraft 1.21.11, on NeoForge 21.11.45 or later. It is 
 
 ### Compatibility
 
-- Tested with Droplets of Thirst 1.21.11-1.0.0, Tough As Nails 21.11.0.4, Serene Seasons 21.11.0.5 with GlitchCore 21.11.0.4, Curios 14.0.0, Jade 21.1.7, AppleSkin 3.0.8 and Overflowing Bars 21.11.0 with Puzzles Lib 21.11.13.
+- Works with Droplets of Thirst 1.21.11-1.0.0, Tough As Nails 21.11.0.4, Serene Seasons 21.11.0.5 with GlitchCore 21.11.0.4, Curios 14.0.0, Jade 21.1.7, AppleSkin 3.0.8 and Overflowing Bars 21.11.0 with Puzzles Lib 21.11.13.
 
 ### For mod developers
 
@@ -47,7 +47,7 @@ Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.112 or later. Same 
 
 ### Compatibility
 
-- Tested with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
+- Works with Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9 and Overflowing Bars 26.1.0.
 - Serene Seasons 26.1.2.0.7 crashes the client on its own as soon as a world renders; use 26.1.2.0.4 to 26.1.2.0.6.
 
 ### For mod developers

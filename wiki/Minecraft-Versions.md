@@ -6,7 +6,7 @@ This wiki describes the newest version of Feathers of Fatigue, for Minecraft 26.
 |---|---|---|---|
 | 26.3 | NeoForge 26.3.0.36-beta | Newest | None: this whole wiki |
 | 26.2 | NeoForge 26.2.0.88 or later | Supported | [26.2](#262-neoforge-262) |
-| 26.1 | NeoForge 26.1.2.109 or later | Supported | [26.1](#261-neoforge-2612) |
+| 26.1.2 | NeoForge 26.1.2.109 or later | Supported | [26.1.2](#2612-neoforge-2612) |
 | 1.21.11 | NeoForge 21.11.42 or later | Supported | [1.21.11](#12111-neoforge-2111) |
 | 1.21.1 | NeoForge 21.1 | Supported | [1.21.1](#1211-neoforge-211) |
 | 1.20.1 | Forge 47 | Supported | [1.20.1](#1201-forge-47) |
@@ -41,7 +41,7 @@ This version needs exactly NeoForge 26.3.0.36-beta. NeoForge 26.3 is in beta, an
 
 **Tested with:** Droplets of Thirst 26.2-1.0.0, Tough As Nails 21.11.0.8, Serene Seasons 26.1.2.0.6 (its build for 26.2), Curios 16.0.0, Jade 26.2.10, AppleSkin 3.0.10, Overflowing Bars 26.2.0, Naturalist 2.0.6.
 
-## 26.1 (NeoForge 26.1.2)
+## 26.1.2 (NeoForge 26.1.2)
 
 **Has, on top of 26.3:** Tough As Nails.
 
@@ -49,7 +49,7 @@ This version needs exactly NeoForge 26.3.0.36-beta. NeoForge 26.3 is in beta, an
 
 - **Naturalist:** it has no build for Minecraft 26.1, so its mounts do not exist.
 
-**Tested with:** Droplets of Thirst 26.1-1.0.0, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9, Overflowing Bars 26.1.0. Serene Seasons 26.1.2.0.7 crashes the client on its own. Use 26.1.2.0.4 to 26.1.2.0.6.
+**Tested with:** Droplets of Thirst 26.1.2-1.0.1, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9, Overflowing Bars 26.1.0. Serene Seasons 26.1.2.0.7 crashes the client on its own. Use 26.1.2.0.4 to 26.1.2.0.6.
 
 ## 1.21.11 (NeoForge 21.11)
 

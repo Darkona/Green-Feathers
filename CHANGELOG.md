@@ -2,9 +2,9 @@
 
 Changes by feature, newest version first.
 
-## 1.21.1-1.0.0 (NeoForge), unreleased
+## 1.21.1-1.0.0 (NeoForge), 2026-10-01
 
-A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
+A rewrite of Green Feathers for NeoForge 1.21.1 (21.1.252 or later), with a new API.
 
 ### Renamed to Feathers of Fatigue
 
@@ -80,5 +80,4 @@ A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 
 ## Planned
 
-- A port to Minecraft 26.2 (NeoForge).
-- The wiki gets a section per Minecraft version where the versions differ.
+- Nothing for 1.21.1 at the moment.

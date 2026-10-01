@@ -31,7 +31,7 @@ Feathers of Fatigue calls into these mods directly, so it accepts the versions i
 | Cold Sweat | 2.4.3.1 up to 3 |
 | Tough As Nails | 10.1.0.13 up to 11 |
 | Legendary Survival Overhaul | 2.4.7.2 up to 3 |
-| Droplets of Thirst | 1.21.1-3.0.0 up to 1.21.1-4 |
+| Droplets of Thirst | 1.21.1-1.0.0 up to 1.21.1-2 |
 | Thirst Was Taken | 1.21.1-2.1.5 up to 1.21.1-3 |
 | Serene Seasons | 10.1.0.9 up to 11 |
 | Curios | 9.5.1 up to 10 |

@@ -8,7 +8,11 @@ Planned: Cold Sweat, Thirst Was Taken and Legendary Survival Overhaul on Minecra
 
 ## [1.0.1] - 2026-10-01
 
+### Added
+- 2026-10-01: Another mod can take over player actions through the API: `FeathersAPI.takeOverPlayerActions(modId)`, called during mod construction or common setup, turns the basic exertion (the sprint and jump costs) off, so a player never pays twice for the same action. `FeathersAPI.arePlayerActionsTakenOver()` and `FeathersAPI.getPlayerActionOwners()` read it, and the comment of `basic_exertion_enabled` says so. Released as `<minecraft>-1.0.1` on each Minecraft version, except 26.1.2 (`26.1.2-1.0.2`, after the relabel below) and 26.3 (`26.3-1.0.0-beta.2`).
+
 ### Changed
+- 2026-10-01: On 26.1.2, 26.1.2-1.0.2 requires NeoForge 26.1.2.109 or newer (it was 26.1.2.112), like Droplets of Thirst 26.1.2-1.0.2: KubeJS 8.0.6 only loads on NeoForge 26.1.2.109. It is built against Droplets of Thirst 26.1.2-1.0.2.
 - 2026-10-01: On 26.1.2, the build is labeled with the Minecraft version it runs on: 26.1.2-1.0.1 is 26.1-1.0.0 under its new name, with the same features, config and API. It is built against Droplets of Thirst 26.1.2-1.0.1 and accepts Droplets of Thirst 26.1.2-1.0.0 up to 26.1.2-2. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1.2-1.0.1`.
 
 ## [1.0.0] - 2026-10-01

@@ -10,7 +10,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Feathers of Fatigue: a stamina bar of feathers that any mod can spend.
@@ -37,6 +40,10 @@ public final class FeathersAPI {
     public static final int API_VERSION = 2;
 
     private static FeathersService service;
+
+    /** Mods that charge player actions themselves: see {@link #takeOverPlayerActions}. */
+    private static final Set<String> playerActionOwners = ConcurrentHashMap.newKeySet();
+    private static volatile boolean playerActionsTakenOver;
 
     private FeathersAPI() {}
 
@@ -369,6 +376,36 @@ public final class FeathersAPI {
      */
     public static void registerStaminaModifier(ResourceLocation id, int ordinal, StaminaModifier modifier) {
         service().registerStaminaModifier(id, ordinal, modifier);
+    }
+
+    /**
+     * Declares that a mod charges player actions itself, such as sprinting and jumping. Feathers of Fatigue then turns
+     * off its own costs for those actions (the basic exertion), so a player never pays twice. Call it during mod
+     * construction or common setup, which run on both sides, before any player ticks. Thread safe. It cannot be undone.
+     *
+     * @param modId the id of the mod that takes over player actions
+     */
+    public static void takeOverPlayerActions(String modId) {
+        playerActionOwners.add(Objects.requireNonNull(modId, "modId"));
+        playerActionsTakenOver = true;
+    }
+
+    /**
+     * Checks whether another mod took over player actions through {@link #takeOverPlayerActions}.
+     *
+     * @return {@code true} when at least one mod charges player actions itself
+     */
+    public static boolean arePlayerActionsTakenOver() {
+        return playerActionsTakenOver;
+    }
+
+    /**
+     * Gets the mods that took over player actions through {@link #takeOverPlayerActions}.
+     *
+     * @return a live, read-only view of their ids
+     */
+    public static Set<String> getPlayerActionOwners() {
+        return Collections.unmodifiableSet(playerActionOwners);
     }
 
     /**

@@ -2,9 +2,9 @@
 
 Changes by feature, newest version first.
 
-## 26.3-2.0.0 (NeoForge), unreleased
+## 26.3-1.0.0-beta.1 (NeoForge), unreleased
 
-Feathers of Fatigue for Minecraft 26.3, on NeoForge 26.3.0.36-beta. Same as 26.2-2.0.0 below, except for what this section lists.
+Feathers of Fatigue for Minecraft 26.3, on NeoForge 26.3.0.36-beta. Same as 26.2-1.0.0 below, except for what this section lists.
 
 ### Potions
 
@@ -12,21 +12,21 @@ Feathers of Fatigue for Minecraft 26.3, on NeoForge 26.3.0.36-beta. Same as 26.2
 
 ### Compatibility
 
-- Tested with Droplets of Thirst 26.3-1.0.0, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
-- NeoForge 26.3 is still in beta, and 26.3.0.37-beta renames the config types: mods built for one side of that change do not load on the other. This build, like Droplets of Thirst 26.3-1.0.0, is for 26.3.0.36-beta only, and so are the compat versions above (Puzzles Lib 26.3.9 needs a newer NeoForge).
+- Tested with Droplets of Thirst 26.3-1.0.0-beta.1, Serene Seasons 26.1.2.0.7 (its build for 26.3, despite the number), Curios 17.0.0-beta.2, Jade 26.3.1, AppleSkin 3.0.10, Overflowing Bars 26.3.0 with Puzzles Lib 26.3.8, and Naturalist 2.0.6.
+- NeoForge 26.3 is still in beta, and 26.3.0.37-beta renames the config types: mods built for one side of that change do not load on the other. This build, like Droplets of Thirst 26.3-1.0.0-beta.1, is for 26.3.0.36-beta only, and so are the compat versions above (Puzzles Lib 26.3.9 needs a newer NeoForge).
 
 ### For mod developers
 
-- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-2.0.0`, with the same API as 26.1.
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.3-1.0.0-beta.1`, with the same API as 26.1.
 
 ### Not in this version
 
 - **Tough As Nails:** no build for Minecraft 26.3; its compat and config section are left out. Droplets of Thirst covers thirst, Serene Seasons the seasons' cold and heat.
 - **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul, Mob Wrangler:** still no build, as on 26.2.
 
-## 26.2-2.0.0 (NeoForge), unreleased
+## 26.2-1.0.0 (NeoForge), unreleased
 
-Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 26.1-2.0.0 below, except for what this section lists.
+Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 26.1-1.0.0 below, except for what this section lists.
 
 ### Compatibility
 
@@ -35,16 +35,16 @@ Feathers of Fatigue for Minecraft 26.2, on NeoForge 26.2.0.88 or later. Same as 
 
 ### For mod developers
 
-- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.2-2.0.0`, with the same API as 26.1.
+- The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.2-1.0.0`, with the same API as 26.1.
 
 ### Not in this version
 
 - **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** still no build for Minecraft 26.2; their compats and config sections are left out, as on 26.1.
 - **Mob Wrangler:** no build for Minecraft 26.2.
 
-## 26.1-2.0.0 (NeoForge), unreleased
+## 26.1-1.0.0 (NeoForge), unreleased
 
-Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same features, config and API as 1.21.1-2.0.0 below, except for what this section lists.
+Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same features, config and API as 1.21.1-1.0.0 below, except for what this section lists.
 
 ### Armor weight
 
@@ -59,14 +59,14 @@ Feathers of Fatigue for Minecraft 26.1.2, on NeoForge 26.1.2.109 or later. Same 
 
 ### For mod developers
 
-- The API is the same, with Minecraft's renames: `ResourceLocation` is now `Identifier` in every signature. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1-2.0.0`.
+- The API is the same, with Minecraft's renames: `ResourceLocation` is now `Identifier` in every signature. The API jar is `com.darkona.feathersoffatigue:feathers-of-fatigue-api:26.1-1.0.0`.
 
 ### Not in this version
 
 - **Cold Sweat, Thirst Was Taken, Legendary Survival Overhaul:** none of them has a build for Minecraft 26.1. Their compats and config sections are left out; Droplets of Thirst and Tough As Nails cover thirst, and Tough As Nails temperature.
 - **Naturalist, Mob Wrangler:** no build for Minecraft 26.1, so their mounts are not there to get feathers. The data map entries for them stay, and apply when the mods come.
 
-## 1.21.1-2.0.0 (NeoForge), unreleased
+## 1.21.1-1.0.0 (NeoForge), unreleased
 
 A rewrite of Green Feathers for NeoForge 1.21.1, with a new API.
 

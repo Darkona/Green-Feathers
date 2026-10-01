@@ -68,7 +68,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.19.2 (through the 1.20.1
 
 ### Compatibility
 
-Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.19.2 Forge builds. Cold Sweat, Droplets of Thirst, Thirst Was Taken, Curios, Jade and Overflowing Bars accept versions up to their next major one: another version stops the game at load with a message instead of a crash in play. Tough As Nails and Serene Seasons jars declare no version, so they have no range.
+Each one only does something when its mod is installed, and can be turned off in the config. Works with these 1.19.2 Forge builds. Cold Sweat, Droplets of Thirst, Thirst Was Taken, Curios, Jade and Overflowing Bars accept versions up to their next major one: another version stops the game at load with a message instead of a crash in play. Tough As Nails and Serene Seasons jars declare no version, so they have no range.
 
 - Cold Sweat 2.4.3: body temperature decides cold and heat.
 - Tough As Nails 8.0.0.78: its temperature decides cold and heat; its thirst affects regeneration.
@@ -78,7 +78,7 @@ Each one only does something when its mod is installed, and can be turned off in
 - Curios 1.19.2-5.1.6.4: the Feather Ring goes in a ring slot.
 - Jade 8.9.2: looking at a mount shows its stamina.
 - AppleSkin 2.4.2, Overflowing Bars 4.0.1: sit nicely alongside the feathers.
-- Mounts from other mods listed in the mount stats data map get feathers when those mods are installed (tested with Naturalist 4.0.3).
+- Mounts from other mods listed in the mount stats data map get feathers when those mods are installed (works with Naturalist 4.0.3).
 
 ### Configuration
 

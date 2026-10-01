@@ -68,7 +68,7 @@ The Green Feathers rewrite of 1.21.1, ported to Forge 1.20.1 with the same featu
 
 ### Compatibility
 
-Each one only does something when its mod is installed, and can be turned off in the config. Tested with these 1.20.1 Forge builds, and each accepts versions up to its next major one: another version stops the game at load with a message instead of a crash in play.
+Each one only does something when its mod is installed, and can be turned off in the config. Works with these 1.20.1 Forge builds, and each accepts versions up to its next major one: another version stops the game at load with a message instead of a crash in play.
 
 - Cold Sweat 2.4.3.2: body temperature decides cold and heat.
 - Tough As Nails 9.2.0.171: its temperature decides cold and heat; its thirst affects regeneration.
@@ -79,7 +79,7 @@ Each one only does something when its mod is installed, and can be turned off in
 - Curios 5.14.1: the Feather Ring goes in a ring slot.
 - Jade 11.13.3: looking at a mount shows its stamina.
 - AppleSkin 2.5.1, Overflowing Bars 8.0.1: sit nicely alongside the feathers.
-- Mounts from other mods listed in the mount stats data map get feathers when those mods are installed (tested with Naturalist 5.0pre2).
+- Mounts from other mods listed in the mount stats data map get feathers when those mods are installed (works with Naturalist 5.0pre2).
 
 ### Configuration
 

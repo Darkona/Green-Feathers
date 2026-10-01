@@ -12,7 +12,7 @@ base {
     archivesName = archives_base_name
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 java.withSourcesJar()
 
 // Test-only data, on the classpath only when running the GameTests: src/gametest/resources as is (it wins over the
@@ -222,4 +222,10 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+// The toolchain is Java 25 (java_version), which runs the game and the GameTests; the jar stays Java 21
+// (java_release), so it still loads for players on Java 21.
+tasks.withType(JavaCompile).configureEach {
+    options.release = java_release as int
 }

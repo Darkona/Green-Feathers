@@ -2,7 +2,7 @@
 
 Changes by feature, newest version first.
 
-## 1.20.1-2.0.0 (Forge 47), unreleased
+## 1.20.1-1.0.0 (Forge 47), unreleased
 
 The Green Feathers rewrite of 1.21.1, ported to Forge 1.20.1 with the same features, config options and API. It replaces the 1.3.0 code of this branch, and its API.
 

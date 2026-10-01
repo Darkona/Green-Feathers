@@ -13,7 +13,7 @@ base {
 }
 
 // Minecraft 1.20.1 runs on Java 17: compile for it and run the game on it.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 java.withSourcesJar()
 
 // Test-only data, on the classpath only when running the GameTests: src/gametest/resources as is (it wins over the

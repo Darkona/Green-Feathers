@@ -4,14 +4,14 @@ This wiki describes the newest version of Feathers of Fatigue, for Minecraft 26.
 
 | Minecraft | Loader | Download | Differences |
 |---|---|---|---|
-| 26.3 | NeoForge 26.3.0.36-beta only | [26.3-1.0.0-beta.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v26.3-1.0.0-beta.1) (beta) | None: this whole wiki |
-| 26.2 | NeoForge 26.2.0.88 or later | [26.2-1.0.0](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v26.2-1.0.0) | [26.2](#262-neoforge-262) |
-| 26.1.2 | NeoForge 26.1.2.112 or later | [26.1.2-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v26.1.2-1.0.1) | [26.1.2](#2612-neoforge-2612) |
-| 1.21.11 | NeoForge 21.11.45 or later | [1.21.11-1.0.0](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.21.11-1.0.0) | [1.21.11](#12111-neoforge-2111) |
-| 1.21.1 | NeoForge 21.1.252 or later | [1.21.1-1.0.0](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.21.1-1.0.0) | [1.21.1](#1211-neoforge-211) |
-| 1.20.1 | Forge 47.4.10 or later | [1.20.1-1.0.0](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.20.1-1.0.0) | [1.20.1](#1201-forge-47) |
-| 1.19.2 | Forge 43.5.2 or later | [1.19.2-1.0.0](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.19.2-1.0.0) | [1.19.2](#1192-forge-43) |
-| 1.18.2 | Forge 40.3.12 or later | [1.18.2-1.0.0](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.18.2-1.0.0) | [1.18.2](#1182-forge-40) |
+| 26.3 | NeoForge 26.3.0.36-beta only | [26.3-1.0.0-beta.2](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v26.3-1.0.0-beta.2) (beta) | None: this whole wiki |
+| 26.2 | NeoForge 26.2.0.88 or later | [26.2-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v26.2-1.0.1) | [26.2](#262-neoforge-262) |
+| 26.1.2 | NeoForge 26.1.2.109 or later | [26.1.2-1.0.2](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v26.1.2-1.0.2) | [26.1.2](#2612-neoforge-2612) |
+| 1.21.11 | NeoForge 21.11.45 or later | [1.21.11-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.21.11-1.0.1) | [1.21.11](#12111-neoforge-2111) |
+| 1.21.1 | NeoForge 21.1.252 or later | [1.21.1-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.21.1-1.0.1) | [1.21.1](#1211-neoforge-211) |
+| 1.20.1 | Forge 47.4.10 or later | [1.20.1-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.20.1-1.0.1) | [1.20.1](#1201-forge-47) |
+| 1.19.2 | Forge 43.5.2 or later | [1.19.2-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.19.2-1.0.1) | [1.19.2](#1192-forge-43) |
+| 1.18.2 | Forge 40.3.12 or later | [1.18.2-1.0.1](https://github.com/Darkona/feathers-of-fatigue/releases/tag/v1.18.2-1.0.1) | [1.18.2](#1182-forge-40) |
 
 Files and folders are the same in every version:
 
@@ -49,7 +49,7 @@ This version needs exactly NeoForge 26.3.0.36-beta. NeoForge 26.3 is in beta, an
 
 - **Naturalist:** it has no build for Minecraft 26.1, so its mounts do not exist.
 
-**Tested with:** Droplets of Thirst 26.1.2-1.0.1, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9, Overflowing Bars 26.1.0. Serene Seasons 26.1.2.0.7 crashes the client on its own. Use 26.1.2.0.4 to 26.1.2.0.6.
+**Tested with:** NeoForge 26.1.2.109 and 26.1.2.112, Droplets of Thirst 26.1.2-1.0.2, Tough As Nails 21.11.0.6, Serene Seasons 26.1.2.0.4, Curios 15.0.0, Jade 26.1.11, AppleSkin 3.0.9, Overflowing Bars 26.1.0. Serene Seasons 26.1.2.0.7 crashes the client on its own. Use 26.1.2.0.4 to 26.1.2.0.6.
 
 ## 1.21.11 (NeoForge 21.11)
 
